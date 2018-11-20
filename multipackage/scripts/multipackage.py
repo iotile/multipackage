@@ -60,8 +60,8 @@ def verify_environment():
 
     travis = TravisCI()
     travis.ensure_token()
-    travis.get_key('iotile/typedargs')
-    encoded = travis.encrypt_string('iotile/typedargs', "TEST_ENV=hello")
+    #travis.get_key('iotile/typedargs')
+    #encoded = travis.encrypt_string('iotile/typedargs', "TEST_ENV=hello")
 
 
 def build_parser():

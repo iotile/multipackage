@@ -100,3 +100,14 @@ def test_lf_section(tmpdir):
     section.update(section.section_contents)
 
     compare_files(path, "file_with_section_lf.nochange.txt")
+
+
+def test_start_end_delimiter(tmpdir):
+    """Make sure we can parse files with an ending delimiter."""
+
+    path = data_path(tmpdir, "file_start_end.txt")
+
+    section = ManagedFileSection(path, delimiter_start="<!-- ", delimiter_end=" -->")
+    assert section.file_exists is True
+    assert section.has_section is True
+    assert section.modified is False
