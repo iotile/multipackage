@@ -5,8 +5,9 @@ import argparse
 import sys
 import os
 import logging
+from multipackage import Repository
 from multipackage.travis import TravisCI
-from multipackage.exceptions import InvalidEnvironmentError
+from multipackage.exceptions import InvalidEnvironmentError, UsageError
 
 DESCRIPTION = \
 """Manage the build, test and release scripts of a multipackage python repo.
@@ -30,11 +31,6 @@ $ multipackage update <path to repo or cwd>
     Update the build and release scripts in the given repository to the
     latest version included with this multipackage program.
 
-$ multipackage verify <path to repo or cwd>
-
-    Verify that all of the multipackage build/release scripts in the given
-    repository are correctly installed and check for common errors.
-
 $ multipackage doctor
 
     Verify that all of your environment variables are set correctly for
@@ -45,6 +41,10 @@ $ multipackage info <path to repo or cwd>
     Get information on the packages inside the given repository.  The
     reposository must already have a working set of multipackage release
     scripts installed via a previous call to multipackage init.
+
+    This will also verify that all of the multipackage build/release scripts
+    in the given repository are correctly installed and check for common
+    errors.
 
 $ multipackage release <path to repo or cwd> <package name> <version>
 
@@ -64,6 +64,69 @@ def verify_environment():
     #encoded = travis.encrypt_string('iotile/typedargs', "TEST_ENV=hello")
 
 
+def create_repo(repo_path):
+    """Helper method to create a Repository object."""
+
+    if repo_path is None:
+        repo_path = os.getcwd()
+
+    return Repository(repo_path)
+
+
+def init_repo(repo_path, clean):
+    """Initialize or reinitialize a repository."""
+
+    repo = create_repo(repo_path)
+    repo.initialize(clean=clean)
+
+
+def verify_repo(repo_path):
+    """Get info on the given repository.
+
+    Args:
+        repo_path (str): The path to the repository.
+
+    Returns:
+        int: An error code indicating any issues.
+    """
+
+    repo = create_repo(repo_path)
+
+    if repo_path is None:
+        repo_path = ""
+
+    if repo.initialized is False:
+        print("\nSTATUS: Repository has not been set up with multipackage.\n")
+        print("Set it up with:\n\n\tmultipackage init {}\n".format(repo_path))
+        return 1
+
+    repo.manifest.verify_files()
+
+    if repo.clean and len(repo.warnings) == 0:
+        print("STATUS: Repository is up-to-date with no problems.\n")
+    elif repo.clean:
+        print("STATUS: Repository has %d warning(s)\n" % len(repo.warnings))
+    else:
+        print("STATUS: Repository has %d error(s) that need to be addressed\n" % len(repo.errors))
+
+    if len(repo.errors) > 0:
+        print("ERRORS:")
+        for error in repo.errors:
+            print("  - {}: {}\n    Fix: {}".format(*error))
+
+        print()
+
+    if len(repo.warnings) > 0:
+        print("WARNINGS:")
+        for warning in repo.warnings:
+            print("  - {}: {}\n    Fix: {}".format(*warning))
+
+    if not repo.clean:
+        return 1
+
+    return 0 
+
+
 def build_parser():
     """Build the argument parser."""
     parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -77,6 +140,10 @@ def build_parser():
 
     _doctor_parser = subparser.add_parser('doctor', description="Verify your environment settings and connectivity.",
                                           help='verify your enviornment for multipackage usage')
+
+    info_parser = subparser.add_parser('info', description="Get info on the given repository and verify it is correctly installed",
+                                       help="get info and any errors with a repository")
+    info_parser.add_argument('repo', nargs='?', help="Optional path to repository, defaults to cwd")
 
     return parser
 
@@ -126,6 +193,15 @@ def print_environment_error(err):
     print("Suggestion: %s" % err.suggestion)
 
 
+def print_usage_error(err):
+    """Print an error about incorrect usage."""
+
+    print("USAGE ERROR: %s" % err.message)
+
+    if err.suggestion is not None:
+        print("Suggestion: %s" % err.suggestion)
+
+
 def main(argv=None):
     """Main entry point for multipackage console script."""
 
@@ -140,9 +216,16 @@ def main(argv=None):
     try:
         if args.action == 'doctor':
             verify_environment()
+        elif args.action == 'info':
+            return verify_repo(args.repo)
+        elif args.action == "init":
+            return init_repo(args.repo, args.clean)
         else:
             print("ERROR: Command Not Supported Yet")
             return 1
+    except UsageError as err:
+        print_usage_error(err)
+        return 1
     except InvalidEnvironmentError as err:
         print_environment_error(err)
         return 1

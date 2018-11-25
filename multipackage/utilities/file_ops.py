@@ -3,6 +3,7 @@
 from builtins import open
 import platform
 import os
+import json
 
 
 def atomic_save(target_path, data, encoding="utf-8"):
@@ -34,3 +35,19 @@ def atomic_save(target_path, data, encoding="utf-8"):
         outfile.write(data)
 
     os.rename(new_path, real_path)
+
+
+def atomic_json(target_path, obj):
+    """Atomically dump a dict as a json file.
+
+    Args:
+        target_path (str): The final path that the file should have.
+        obj (dict): The dictionary that should be dumped.
+    """
+
+    data = json.dumps(obj, indent=4)
+
+    if isinstance(data, bytes):
+        data = data.decode('utf-8')
+
+    atomic_save(target_path, data)

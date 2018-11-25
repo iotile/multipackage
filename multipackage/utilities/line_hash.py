@@ -28,4 +28,4 @@ def line_hash(lines, method="md5"):
     md5 = hashlib.md5()
     md5.update(data)
 
-    return md5.hexdigest().upper()
+    return "MD5:" + md5.hexdigest().upper()
