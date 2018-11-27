@@ -10,7 +10,7 @@ class BasicSubsystem:
         self._logger = logging.getLogger(__name__)
 
     def update(self, options):
-        """Update the linting subsystem."""
+        """Update the basic subsystem."""
 
         self._repo.ensure_lines(".gitignore", [
             "workspace/",
@@ -27,3 +27,6 @@ class BasicSubsystem:
             "twine",
             "pycryptodome"
         ])
+
+        self._repo.ensure_directory("scripts")
+        self._repo.ensure_template("scripts/components.txt", template="components.txt", overwrite=False)

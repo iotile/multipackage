@@ -59,7 +59,7 @@ jobs:
       language: python
       name: "Test Documentation Build"
       install:
-        - pip install -r requirements_build.txt -r requirements_test.txt -r requirements_doc.txt
+        - pip install -r requirements_build.txt -r requirements_doc.txt
         - pip install .
       script:
         - mkdir .tmp_doc
@@ -72,7 +72,7 @@ jobs:
 {% endif %}
 
 install:
-- pip install -r requirements_build.txt -r requirements_test.txt
+- pip install -r requirements_build.txt
 - pip install .
 script:
 - pytest test

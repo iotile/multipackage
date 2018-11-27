@@ -176,6 +176,31 @@ class ManifestFile:
         info = ManagedFile(key, abspath, status, actual_hash, hash_type)
         self.files[key] = info
 
+    def remove_file(self, path, force=False):
+        """Remove a managed file from the manifest.
+
+        This will remove the entry from this manifest for the file.
+        If the entry does not exist and force is False, an exception will
+        be raised.  If force is True, then this error will be silently ignored.
+
+        This method does not actually touch the file on disk, it just removes
+        the corresponding entry in this manifest file.
+
+        Args:
+            path (str): The path to the file to remove.
+            force (bool): Whether we should throw an error if the file is not
+                present in the manifest.  Default is False, which means throw
+                an error.
+        """
+
+        key = self._make_key(path)
+        if key not in self.files and not force:
+            self._logger.error("Attempted to remove unkown file %s from manifest", path)
+            raise InternalError("Attempted to remove file %s from Manifest but it was not present" % path, "Try using ManifestFile.remove_file(path, force=True)")
+
+        if key in self.files:
+            del self.files[key]
+
     def save(self):
         """Atomically save this file to disk."""
 

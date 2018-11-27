@@ -145,8 +145,8 @@ class ManagedFileSection:
         self.modified = actual_hash != section_hash
         self._start_line = start_line
 
-    def ensure_lines(self, lines):
-        """Ensure that the given lines are present in this file.
+    def ensure_lines(self, lines, present=True):
+        """Ensure that the given lines are present or absent in this file.
 
         Each line is added independently and no order is assumed. This method
         is idempotent so that you can call it repeatedly and each line will
@@ -157,15 +157,23 @@ class ManagedFileSection:
 
         Args:
             lines (list of str): A list of lines to add to the
-                file if they are not present.
+                file if they are not present or remove from the file if they are.
+                Whether the lines are added or removed is controlled by the
+                ``present`` parameter.
+            present (bool): If True, ensure lines are present (the default), if
+                False, ensure lines are absent.
         """
 
-        if self.section_contents is None:
-            self.section_contents = lines
+        if present:
+            if self.section_contents is None:
+                self.section_contents = lines
+            else:
+                for line in lines:
+                    if line not in self.section_contents:
+                        self.section_contents.append(line)
         else:
-            for line in lines:
-                if line not in self.section_contents:
-                    self.section_contents.append(line)
+            if self.section_contents is not None:
+                self.section_contents = [x for x in self.section_contents if x not in lines]
 
         self.update()
 

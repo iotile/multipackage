@@ -1,0 +1,16 @@
+# List of all component packages in this repository
+#
+# This is the master list that is used to determine which subfolders of
+# this repository contain python packages that should be tested and released.
+#
+# There should be one component listed on each line in the following format:
+# package_name: relative_path[, compatibility=(universal|python2|python3)]
+#
+# Whitespace is ignored.  The package name cannot contain a - character or
+# other special characters.  The relative path should be the path to the
+# folder containing the setup.py file for the package.
+# 
+# If the package is not compatible with either python 2 or python 3, you
+# can pass a compatibility flag, specifying which version of python it 
+# is compatible with.  The default is a universal package that is compatible
+# with both python 2 and python 3.

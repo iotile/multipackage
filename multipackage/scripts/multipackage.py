@@ -142,6 +142,12 @@ def verify_repo(repo_path):
     else:
         print("STATUS: Repository has %d error(s) that need to be addressed\n" % len(repo.errors))
 
+    print("COMPONENTS:")
+    for component in sorted(repo.components.values()):
+        print("  - %s: %s\n    python-version=%s" % component)
+
+    print()
+
     if len(repo.errors) > 0:
         print("ERRORS:")
         for error in repo.errors:

@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import os
+import re
 import json
 import logging
 from builtins import open
@@ -13,6 +14,8 @@ from . import subsystems
 
 
 ErrorMessage = namedtuple("ErrorMessage", ['file', 'message', 'suggestion'])
+Component = namedtuple("Component", ['name', 'relative_path', 'compatibility'])
+
 
 class Repository:
     """High-level representation of an entire repository.
@@ -31,7 +34,11 @@ class Repository:
     DEFAULT_TEMPLATE = "pypi_package"
     SETTINGS_FILE = "multipackage.json"
     MANIFEST_FILE = "multipackage_manifest.json"
+    SCRIPT_FOLDER = "scripts"
+    COMPONENT_FILE = "components.txt"
+    COMPONENT_REGEX = r"^(?P<package>[a-zA-Z_0-9]+):\s*(?P<path>[\.a-zA-Z_\-0-9\\/]+)(\s*,\s*compatibility=(?P<compat>universal|python2|python3))?\s*$"
     SETTINGS_VERSION = "1.0"
+
 
     def __init__(self, path):
         self.path = path
@@ -51,11 +58,14 @@ class Repository:
         self.options = {}
         self.errors = []
         self.warnings = []
+        self.components = {}
 
         self._try_load()
         self.manifest = ManifestFile(os.path.join(path, self.MANIFEST_FILE), self)
-
         self.git = GITRepository(self.path)
+
+        if self.initialized:
+            self._try_load_components()
 
     @property
     def clean(self):
@@ -75,6 +85,48 @@ class Repository:
 
         This is a string of the format user/repo_name.
         """
+
+    def _try_load_components(self):
+        """Try to load the list of components from this repository.
+
+        The format of the components text file is a list of lines:
+        <package_name>: <relative_path>, compatibility=[universal|python2|python3]
+        """
+
+        component_path = os.path.join(self.path, self.SCRIPT_FOLDER, self.COMPONENT_FILE)
+        relative_path = os.path.join(self.SCRIPT_FOLDER, self.COMPONENT_FILE)
+        if not os.path.exists(component_path):
+            self.add_warning(relative_path, "Missing components list", "Run `multipackage update` to reinitialize")
+            return
+
+        with open(component_path, "r", encoding="utf-8") as infile:
+            lines = infile.readlines()
+
+        regex = re.compile(self.COMPONENT_REGEX)
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith('#') or len(line) == 0:
+                continue
+
+            result = regex.match(line)
+            if result is None:
+                self.add_error(relative_path, "Could not parse line '%s' in components file" % line,
+                               "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
+                continue
+
+            package, path, compat = result.group("package", "path", "compat")
+            if compat is None:
+                compat = "universal"
+
+            if not os.path.isdir(os.path.join(self.path, path)):
+                self.add_error(relative_path, "Component folder '%s' specified in components file is not a directory" % path,
+                               "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
+                continue
+
+            component = Component(package, path, compat)
+            self._logger.debug("Adding component %s", component)
+            self.components[package] = component
 
     def _try_load(self):
         """Try to load settings for this repository."""
@@ -160,7 +212,7 @@ class Repository:
         self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type="json")
         self.manifest.save()
 
-    def ensure_lines(self, relative_path, lines, delimiter_start='#', delimiter_end=''):
+    def ensure_lines(self, relative_path, lines, present=True, delimiter_start='#', delimiter_end=''):
         """Ensure that the following lines are in the given file.
 
         This will create or update a ManagedSection and ensure that the
@@ -177,6 +229,8 @@ class Repository:
                 update.
             lines (list of str): A list of strings to add to the given file if
                 they do not exist.
+            present (bool): If True, ensure lines are present (the default), if
+                False, ensure lines are absent.
             delimiter_start (str): The character string that starts a managed file
                 section block header line.  This is usually a comment character
                 like '#'.
@@ -188,11 +242,26 @@ class Repository:
 
         path = os.path.join(self.path, relative_path)
         section = ManagedFileSection(path, delimiter_start=delimiter_start, delimiter_end=delimiter_end)
-        section.ensure_lines(lines)
+        section.ensure_lines(lines, present=present)
 
         self.manifest.update_file(path, hash_type="section")
 
-    def ensure_template(self, relative_path, template, variables=None):
+    def ensure_directory(self, relative_path):
+        """Ensure that a given directory exists.
+
+        Args:
+            relative_path (str): The relative path to the directory that we
+                wish to check.
+        """
+
+        path = os.path.join(self.path, relative_path)
+        if os.path.exists(path) and not os.path.isdir(path):
+            raise UsageError("Cannot create directory, a file is in its place: %s" % relative_path, "Remove or rename the file to make space for the directory")
+
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+    def ensure_template(self, relative_path, template, variables=None, present=True, overwrite=True):
         """Ensure that the contents of a given file match a template.
 
         This function will render the given template shipped with the
@@ -204,9 +273,24 @@ class Repository:
             template (str): The name of the template file to render
             variables (dict): A set of substitution variables to fill into
                 the template.
+            present (bool): If True, ensure lines are present (the default), if
+                False, ensure lines are absent.
+            overwrite (bool): Overwrite the file if it exists already. Setting this
+                to False will ensure that the file is added only if is absent,
+                allowing for initializing files that are not present without
+                subsequently overwriting them.
         """
-
         path = os.path.join(self.path, relative_path)
+
+        if present is False:
+            self.manifest.remove_file(path, force=True)
+            if os.path.exists(path):
+                os.remove(path)
+
+            return
+
+        if overwrite is False and os.path.exists(path):
+            return
 
         if variables is None:
             variables = {}
@@ -235,5 +319,6 @@ class Repository:
             subsystems.TravisSubsystem(self).update(self.options)
 
             self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type='json')
+            self.manifest.update_file(os.path.join(self.path, self.SCRIPT_FOLDER, self.COMPONENT_FILE))
         finally:
             self.manifest.save()
