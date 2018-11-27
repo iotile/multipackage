@@ -3,7 +3,7 @@
 from builtins import open
 import os
 import platform
-from multipackage.utilities import ManagedFileSection, dict_hash
+from multipackage.utilities import ManagedFileSection, dict_hash, find_toplevel_packages
 
 
 def data_path(tmpdir, name, allow_empty=False):
@@ -126,3 +126,10 @@ def test_dict_hash():
 
     hash_value = dict_hash(obj)
     assert hash_value == "MD5:07358855AB401EE3EAB3167DA585C70A"
+
+
+def test_find_toplevel_packages():
+    """Make sure we can find top level packages."""
+
+    packages = find_toplevel_packages(os.path.join(os.path.dirname(__file__), '..'))
+    assert packages == ['multipackage']

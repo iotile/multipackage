@@ -11,14 +11,32 @@ class DocumentationSubsystem:
         """Update the documentation subsystem."""
 
         self._repo.ensure_lines("requirements_doc.txt",
-                                ["sphinx", "jinja2"])
+                                ["sphinx", "jinja2", "sphinx_rtd_theme", "sphinxcontrib-programoutput",
+                                 "recommonmark"])
 
-        self._repo.ensure_lines(".gitignore", ['.tmp_docs'])
+        self._repo.ensure_lines(".gitignore", ['.tmp_docs', 'built_docs'])
 
         self._repo.ensure_directory("doc")
         self._repo.ensure_directory("doc/_static", gitkeep=True)
         self._repo.ensure_directory("doc/_template", gitkeep=True)
         self._repo.ensure_directory("built_docs", gitkeep=True)
 
-        self._repo.ensure_template("doc/_template/module.rst", template="module.rst")
-        self._repo.ensure_template("doc/_template/package.rst", template="package.rst")
+        variables = {
+            'options': options,
+            'components': self._repo.components,
+            'doc': options.get('documentation', {})
+        }
+
+        self._repo.ensure_template("doc/_template/module.rst", template="module.rst", raw=True)
+        self._repo.ensure_template("doc/_template/package.rst", template="package.rst", raw=True)
+
+        # Install our basic rst sphinx index files
+        self._repo.ensure_template("doc/conf.py", "conf.py.tpl", variables)
+        self._repo.ensure_template("doc/index.rst", "index.rst.tpl", variables, overwrite=False)
+        self._repo.ensure_template("doc/api.rst", "api.rst.tpl", variables)
+        self._repo.ensure_template("doc/release.rst", "release.rst.tpl", variables)
+
+        # Install the documentation building scripts
+        self._repo.ensure_script("scripts/generate_api.py", "generate_api.py")
+        self._repo.ensure_script("scripts/better_apidocs.py", "better_apidocs.py")
+        self._repo.ensure_template("scripts/build_documentation.py", "build_documentation.py.tpl", variables)

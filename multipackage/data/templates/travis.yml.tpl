@@ -58,23 +58,6 @@ jobs:
       python: "2.7"
       name: "Linux - Python 2.7"
       language: python
-    - os: linux
-      dist: xenial
-      sudo: false
-      python: "3.6"
-      language: python
-      name: "Test Documentation Build"
-      install:
-        - pip install -r requirements_build.txt -r requirements_doc.txt
-        - pip install .
-      script:
-        - mkdir .tmp_doc
-        - mkdir .tmp_html
-        - scripts/generate_api.sh
-        - python scripts/copy_docs.py doc .tmp_doc
-        - sphinx-build -W -E -b html .tmp_doc .tmp_html
-        - python scripts/copy_docs.py .tmp_html built_docs
-        - touch built_docs/.nojekyll
 {% endif %}
 
 install:
@@ -87,6 +70,7 @@ script:
 {% for _key, component in components|dictsort %}
 - cd {{ component.relative_path }} && pwd && pytest test
 {% endfor %}
+- python scripts/build_documentation.py
 
 notifications:
   on_success: always

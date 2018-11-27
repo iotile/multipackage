@@ -4,17 +4,18 @@ from __future__ import unicode_literals
 import os
 import re
 import json
+import shutil
 import logging
 from builtins import open
 from collections import namedtuple
 from .exceptions import UsageError
-from .utilities import atomic_json, ManagedFileSection, render_template, GITRepository
+from .utilities import atomic_json, ManagedFileSection, render_template, GITRepository, find_toplevel_packages
 from .manifest import ManifestFile
 from . import subsystems
 
 
 ErrorMessage = namedtuple("ErrorMessage", ['file', 'message', 'suggestion'])
-Component = namedtuple("Component", ['name', 'relative_path', 'compatibility'])
+Component = namedtuple("Component", ['name', 'relative_path', 'compatibility', 'packages'])
 
 
 class Repository:
@@ -130,7 +131,10 @@ class Repository:
                                "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
                 continue
 
-            component = Component(package, path, compat)
+            comp_path = os.path.join(self.path, path)
+            packages = find_toplevel_packages(comp_path)
+
+            component = Component(package, path, compat, packages)
             self._logger.debug("Adding component %s", component)
             self.components[package] = component
 
@@ -280,7 +284,44 @@ class Repository:
                 with open(gitkeep_path, "wb") as outfile:
                     pass
 
-    def ensure_template(self, relative_path, template, variables=None, present=True, overwrite=True):
+    def ensure_script(self, relative_path, source, present=True, overwrite=True):
+        """Ensure that a script file is copied.
+
+        This function will copy or remove the given script file. All script
+        files come from the multipackage/data/scripts folder.
+
+        Args:
+            relative_path (str): The relative path to the file that we want to
+                update.
+            source (str): The name of the template file to render
+            present (bool): If True, ensure lines are present (the default), if
+                False, ensure lines are absent.
+            overwrite (bool): Overwrite the file if it exists already. Setting this
+                to False will ensure that the file is added only if is absent,
+                allowing for initializing files that are not present without
+                subsequently overwriting them.
+        """
+
+        from pkg_resources import resource_filename, Requirement
+
+        path = os.path.join(self.path, relative_path)
+
+        if present is False:
+            self.manifest.remove_file(path, force=True)
+            if os.path.exists(path):
+                os.remove(path)
+
+            return
+
+        if overwrite is False and os.path.exists(path):
+            return
+
+        source_path = os.path.join(resource_filename(Requirement.parse("multipackage"), "multipackage/data/scripts"), source)
+        shutil.copyfile(source_path, path)
+
+        self.manifest.update_file(path)
+
+    def ensure_template(self, relative_path, template, variables=None, present=True, overwrite=True, raw=False):
         """Ensure that the contents of a given file match a template.
 
         This function will render the given template shipped with the
@@ -298,7 +339,11 @@ class Repository:
                 to False will ensure that the file is added only if is absent,
                 allowing for initializing files that are not present without
                 subsequently overwriting them.
+            raw (bool): Do not actually fill in the template, just copy it into place.
+                This is useful if the file itself is a jinja2 template that should
+                be rendered later.
         """
+
         path = os.path.join(self.path, relative_path)
 
         if present is False:
@@ -309,6 +354,12 @@ class Repository:
             return
 
         if overwrite is False and os.path.exists(path):
+            return
+
+        if raw:
+            from pkg_resources import resource_filename, Requirement
+            source_path = os.path.join(resource_filename(Requirement.parse("multipackage"), "multipackage/data/templates"), template)
+            shutil.copyfile(source_path, path)
             return
 
         if variables is None:
