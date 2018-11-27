@@ -70,16 +70,8 @@ install:
 - pip install ./
 
 script:
-- cd ./ && cwd && pytest test
+- cd ./ && pwd && pytest test
 
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: python scripts/release.py $TRAVIS_TAG
-  on:
-    branch: master
-    tags: true
-    condition: $TRAVIS_PYTHON_VERSION = "2.7"
 notifications:
   on_success: always
   on_failure: always

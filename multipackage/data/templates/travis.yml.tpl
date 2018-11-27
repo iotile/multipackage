@@ -79,17 +79,9 @@ install:
 
 script:
 {% for _key, component in components|dictsort %}
-- cd {{ component.relative_path }} && cwd && pytest test
+- cd {{ component.relative_path }} && pwd && pytest test
 {% endfor %}
 
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: python scripts/release.py $TRAVIS_TAG
-  on:
-    branch: master
-    tags: true
-    condition: $TRAVIS_PYTHON_VERSION = "2.7"
 notifications:
   on_success: always
   on_failure: always
