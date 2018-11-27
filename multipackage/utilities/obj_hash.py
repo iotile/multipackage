@@ -53,6 +53,9 @@ def dict_hash(obj, method="md5"):
 
 
 def _md5_hash(data):
+    if not isinstance(data, bytes):
+        data = data.encode('utf-8')
+
     md5 = hashlib.md5()
     md5.update(data)
 

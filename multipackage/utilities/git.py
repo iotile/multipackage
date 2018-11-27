@@ -25,6 +25,7 @@ class GITRepository:
 
         try:
             contents = subprocess.check_output(['git', '-C', self.path, 'status', '--porcelain=v2', '-b'], stderr=subprocess.PIPE)
+            contents = contents.decode('utf-8')
         except subprocess.CalledProcessError:
             raise UsageError("Not a valid git repository: %s" % self.path, "Make sure the path is correct")
 
@@ -41,6 +42,7 @@ class GITRepository:
         """
 
         contents = subprocess.check_output(['git', '-C', self.path, 'remote', 'get-url', name])
+        contents = contents.decode('utf-8')
         return contents.rstrip()
 
     def github_name(self, name="origin"):
@@ -66,6 +68,7 @@ class GITRepository:
 
         try:
             version_string = subprocess.check_output(['git', '--version'])
+            version_string = version_string.decode('utf-8')
         except subprocess.CalledProcessError:
             raise MissingPackageError("git", "Git must be installed")
 
