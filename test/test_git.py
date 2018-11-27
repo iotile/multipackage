@@ -11,10 +11,14 @@ REPO_DIR = os.path.join(os.path.dirname(__file__), '..')
 NONREPO_DIR = os.path.join(REPO_DIR, '..')
 
 def test_git_remote():
-    """Ensure that git remote works."""
+    """Ensure that git remote works.
+
+    Note that we check both clone URLS since travis uses https to clone rather
+    than ssh."""
 
     repo = GITRepository(REPO_DIR)
-    assert repo.remote() == "git@github.com:iotile/python_multipackage.git"
+    assert repo.remote() in ("git@github.com:iotile/python_multipackage.git",
+                             "https://github.com/iotile/python_multipackage.git")
 
     with pytest.raises(UsageError):
         GITRepository(NONREPO_DIR)
