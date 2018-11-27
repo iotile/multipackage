@@ -3,5 +3,6 @@
 from .linting import LintingSubsystem
 from .basic import BasicSubsystem
 from .travis import TravisSubsystem
+from .docs import DocumentationSubsystem
 
-__all__ = ['LintingSubsystem', 'BasicSubsystem', 'TravisSubsystem']
+__all__ = ['LintingSubsystem', 'BasicSubsystem', 'TravisSubsystem', 'DocumentationSubsystem']

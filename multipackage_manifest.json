@@ -3,16 +3,24 @@
         "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1", 
         "hash_type": "line"
     }, 
-    ".gitignore": {
-        "hash": "MD5:3FC3B5536468798AAC3FC2F973542EF2", 
-        "hash_type": "section"
+    "doc/_template/module.rst": {
+        "hash": "MD5:755FAD8AC90F86A047D6A2BCB1DA16F1", 
+        "hash_type": "line"
+    }, 
+    ".editorconfig": {
+        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943", 
+        "hash_type": "line"
     }, 
     "requirements_build.txt": {
         "hash": "MD5:EF4F76A18BEDA2B13976B0655F20E637", 
         "hash_type": "section"
     }, 
-    ".editorconfig": {
-        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943", 
+    ".gitignore": {
+        "hash": "MD5:9331DF05700DF6938DDFB143BFB85FBD", 
+        "hash_type": "section"
+    }, 
+    "doc/_template/package.rst": {
+        "hash": "MD5:5929DFF8A6F8DEB44A2038E3F76EE7F1", 
         "hash_type": "line"
     }, 
     ".pylintrc": {
@@ -26,5 +34,9 @@
     "multipackage.json": {
         "hash": "MD5:32F9347D426B87235EF56F2CA41DAD2B", 
         "hash_type": "json"
+    }, 
+    "requirements_doc.txt": {
+        "hash": "MD5:47C10C8D2FD7422C98067491B494357C", 
+        "hash_type": "section"
     }
 }

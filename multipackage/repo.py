@@ -257,12 +257,14 @@ class Repository:
 
         self.manifest.update_file(path, hash_type="section")
 
-    def ensure_directory(self, relative_path):
+    def ensure_directory(self, relative_path, gitkeep=False):
         """Ensure that a given directory exists.
 
         Args:
             relative_path (str): The relative path to the directory that we
                 wish to check.
+            gitkeep (bool): Also insert an unmanaged .gitkeep file to ensure
+                the directory is saved in the git repo history.
         """
 
         path = os.path.join(self.path, relative_path)
@@ -271,6 +273,12 @@ class Repository:
 
         if not os.path.exists(path):
             os.mkdir(path)
+
+        if gitkeep:
+            gitkeep_path = os.path.join(path, ".gitkeep")
+            if not os.path.exists(gitkeep_path):
+                with open(gitkeep_path, "wb") as outfile:
+                    pass
 
     def ensure_template(self, relative_path, template, variables=None, present=True, overwrite=True):
         """Ensure that the contents of a given file match a template.
@@ -328,6 +336,7 @@ class Repository:
             subsystems.BasicSubsystem(self).update(self.options)
             subsystems.LintingSubsystem(self).update(self.options)
             subsystems.TravisSubsystem(self).update(self.options)
+            subsystems.DocumentationSubsystem(self).update(self.options)
 
             self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type='json')
             self.manifest.update_file(os.path.join(self.path, self.SCRIPT_FOLDER, self.COMPONENT_FILE))

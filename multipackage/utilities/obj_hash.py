@@ -3,6 +3,8 @@
 from __future__ import unicode_literals
 import hashlib
 import json
+import fnmatch
+import os
 
 
 def line_hash(lines, method="md5"):
@@ -50,6 +52,56 @@ def dict_hash(obj, method="md5"):
 
     data = json.dumps(obj, sort_keys=True)
     return _md5_hash(data)
+
+
+
+def directory_hash(path, glob="*"):
+    """Hash all files in a given folder.
+
+    This will return a hash value that will tell you if any file has changed
+    in the given directory.  You can calculate the hash only over a specific
+    subset of the files by using glob which will be passed to fnmatch to
+    select files.
+
+    The hash value will detect:
+     - a file is added
+     - a file is removed
+     - a file name is changed
+     - a file is changed in anyway
+
+    The hash value is stable on multiple operating systems and across line
+    endings for text files.  The name of the parent directory is not part of
+    the hash value so it is useful for ensuring that a given folder has the
+    same contents.
+
+    **This function assumes all files are text files and calculates a
+    line-ending independing hash**
+
+    Args:
+        path (str): The path to the directory that we want to hash.
+        glob (str): Optional wildcard specifier for selecting which
+            files should be hashed.
+
+    Returns:
+        str: The hash digest as a hex string in uppercase.
+    """
+
+    files = os.listdir(path)
+    selected = fnmatch.filter(files, glob)
+    selected.sort()
+
+    md5 = hashlib.md5()
+    hashes = [line_hash(x) for x in selected]
+
+    md5.update(b"START OF DIRECTORY")
+    md5.update(b"File count: %d" % len(selected))
+
+    for name, hash_value in zip(selected, hashes):
+        md5.update(b"START OF FILE: " + name.encode('utf-8'))
+        md5.update(hash_value.encode('utf-8'))
+
+    md5.update(b"END OF DIRECTORY")
+    return "MD5:" + md5.hexdigest().upper()
 
 
 def _md5_hash(data):
