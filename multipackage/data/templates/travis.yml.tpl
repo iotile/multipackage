@@ -61,7 +61,7 @@ jobs:
 {% endif %}
 
 install:
-- pip install -r requirements_build.txt
+- pip install -r requirements_build.txt -r requirements_doc.txt
 {% for _key, component in components|dictsort %}
 - pip install {{ component.relative_path }}
 {% endfor %}

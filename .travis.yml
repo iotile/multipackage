@@ -55,7 +55,7 @@ jobs:
       language: python
 
 install:
-- pip install -r requirements_build.txt
+- pip install -r requirements_build.txt -r requirements_doc.txt
 - pip install ./
 
 script:
