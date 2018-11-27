@@ -73,10 +73,14 @@ jobs:
 
 install:
 - pip install -r requirements_build.txt
-- pip install .
+{% for _key, component in components|dictsort %}
+- pip install {{ component.relative_path }}
+{% endfor %}
+
 script:
-- pytest test
-- pylint --rcfile=.pylintrc typedargs
+{% for _key, component in components|dictsort %}
+- cd {{ component.relative_path }} && cwd && pytest test
+{% endfor %}
 
 deploy:
   skip_cleanup: true

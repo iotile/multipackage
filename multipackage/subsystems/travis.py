@@ -13,7 +13,8 @@ class TravisSubsystem:
         """Update the linting subsystem."""
 
         variables = {
-            'options': options
+            'options': options,
+            'components': self._repo.components
         }
 
         self._repo.ensure_template(".travis.yml", "travis.yml.tpl", variables)

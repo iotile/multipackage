@@ -67,10 +67,10 @@ jobs:
 
 install:
 - pip install -r requirements_build.txt
-- pip install .
+- pip install ./
+
 script:
-- pytest test
-- pylint --rcfile=.pylintrc typedargs
+- cd ./ && cwd && pytest test
 
 deploy:
   skip_cleanup: true
