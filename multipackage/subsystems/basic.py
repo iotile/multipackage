@@ -25,7 +25,8 @@ class BasicSubsystem:
         self._repo.ensure_lines("requirements_build.txt", [
             "requests",
             "twine",
-            "pycryptodome"
+            "pycryptodome",
+            "pytest"
         ])
 
         self._repo.ensure_directory("scripts")
