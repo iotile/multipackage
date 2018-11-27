@@ -7,7 +7,7 @@ import logging
 from builtins import open
 from collections import namedtuple
 from .exceptions import UsageError
-from .utilities import atomic_json, ManagedFileSection, render_template
+from .utilities import atomic_json, ManagedFileSection, render_template, GITRepository
 from .manifest import ManifestFile
 from . import subsystems
 
@@ -54,6 +54,8 @@ class Repository:
 
         self._try_load()
         self.manifest = ManifestFile(os.path.join(path, self.MANIFEST_FILE), self)
+
+        self.git = GITRepository(self.path)
 
     @property
     def clean(self):

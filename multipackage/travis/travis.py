@@ -75,13 +75,33 @@ class TravisCI:
         self._logger.error("Token check failed, response: %s, content=%s", resp, resp.text)
         raise InvalidEnvironmentError("TRAVIS_TOKEN", self.INVALID_REASON, self.SUGGESTION)
 
+    def _encode_repo_slug(self, repo_slug):
+        # Allow (org, repository) format for repo_slug
+        if isinstance(repo_slug, tuple):
+            repo_slug = "/".join(repo_slug)
+
+        return urllib.quote(repo_slug, safe='')
+
+    def get_info(self, repo_slug):
+        """Get info about this repository on Travis CI.
+
+        Args:
+            repo_slug (str): The repository slug to set up.
+
+        Returns:
+            dict: The repository info
+        """
+
+        encoded_slug = self._encode_repo_slug(repo_slug)
+        info = self._get_parse("repo/{}".format(encoded_slug))
+
+        self._logger.debug("Repository info on %s: %s", repo_slug, info)
+        return info
+
     def get_key(self, repo_slug):
         """Get the encryption key for a repository by its slug."""
 
-        if repo_slug in self._key_cache:
-            return self._key_cache[repo_slug]
-
-        encoded_slug = urllib.quote(repo_slug, safe='')
+        encoded_slug = self._encode_repo_slug(repo_slug)
 
         resp = self._get_parse("repo/{}/key_pair/generated".format(encoded_slug))
 
@@ -97,7 +117,7 @@ class TravisCI:
         return key
 
     def encrypt_string(self, repo_slug, text):
-        """Encyrpt a string using the repo's public key."""
+        """Encrypt a string using the repo's public key."""
 
         if not isinstance(text, bytes):
             text = text.encode('utf-8')

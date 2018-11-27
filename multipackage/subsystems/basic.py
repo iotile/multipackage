@@ -17,7 +17,13 @@ class BasicSubsystem:
             "*.egg-info/",
             "dist/*",
             "__pycache__",
-            "*.pyc"
+            "*.pyc",
+            ".pytest_cache/"
         ])
 
         self._repo.ensure_template(".editorconfig", template="editorconfig")
+        self._repo.ensure_lines("requirements_build.txt", [
+            "requests",
+            "twine",
+            "pycryptodome"
+        ])

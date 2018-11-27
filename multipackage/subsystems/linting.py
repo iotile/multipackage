@@ -10,5 +10,5 @@ class LintingSubsystem:
     def update(self, options):
         """Update the linting subsystem."""
 
-        self._repo.ensure_lines("requirements_test.txt", ["pylint"])
+        self._repo.ensure_lines("requirements_build.txt", ["pylint"])
         self._repo.ensure_template(".pylintrc", template="pylintrc")
