@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import os
 import platform
 from builtins import open
-from .line_hash import line_hash
+from .obj_hash import line_hash
 from .file_ops import atomic_save
 from ..exceptions import ManualInterventionError
 

@@ -5,6 +5,7 @@ jobs:
       os: osx
       language: sh
       python: "3.6"
+      name: "Mac OS - Python 3.6"
       addons:
         homebrew:
           packages:
@@ -17,6 +18,7 @@ jobs:
     - os: osx
       language: sh
       python: "2.7"
+      name: "Mac OS - Python 2.7"
       before_install:
         - python -m pip install virtualenv
         - virtualenv venv -p python2
@@ -27,6 +29,7 @@ jobs:
     - os: windows
       language: sh
       python: "3.6"
+      name: "Windows - Python 3.6"
       before_install:
         - choco install python3 --version 3.6.5
         - export PATH="/c/Python36:/c/Python36/Scripts:$PATH"
@@ -35,6 +38,7 @@ jobs:
     - os: windows
       language: sh
       python: "2.7"
+      name: "Windows - Python 2.7"
       before_install:
         - choco install python2
         - export PATH="/c/Python27:/c/Python27/Scripts:$PATH"
@@ -47,10 +51,12 @@ jobs:
       sudo: false
       python: "3.6"
       language: python
+      name: "Linux - Python 3.6"
     - os: linux
       dist: xenial
       sudo: false
       python: "2.7"
+      name: "Linux - Python 2.7"
       language: python
     - os: linux
       dist: xenial

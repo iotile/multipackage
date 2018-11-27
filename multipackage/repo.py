@@ -29,6 +29,8 @@ class Repository:
 
     Args:
         path (str): A path to the repository root directory.
+        nogit (bool): Optional parameter to support creating a repository
+            from a non-git repository.  This is useful for testing purposes.
     """
 
     DEFAULT_TEMPLATE = "pypi_package"
@@ -40,7 +42,7 @@ class Repository:
     SETTINGS_VERSION = "1.0"
 
 
-    def __init__(self, path):
+    def __init__(self, path, nogit=False):
         self.path = path
         self._logger = logging.getLogger(__name__)
 
@@ -62,7 +64,11 @@ class Repository:
 
         self._try_load()
         self.manifest = ManifestFile(os.path.join(path, self.MANIFEST_FILE), self)
-        self.git = GITRepository(self.path)
+
+        if nogit:
+            self.git = None
+        else:
+            self.git = GITRepository(self.path)
 
         if self.initialized:
             self._try_load_components()
@@ -210,6 +216,11 @@ class Repository:
         atomic_json(os.path.join(self.path, self.MANIFEST_FILE), {})
 
         self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type="json")
+
+        # Make sure we start off with a blank components file if it doesn't exist already
+        self.ensure_directory("scripts")
+        self.ensure_template("scripts/components.txt", template="components.txt", overwrite=False)
+
         self.manifest.save()
 
     def ensure_lines(self, relative_path, lines, present=True, delimiter_start='#', delimiter_end=''):

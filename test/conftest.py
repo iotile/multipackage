@@ -10,7 +10,7 @@ def bare_repo(tmpdir):
 
     folder = str(tmpdir.mkdir("bare_repo"))
 
-    return Repository(folder)
+    return Repository(folder, nogit=True)
 
 
 @pytest.fixture(scope="function")
@@ -19,7 +19,7 @@ def init_repo(tmpdir):
 
     folder = str(tmpdir.mkdir("init_repo"))
 
-    repo = Repository(folder)
+    repo = Repository(folder, nogit=True)
     repo.initialize()
 
-    return Repository(folder)
+    return Repository(folder, nogit=True)
