@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import hashlib
+import json
 
 
 def line_hash(lines, method="md5"):
@@ -24,7 +25,34 @@ def line_hash(lines, method="md5"):
 
 
     data = "\n".join([x.rstrip('\r\n') for x in lines])
+    return _md5_hash(data)
 
+
+def dict_hash(obj, method="md5"):
+    r"""Calculate a hash over a json-serializable dictionary.
+
+    The obj argument will be dumped to a json string with sorted
+    keys encoded as utf-8 and then that string will be hashed to
+    produce the hash value.
+
+    Args:
+        obj (dict): The json serializable dictionary that should
+            be hashed.
+        method (str): The name of the hash method, currently
+            only md5 is supported.
+
+    Returns:
+        str: The hash digest as a hex string in uppercase.
+    """
+
+    if method != 'md5':
+        raise ValueError("Unsupported hash algorithm: %s" % method)
+
+    data = json.dumps(obj, sort_keys=True)
+    return _md5_hash(data)
+
+
+def _md5_hash(data):
     md5 = hashlib.md5()
     md5.update(data)
 

@@ -1,0 +1,26 @@
+{
+    "multipackage.json": {
+        "hash": "MD5:32F9347D426B87235EF56F2CA41DAD2B", 
+        "hash_type": "json"
+    }, 
+    ".editorconfig": {
+        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943", 
+        "hash_type": "line"
+    }, 
+    "requirements_test.txt": {
+        "hash": "MD5:3DE3436108C5E7B9818CA66D698A56FC", 
+        "hash_type": "section"
+    }, 
+    ".gitignore": {
+        "hash": "MD5:47C2572B49D50723C6CCA3CA60026886", 
+        "hash_type": "section"
+    }, 
+    ".pylintrc": {
+        "hash": "MD5:C73A3B561CEF58737117F47C66364AFE", 
+        "hash_type": "line"
+    }, 
+    ".travis.yml": {
+        "hash": "MD5:6CD1F237F86FC6BA27EC43A307786A53", 
+        "hash_type": "line"
+    }
+}

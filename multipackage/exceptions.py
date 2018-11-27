@@ -28,7 +28,7 @@ class MissingPackageError(Exception):
     """Raised when a required support package is not present."""
 
     def __init__(self, package_name, reason):
-        super(MissingPackageError, self).__init__("Missing python package {}".format(package_name))
+        super(MissingPackageError, self).__init__("Missing package {}".format(package_name))
 
         self.package_name = package_name
         self.reason = reason

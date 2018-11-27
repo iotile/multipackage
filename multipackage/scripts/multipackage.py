@@ -8,6 +8,7 @@ import logging
 from multipackage import Repository
 from multipackage.travis import TravisCI
 from multipackage.exceptions import InvalidEnvironmentError, UsageError
+from multipackage.utilities import GITRepository
 
 DESCRIPTION = \
 """Manage the build, test and release scripts of a multipackage python repo.
@@ -60,6 +61,9 @@ def verify_environment():
 
     travis = TravisCI()
     travis.ensure_token()
+
+    GITRepository.version()
+
     #travis.get_key('iotile/typedargs')
     #encoded = travis.encrypt_string('iotile/typedargs', "TEST_ENV=hello")
 
@@ -80,6 +84,25 @@ def init_repo(repo_path, clean):
     repo.initialize(clean=clean)
 
 
+def update_repo(repo_path):
+    """Update the installed files in a repository."""
+
+    repo = create_repo(repo_path)
+
+    if repo.initialized is False:
+        print("\nSTATUS: Repository has not been set up with multipackage.\n")
+        print("Set it up with:\n\n\tmultipackage init {}\n".format(repo_path))
+        return 1
+
+    if not repo.clean:
+        print("ERROR: Repository has errors, please correct them first\n")
+        print("    multipackage info {}".format(repo_path))
+        return 2
+
+    repo.update()
+    return 0
+
+
 def verify_repo(repo_path):
     """Get info on the given repository.
 
@@ -95,15 +118,25 @@ def verify_repo(repo_path):
     if repo_path is None:
         repo_path = ""
 
+    try:
+        GITRepository(repo_path)
+    except UsageError:
+        print("STATUS: Repository is not a valid git repo.\n")
+        print("Make sure your path is correct.\n")
+        return 2
+
     if repo.initialized is False:
         print("\nSTATUS: Repository has not been set up with multipackage.\n")
         print("Set it up with:\n\n\tmultipackage init {}\n".format(repo_path))
         return 1
 
-    repo.manifest.verify_files()
+    repo.manifest.verify_all(report=True)
 
-    if repo.clean and len(repo.warnings) == 0:
+    #FIXME: There are missing branches on this logic tree
+    if repo.clean and not repo.settings_changed and len(repo.warnings) == 0:
         print("STATUS: Repository is up-to-date with no problems.\n")
+    elif repo.clean and repo.settings_changed:
+        print("STATUS: Repository needs to be updated.\nRUN TO UPDATE:\n\n    multipackage update {}\n".format(repo_path))
     elif repo.clean:
         print("STATUS: Repository has %d warning(s)\n" % len(repo.warnings))
     else:
@@ -124,7 +157,7 @@ def verify_repo(repo_path):
     if not repo.clean:
         return 1
 
-    return 0 
+    return 0
 
 
 def build_parser():
@@ -135,7 +168,7 @@ def build_parser():
 
     init_parser = subparser.add_parser('init', description="Initialize or forcibly clean and reinitialize a repository.",
                                        help='initialize (or clean and reinitialize) a repo')
-    init_parser.add_argument('-c', '--clean', action="store_true", help="Forcibly clean and reinitialize the repo")
+    init_parser.add_argument('-f', '--force', action="store_true", help="Forcibly clean and reinitialize the repo")
     init_parser.add_argument('repo', nargs='?', help="Optional path to repository, defaults to cwd")
 
     _doctor_parser = subparser.add_parser('doctor', description="Verify your environment settings and connectivity.",
@@ -144,6 +177,10 @@ def build_parser():
     info_parser = subparser.add_parser('info', description="Get info on the given repository and verify it is correctly installed",
                                        help="get info and any errors with a repository")
     info_parser.add_argument('repo', nargs='?', help="Optional path to repository, defaults to cwd")
+
+    update_parser = subparser.add_parser('update', description="Update all managed files to their latest versions",
+                                         help="update all managed files to their latest versions")
+    update_parser.add_argument('repo', nargs='?', help="Optional path to repository, defaults to cwd")
 
     return parser
 
@@ -213,23 +250,28 @@ def main(argv=None):
     args = parser.parse_args(argv)
     setup_logging(args)
 
+    retval = 0
+
     try:
         if args.action == 'doctor':
             verify_environment()
         elif args.action == 'info':
-            return verify_repo(args.repo)
+            retval = verify_repo(args.repo)
         elif args.action == "init":
-            return init_repo(args.repo, args.clean)
+            retval = init_repo(args.repo, args.force)
+        elif args.action == "update":
+            retval = update_repo(args.repo)
         else:
             print("ERROR: Command Not Supported Yet")
-            return 1
+            retval = 1
     except UsageError as err:
         print_usage_error(err)
-        return 1
+        retval = 1
     except InvalidEnvironmentError as err:
         print_environment_error(err)
-        return 1
+        retval = 1
     except:
         raise
 
-    return 0
+    return retval
+

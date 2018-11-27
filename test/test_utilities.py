@@ -3,7 +3,7 @@
 from builtins import open
 import os
 import platform
-from multipackage.utilities import ManagedFileSection
+from multipackage.utilities import ManagedFileSection, dict_hash
 
 
 def data_path(tmpdir, name, allow_empty=False):
@@ -111,3 +111,18 @@ def test_start_end_delimiter(tmpdir):
     assert section.file_exists is True
     assert section.has_section is True
     assert section.modified is False
+
+
+def test_dict_hash():
+    """Make sure we can repeatably hash dictionaries."""
+
+    obj = {
+        'test1': 15.0,
+        'test2': 5,
+        'test5': {
+            "string_key": [1, 2, 3]
+        }
+    }
+
+    hash_value = dict_hash(obj)
+    assert hash_value == "MD5:07358855AB401EE3EAB3167DA585C70A"

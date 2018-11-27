@@ -22,14 +22,13 @@ class ManagedFileSection:
             This file does not need to exist and will be created
             when you try to update it with data if it does not
             currently exist.
-
         delimiter_start (str): The character string that starts a managed file
             section block header line.  This is usually a comment character
             like '#'.
-        delimiter_end (str): Optional charcter string that ends
-            a managed file section block header line.  This defaults to
-            None but can be set to a value if comments need to be explicitly
-            closed such as delimiter_start="<!-- ", delimiter_end=" -->".
+        delimiter_end (str): Optional charcter string that ends a managed file
+            section block header line.  This defaults to an emptry string but
+            can be set to a value if comments need to be explicitly closed
+            such as delimiter_start="<!-- ", delimiter_end=" -->".
     """
 
     SECTION_START = "BEGIN MULTIPACKAGE MANAGED SECTION, HASH="
@@ -50,6 +49,7 @@ class ManagedFileSection:
 
         self.file_exists = False
         self.has_section = False
+        self.actual_hash = None
         self.section_contents = None
         self.other_lines = []
         self.modified = False
@@ -141,10 +141,35 @@ class ManagedFileSection:
         self.has_section = True
         self.section_contents = section_lines
         self.other_lines = other_lines
+        self.actual_hash = actual_hash
         self.modified = actual_hash != section_hash
         self._start_line = start_line
 
-    def update(self, lines):
+    def ensure_lines(self, lines):
+        """Ensure that the given lines are present in this file.
+
+        Each line is added independently and no order is assumed. This method
+        is idempotent so that you can call it repeatedly and each line will
+        only be added once.  The lines must match exactly.
+
+        The lines must be distinct.  If there are multiple copies of the same
+        line in ``lines``, only one copy will be added to the file.
+
+        Args:
+            lines (list of str): A list of lines to add to the
+                file if they are not present.
+        """
+
+        if self.section_contents is None:
+            self.section_contents = lines
+        else:
+            for line in lines:
+                if line not in self.section_contents:
+                    self.section_contents.append(line)
+
+        self.update()
+
+    def update(self, lines=None):
         """Update or add a managed section into the file.
 
         This method will add a new managed section into the file or update the
@@ -156,10 +181,15 @@ class ManagedFileSection:
 
         Args:
             lines (list of str): A list of lines to add to the
-                file.
-            newline (str): The line termination character to
-                use to join the lines
+                file.  If this is passed as None, then the current value of
+                self.section_contents will be used instead.
         """
+
+        if lines is None:
+            lines = self.section_contents
+
+        if lines is None:
+            lines = []
 
         hash_hex = line_hash(lines)
 
