@@ -1,1 +1,3 @@
 include version.py
+recursive-include multipackage/data *
+recursive-exclude multipackage/data *.pyc

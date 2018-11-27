@@ -14,6 +14,7 @@ setup(
         "requests",
         "pyyaml"
     ],
+    include_package_data=True,
     entry_points={
         "console_scripts": ['multipackage = multipackage.scripts.multipackage:main']
     },
