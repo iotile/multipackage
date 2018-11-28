@@ -138,19 +138,30 @@ class TravisCI:
 
         return base64.b64encode(ciphertext).decode('utf-8')
 
-    def encrypt_env(self, repo_slug, env_name):
-        """Encrypt an environment variable.
+    def encrypt_env(self, repo_slug, *env_names):
+        """Encrypt one or more environment variables.
 
         The resulting string is suitable for pasting directly into a
         .travis.yml file, i.e. it is of the form secure: <encrypted value>
+
+        See https://github.com/travis-ci/travis-ci/issues/9548 for why it
+        is necessary to include all secure environment variables in a
+        single line.
         """
 
-        env_value = os.environ.get(env_name)
-        if env_value is None:
-            raise InvalidEnvironmentError(env_name, "Needed to store as encrypted environment variable",
-                                          "Make sure your environment variables are set correctly")
+        raw_envs = []
 
-        raw_txt = "{}={}".format(env_name, env_value)
+        for env_name in env_names:
+            env_value = os.environ.get(env_name)
+            if env_value is None:
+                raise InvalidEnvironmentError(env_name, "Needed to store as encrypted environment variable",
+                                              "Make sure your environment variables are set correctly")
+
+            raw_txt = '{}="{}"'.format(env_name, env_value)
+            raw_envs.append(raw_txt)
+
+        raw_txt = " ".join(raw_envs)
+
         enc_text = self.encrypt_string(repo_slug, raw_txt)
 
         return "secure: {}".format(enc_text)

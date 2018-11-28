@@ -73,7 +73,7 @@ jobs:
           keep-history: true
           local-dir: built_docs
       env:
-        - {{ env.github_token }}
+        {{ deploy_tokens }}
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt

@@ -7,6 +7,10 @@
         "hash": "MD5:162C4492CD4CF91845E3A5FB03F404F5", 
         "hash_type": "line"
     }, 
+    "multipackage.json": {
+        "hash": "MD5:32F9347D426B87235EF56F2CA41DAD2B", 
+        "hash_type": "json"
+    }, 
     "scripts/better_apidocs.py": {
         "hash": "MD5:619EF1C5A91A2D25CC6FD99C024750F6", 
         "hash_type": "line"
@@ -23,9 +27,9 @@
         "hash": "MD5:446C8C27897E549B7E4FF8403932C5E2", 
         "hash_type": "line"
     }, 
-    "multipackage.json": {
-        "hash": "MD5:32F9347D426B87235EF56F2CA41DAD2B", 
-        "hash_type": "json"
+    ".editorconfig": {
+        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943", 
+        "hash_type": "line"
     }, 
     "scripts/build_documentation.py": {
         "hash": "MD5:CDAD076C6C7C535FCDFBA3BF125E2168", 
@@ -35,9 +39,9 @@
         "hash": "MD5:EF4F76A18BEDA2B13976B0655F20E637", 
         "hash_type": "section"
     }, 
-    ".editorconfig": {
-        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943", 
-        "hash_type": "line"
+    "requirements_doc.txt": {
+        "hash": "MD5:1EC4A56B5267A3F13BD6E757610704DC", 
+        "hash_type": "section"
     }, 
     "doc/_template/package.rst": {
         "hash": "MD5:5929DFF8A6F8DEB44A2038E3F76EE7F1", 
@@ -47,24 +51,20 @@
         "hash": "MD5:C73A3B561CEF58737117F47C66364AFE", 
         "hash_type": "line"
     }, 
-    "doc/conf.py": {
-        "hash": "MD5:42152BC618B07BC70D61EEF8BA4E24BB", 
-        "hash_type": "line"
-    }, 
-    ".travis.yml": {
-        "hash": "MD5:46EF213F21DAFA31AB53F1EAD9EF2901", 
+    "doc/release.rst": {
+        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB", 
         "hash_type": "line"
     }, 
     ".gitignore": {
         "hash": "MD5:2A5457453A89C61B6385D2A5896F82EF", 
         "hash_type": "section"
     }, 
-    "doc/release.rst": {
-        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB", 
+    ".travis.yml": {
+        "hash": "MD5:AC1A3E57BA6336FA1F0D6EE5D5E73C7E", 
         "hash_type": "line"
     }, 
-    "requirements_doc.txt": {
-        "hash": "MD5:1EC4A56B5267A3F13BD6E757610704DC", 
-        "hash_type": "section"
+    "doc/conf.py": {
+        "hash": "MD5:42152BC618B07BC70D61EEF8BA4E24BB", 
+        "hash_type": "line"
     }
 }
