@@ -71,7 +71,7 @@ jobs:
           skip-cleanup: true
           github-token: $GITHUB_TOKEN
           committer-from-gh: true
-          keep-history: false
+          keep-history: true
           local-dir: built_docs
       env:
         - {{ env.github_token }}

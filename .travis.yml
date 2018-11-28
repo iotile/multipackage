@@ -65,10 +65,10 @@ jobs:
           skip-cleanup: true
           github-token: $GITHUB_TOKEN
           committer-from-gh: true
-          keep-history: false
+          keep-history: true
           local-dir: built_docs
       env:
-        - secure: F2FtUozywLFOgFsDKdqf/tsiRptaMbahyjomZjrD8k/HnpPkb8E5WjdYCt/vfaSTd+lq9QaW+WOv6lhTLTRSr6t+R16vC6n7mSJmHxZqbcmdWCdH9ITwl67bk+c/6URewl5wPq4fyUFlUFfrZZi58i5G0aMfgkTIiyoOygKUWK8l+j2sS4JY24Qt3o7Pn2nIHpE5I8fVciKIPatdoN+EcjRmhYjfJR3pez01m5A2/xp9VmXMYcr0blpUSAYwlXcJUcxaesWRQKRvb0vhn9dfEyiaAcrNiCgL/o3fjjdnMkPUn5UYC4MFHve8XVLlX4WwTQnXNG8T1K82g/rfGAJTnhWMp2dJo0pNn7cR+Fj5lMcAgpSSMWdalwcdasavUS+KxoptTvpv+wUDi4adeDtVMgNA66b52+/BYs8OJ0bRbMzWi9v1yot61TCj9iCsDZLXcGBsVTDMdD0nUWgC2VtUZuyT+vBhwqQOBtAechi4Ed3vhoulDHoFCGH/pW0Sb1RBU9JyeFbW/OW9nCAzl9xFh4L2M49okoJfrgA9GBAxXnBrYwV3gmEjtq9ViNqygFybas79tCOeWdD4N3AS+jyuLJzNyJ1zpCNpSRnPP6w++38+nZyz1maKIBvuVyNWRkOSQx+KtnTqbKh4dZmNYYIGDpJte3k8glizTc4Nh/VVYI0=
+        - secure: OaiXZKCTU+WgUxqYEY+I7Gb1J2UEbCZCUniCVhyn6JhQNrNQEvnuJm8Kwhzyj0bC/Ww6rxD/nB6srY+waBuIhwaq83qcArL6ERwrc6Vg2tE7TPTpIctVmQSZZGDLiGPn+9C2sc+EKPPR7G00eAxW+vWkD9z2HEcKaArovFJdanwiLog+0iWGY7hTmHpJlHrjpJbnL9TIh6uEZbgzqIGVOMPpwvG1Ww7ZYQ5H8J2eDjeeabNn+9T1vLIT5P6/L3RTvOCAnoJRv7ELmwGoBQbSfn+GCYrPvbfGcGe22lMlwia03v7nKIZ/3KOWt6wL4AtPWZ06ZIJPeXs1Eweo5ghVNCmIV8xaJ9x3uKnY1vFL5f0Ar5fN9xDrsTkIv6W7SbK48C4G1BpIknFG4P17n/RhaCUQvDVskQ36xBexJ72fWJekLvAcIalFvsyTIYyeITm1jycwgIyHEPXZaqXHqU2Guld6cSJqJWIHCchDz1bxvnTAxxAvZYSRfDr/z6Htc5RNfoXbW4QuiWXZPs2BZpre0Mxpp5t7iDsZoUpNoaeOg3TNvjnckWkg4oOsVmHj6aJDRacPzbUZwR2wpwuhlPGo24CW8wC4We2d/FWsT7BU9rfZU/FCBSHm5QV0hkdJNG9gLEeo2LN5F24GS0re66gUXdcozYM481ueq3PzveeQ3vo=
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
