@@ -56,6 +56,19 @@ $ multipackage release <path to repo or cwd> <package name> <version>
     having fetched the latest changes, etc.
 """
 
+
+def verify_env_var(name, message):
+    """Check that an environment variable exists."""
+
+    if os.environ.get(name) is None:
+        print("  - %s: ERROR, NOT PRESENT" % name)
+        print("    Needed for %s" % message)
+        return 0
+
+    print("  - %s: OKAY" % name)
+    return 1
+
+
 def verify_environment():
     """Verify that all required environment settings are correct."""
 
@@ -64,8 +77,20 @@ def verify_environment():
 
     GITRepository.version()
 
-    #travis.get_key('iotile/typedargs')
-    #encoded = travis.encrypt_string('iotile/typedargs', "TEST_ENV=hello")
+    print("\nChecking for required environment variables:")
+
+    found = 0
+    found += verify_env_var("TRAVIS_TOKEN_ORG", "encrypting environment variables on travis-ci.org")
+    found += verify_env_var("TRAVIS_TOKEN_COM", "encrypting environment variables on travis-ci.com")
+    found += verify_env_var("GITHUB_TOKEN", "deploying documentation to github pages")
+    found += verify_env_var("SLACK_TOKEN", "sending slack notifications")
+
+    print()
+
+    if found == 3:
+        return 0
+
+    return 1
 
 
 def create_repo(repo_path):
@@ -260,7 +285,7 @@ def main(argv=None):
 
     try:
         if args.action == 'doctor':
-            verify_environment()
+            retval = verify_environment()
         elif args.action == 'info':
             retval = verify_repo(args.repo)
         elif args.action == "init":
