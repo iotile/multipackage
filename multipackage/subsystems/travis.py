@@ -20,7 +20,7 @@ class TravisSubsystem:
         variables = {
             'options': options,
             'components': self._repo.components,
-            'deploy_tokens': self._travis.encrypt_env(slug, "GITHUB_TOKEN")
+            'deploy_tokens': self._travis.encrypt_env(slug, "GITHUB_TOKEN", "PYPI_USER")
         }
 
         self._repo.ensure_template(".travis.yml", "travis.yml.tpl", variables)

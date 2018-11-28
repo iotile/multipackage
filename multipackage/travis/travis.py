@@ -157,7 +157,7 @@ class TravisCI:
                 raise InvalidEnvironmentError(env_name, "Needed to store as encrypted environment variable",
                                               "Make sure your environment variables are set correctly")
 
-            raw_txt = '{}="{}"'.format(env_name, env_value)
+            raw_txt = '{}={}'.format(env_name, env_value)
             raw_envs.append(raw_txt)
 
         raw_txt = " ".join(raw_envs)
