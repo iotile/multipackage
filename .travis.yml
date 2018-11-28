@@ -67,8 +67,8 @@ jobs:
           committer-from-gh: true
           keep-history: true
           local-dir: built_docs
-      env:
-        secure: epvqxezcD7hcyRf26i1o2PAQMjbZMLMtRlm/6LWUrqcuxhLACHY+14saE30dADoYacPhmZpr0MaiTA5s2vu90ExF1eL27fZCMA23Bm/UsRZds3Cv2Wf+bri09iTIS0Q92WhgZNjE5HZcaaL6MivPnQWGIXZV7AB5+g4t5KDgogntvD1SrRJ5T+8w0+IPmXKjP8Mr1TDZeuQZeGCtotRGKmjGFvVkQ7OO08Qp+7BcXndcQQSs7UHFqXPdpRPOI1BYn3o3CHXzG1x4knNp6Qkzz/Epiz31kWHsJBNukRbR5czAJ2IknLtYIpsc5R9Sz9T+Ascw8pCNltg7d8cUeva4bmO2QFSvM8pxuSFVfbMiMNhqaW+UKAH13h7DG4qN66vsXCEVGkjAaJN4626uUOLVgo8A4bBtp42WG/bljyN1CgV739PFHWZB9rIQZFlA9D/AjbnDj9+eaa96+uOhlCAHmKdt/EovH0GedbIURM8QortcfaAeWEVembmEx5AeHkVBBjAiYMXo1beavzB0Cmr25+uIDRYjp0le0WvhMbqYdzG3Zp3C0TSC+f+fwK2xProkwoPMUr57kV48488LrqVKUM3b/BiXPyBoMSVLUEoAwKdK/+SDkBYESSWNJ7sm2MWSBY3r04A0EyzZgixtiIHhyOLt+NFDkV7F6WGN2NlXfnw=
+      #env:
+      #  secure: epvqxezcD7hcyRf26i1o2PAQMjbZMLMtRlm/6LWUrqcuxhLACHY+14saE30dADoYacPhmZpr0MaiTA5s2vu90ExF1eL27fZCMA23Bm/UsRZds3Cv2Wf+bri09iTIS0Q92WhgZNjE5HZcaaL6MivPnQWGIXZV7AB5+g4t5KDgogntvD1SrRJ5T+8w0+IPmXKjP8Mr1TDZeuQZeGCtotRGKmjGFvVkQ7OO08Qp+7BcXndcQQSs7UHFqXPdpRPOI1BYn3o3CHXzG1x4knNp6Qkzz/Epiz31kWHsJBNukRbR5czAJ2IknLtYIpsc5R9Sz9T+Ascw8pCNltg7d8cUeva4bmO2QFSvM8pxuSFVfbMiMNhqaW+UKAH13h7DG4qN66vsXCEVGkjAaJN4626uUOLVgo8A4bBtp42WG/bljyN1CgV739PFHWZB9rIQZFlA9D/AjbnDj9+eaa96+uOhlCAHmKdt/EovH0GedbIURM8QortcfaAeWEVembmEx5AeHkVBBjAiYMXo1beavzB0Cmr25+uIDRYjp0le0WvhMbqYdzG3Zp3C0TSC+f+fwK2xProkwoPMUr57kV48488LrqVKUM3b/BiXPyBoMSVLUEoAwKdK/+SDkBYESSWNJ7sm2MWSBY3r04A0EyzZgixtiIHhyOLt+NFDkV7F6WGN2NlXfnw=
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
