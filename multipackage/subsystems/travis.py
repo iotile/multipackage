@@ -17,7 +17,7 @@ class TravisSubsystem:
             'github_token': self._travis.encrypt_env(slug, "GITHUB_TOKEN"),
             'pypi_user': self._travis.encrypt_env(slug, "PYPI_USER"),
             'pypi_pass': self._travis.encrypt_env(slug, "PYPI_PASS"),
-            'slack_token': self._travis.encrypt_env(slug, "SLACK_TOKEN")
+            'slack_token': self._travis.encrypt_env(slug, "SLACK_TOKEN", only_value=True)
         }
 
         variables = {

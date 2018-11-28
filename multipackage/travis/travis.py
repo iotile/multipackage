@@ -167,6 +167,7 @@ class TravisCI:
         """
 
         if repo_slug in self._key_cache:
+            self._logger.debug("Using cached key for repository %s", repo_slug)
             return self._key_cache[repo_slug]
 
         org = self.use_travis_org(repo_slug)
@@ -206,18 +207,24 @@ class TravisCI:
 
         return base64.b64encode(ciphertext).decode('utf-8')
 
-    def encrypt_env(self, repo_slug, *env_names):
+    def encrypt_env(self, repo_slug, *env_names, only_value=False):
         """Encrypt one or more environment variables.
 
         The resulting string is suitable for pasting directly into a
         .travis.yml file, i.e. it is of the form secure: <encrypted value>
 
         See https://github.com/travis-ci/travis-ci/issues/9548 for why it
-        is necessary to include all secure environment variables in a
+        could be necessary to include all secure environment variables in a
         single line.
+
+        If only value is passed, you must give a single environment variable
+        name and its raw value will be encrypted without a NAME= prefix.
         """
 
-        raw_envs = []
+        if only_value and len(env_names) != 1:
+            raise InternalError("TravisCI.encrypt_env called with multiple variables and only_value=True")
+
+        raw_vals = []
 
         for env_name in env_names:
             env_value = os.environ.get(env_name)
@@ -225,11 +232,14 @@ class TravisCI:
                 raise InvalidEnvironmentError(env_name, "Needed to store as encrypted environment variable",
                                               "Make sure your environment variables are set correctly")
 
-            raw_txt = '{}={}'.format(env_name, env_value)
-            raw_envs.append(raw_txt)
+            raw_vals.append(env_value)
 
-        raw_txt = " ".join(raw_envs)
+        if only_value:
+            enc_text = self.encrypt_string(repo_slug, raw_vals[0])
+        else:
+            raw_envs = ["{}={}".format(name, value) for name, value in zip(env_names, raw_vals)]
+            raw_txt = " ".join(raw_envs)
 
-        enc_text = self.encrypt_string(repo_slug, raw_txt)
+            enc_text = self.encrypt_string(repo_slug, raw_txt)
 
         return "secure: {}".format(enc_text)
