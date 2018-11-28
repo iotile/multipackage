@@ -8,7 +8,7 @@ import shutil
 import logging
 from builtins import open
 from collections import namedtuple
-from .exceptions import UsageError
+from .exceptions import UsageError, InternalError
 from .utilities import atomic_json, ManagedFileSection, render_template, GITRepository, find_toplevel_packages
 from .manifest import ManifestFile
 from . import subsystems
@@ -92,6 +92,12 @@ class Repository:
 
         This is a string of the format user/repo_name.
         """
+
+        if self.git is None:
+            raise InternalError("You cannot call github_slug() if you pass nogit to the constructor")
+
+        org, repo = self.git.github_name()
+        return "{}/{}".format(org, repo)
 
     def _try_load_components(self):
         """Try to load the list of components from this repository.

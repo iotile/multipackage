@@ -66,6 +66,8 @@ jobs:
         committer-from-gh: true
         keep-history: true
         local-dir: built_docs
+      env:
+      - secure: A4iTX8DVcGlCdYpwJUBz0eV+KwjR6WT96YVKIe3ozJVoevQystGvn7aAjDTturSDJZNM1FGcS2sc7YHc6PoUxR4MGcFpStITV5AFskJcAnBKcZ6a5Zzwo1WcQ0cqg/8ZrkiObsD9TK8X8g/7DzhNc+mK23DCV5fT+W75pKhyvpEE3DXId5GEkHDMPuBjTf9myQy3YTJlKOoto+QVOa1IQX8KQiQcE60iBIFFN9FZeO+FXgbOJtSWRr9r0O0kpCRhkQKfcmouj6+HrxGFKR8GvUDFZMOU/YP2GL+OtRUggvzolftdmt6Mb42gFbPyj3B5AyhbMkoIdqKDHze8iQy1iSe3ned2xdnu9I9BU2ttBf6aNuzrPjaG9sX5eTKRBy8eFOHgtHC633aGYtEj1frabTd1K5wXqhuu3khTC7f/B9VE8YOCh2y1lUjVh1gkiI2SQ3/b8lpxdu3S7wdhlpRBZnaajxG5tITWNJrWjz3AWjqdyaAxoDaaYbAD6FMzpIceKE+h6U8IW85upKuacP2rlRk8hCiDTwwv3BKmBUJhlK4eyDeH78lhKn8xT1E1Q3ub9fCctWFNs6NMms+m3e7LAAe2YHo4y+lZ/az9oLLKVD9l/q7AyJooXbttzSqIYGdakyPbRYUW/um+z88PIbe3wyncTzLRvtxYOy4274GWC/8=
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt

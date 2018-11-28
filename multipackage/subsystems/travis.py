@@ -12,9 +12,15 @@ class TravisSubsystem:
     def update(self, options):
         """Update the linting subsystem."""
 
+        slug = self._repo.github_slug()
+        env = {
+            'github_token': self._travis.encrypt_env(slug, "GITHUB_TOKEN")
+        }
+
         variables = {
             'options': options,
-            'components': self._repo.components
+            'components': self._repo.components,
+            'env': env
         }
 
         self._repo.ensure_template(".travis.yml", "travis.yml.tpl", variables)

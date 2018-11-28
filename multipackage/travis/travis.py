@@ -2,8 +2,14 @@
 
 from __future__ import unicode_literals
 import os
+import sys
 import logging
-import urllib
+
+try:
+    from urllib import quote  # Python 2.X
+except ImportError:
+    from urllib.parse import quote  # Python 3+
+
 import requests
 import base64
 from Crypto.Cipher import PKCS1_v1_5
@@ -80,7 +86,7 @@ class TravisCI:
         if isinstance(repo_slug, tuple):
             repo_slug = "/".join(repo_slug)
 
-        return urllib.quote(repo_slug, safe='')
+        return quote(repo_slug, safe='')
 
     def get_info(self, repo_slug):
         """Get info about this repository on Travis CI.
@@ -128,4 +134,21 @@ class TravisCI:
         cipher = PKCS1_v1_5.new(key)
         ciphertext = cipher.encrypt(text)
 
-        return base64.b64encode(ciphertext)
+        return base64.b64encode(ciphertext).decode('utf-8')
+
+    def encrypt_env(self, repo_slug, env_name):
+        """Encrypt an environment variable.
+
+        The resulting string is suitable for pasting directly into a
+        .travis.yml file, i.e. it is of the form secure: <encrypted value>
+        """
+
+        env_value = os.environ.get(env_name)
+        if env_value is None:
+            raise InvalidEnvironmentError(env_name, "Needed to store as encrypted environment variable",
+                                          "Make sure your environment variables are set correctly")
+
+        raw_txt = "{}={}".format(env_name, env_value)
+        enc_text = self.encrypt_string(repo_slug, raw_txt)
+
+        return "secure: {}".format(enc_text)
