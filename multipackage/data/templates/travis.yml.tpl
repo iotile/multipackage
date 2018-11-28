@@ -93,6 +93,7 @@ notifications:
   on_failure: always
   email: false
   slack:
-    {{ env.slack_token }}
+    rooms:
+    - {{ env.slack_token }}
     template:
     - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch} in PR <%{pull_request_url}|#%{pull_request_number}> by %{author} %{result} in %{elapsed_time}"
