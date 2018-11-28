@@ -10,10 +10,17 @@ from generate_api import main as api_main
 
 COMPONENTS = {
 {% for key, component in components|dictsort %}
-    "{{ key }}": {"name": "{{ key }}", "path": "{{ component.relative_path }}", "packages": [{% for package in component.packages|sort %}"{{ package }}"{% if not loop.last %},{% endif %}{% endfor %}]}{% if not loop.last %},{% endif %}
+    "{{ key }}": {"name": "{{ key }}", "path": "{{ component.relative_path }}", "packages": [{% for package in component.toplevel_packages|sort %}"{{ package }}"{% if not loop.last %},{% endif %}{% endfor %}]}{% if not loop.last %},{% endif %}
 {% endfor %}
 
 }
+
+{% if namespace %}
+NAMESPACE = "{{ namespace }}"
+{% else %}
+NAMESPACE = None
+{% endif %}
+
 
 def delete_with_retry(folder):
     """Try multiple times to delete a folder.
@@ -118,7 +125,12 @@ def main():
     copy_with_retry(os.path.join(base_folder, "doc"), output_folder)
 
     folders = get_package_folders()
-    args = generate_args(folders, extra_args=['-r', 'modules.rst'])
+    
+    extra_args=['-r', 'modules.rst']
+    if NAMESPACE is not None:
+        extra_args.extend(['-r', "%s.rst" % NAMESPACE])
+
+    args = generate_args(folders, extra_args=extra_args)
     
     print("\n---- Generating API docs ----\n")
     api_main(args)

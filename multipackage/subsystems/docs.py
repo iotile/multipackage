@@ -1,6 +1,7 @@
 """Documentation subsystem that manages autogenerating documentation."""
 
 import logging
+from ..exceptions import InternalError
 
 class DocumentationSubsystem:
     def __init__(self, repo):
@@ -26,10 +27,17 @@ class DocumentationSubsystem:
         self._repo.ensure_directory("doc/_template", gitkeep=True)
         self._repo.ensure_directory("built_docs", gitkeep=True)
 
+        namespace_package = None
+        if len(self._repo.namespace_packages) > 1:
+            raise InternalError("Having more than one namespace package is not yet supported: %s" % self._repo.namespace_packages)
+        elif len(self._repo.namespace_packages):
+            namespace_package = self._repo.namespace_packages[0]
+
         variables = {
             'options': options,
             'components': self._repo.components,
-            'doc': options.get('documentation', {})
+            'doc': options.get('documentation', {}),
+            'namespace': namespace_package
         }
 
         self._repo.ensure_template("doc/_template/module.rst", template="module.rst", raw=True)

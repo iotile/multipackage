@@ -74,7 +74,7 @@ class TravisCI:
     def _get(self, url, org=False):
         if org:
             base = self.TRAVIS_BASE_ORG
-            token = self.org_token
+            token = self._org_token
         else:
             base = self.TRAVIS_BASE_COM
             token = self._com_token

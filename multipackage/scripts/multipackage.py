@@ -167,9 +167,10 @@ def verify_repo(repo_path):
     else:
         print("STATUS: Repository has %d error(s) that need to be addressed\n" % len(repo.errors))
 
-    print("COMPONENTS:")
+    print("COMPONENTS:\n")
     for component in sorted(repo.components.values()):
-        print("  - %s: %s\n    python-version=%s" % component)
+        print("  - %s: %s\n    python-version=%s" % (component.name, component.relative_path, component.compatibility))
+        print("    packages: %s" % (", ".join(component.desired_packages)))
 
     print()
 

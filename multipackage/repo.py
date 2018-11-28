@@ -15,7 +15,7 @@ from . import subsystems
 
 
 ErrorMessage = namedtuple("ErrorMessage", ['file', 'message', 'suggestion'])
-Component = namedtuple("Component", ['name', 'relative_path', 'compatibility', 'packages'])
+Component = namedtuple("Component", ['name', 'relative_path', 'compatibility', 'desired_packages', 'toplevel_packages'])
 
 
 class Repository:
@@ -62,6 +62,7 @@ class Repository:
         self.errors = []
         self.warnings = []
         self.components = {}
+        self.namespace_packages = []
 
         self._try_load()
         self.manifest = ManifestFile(os.path.join(path, self.MANIFEST_FILE), self)
@@ -138,11 +139,43 @@ class Repository:
                 continue
 
             comp_path = os.path.join(self.path, path)
-            packages = find_toplevel_packages(comp_path)
+            toplevel_packages = find_toplevel_packages(comp_path)
 
-            component = Component(package, path, compat, packages)
+            component = Component(package, path, compat, toplevel_packages, toplevel_packages)
             self._logger.debug("Adding component %s", component)
             self.components[package] = component
+
+        self._prune_namespace_packages()
+
+    def _prune_namespace_packages(self):
+        namespace_packages = set()
+        packages = set()
+
+        for key, comp in self.components.items():
+            for package in comp.toplevel_packages:
+                if package in packages:
+                    namespace_packages.add(package)
+                else:
+                    packages.add(package)
+
+        self.namespace_packages = sorted(namespace_packages)
+
+        if len(namespace_packages) > 0:
+            self._logger.info("Found namespace packages: %s, pruning them", ", ".join(self.namespace_packages))
+
+        for key, old_comp in self.components.items():
+            old_comp = self.components[key]
+
+            if len(old_comp.toplevel_packages) != 1:
+                raise InternalError("Cannot support multiple packages per component in '%s' if there is a namespace package" % key)
+
+            desired_packages = find_toplevel_packages(os.path.join(self.path, old_comp.relative_path), prefix=old_comp.toplevel_packages[0])
+            comp = Component(key, old_comp.relative_path, old_comp.compatibility, desired_packages, old_comp.toplevel_packages)
+            self.components[key] = comp
+
+            self._logger.debug("Replaced namespace package '%s' in '%s' with %s", old_comp.toplevel_packages[0], key, desired_packages)
+
+
 
     def _try_load(self):
         """Try to load settings for this repository."""
