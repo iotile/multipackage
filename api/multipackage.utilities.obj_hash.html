@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.utilities.obj_hash module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.utilities.packages module" href="multipackage.utilities.packages.html" />
+    <link rel="prev" title="multipackage.utilities.managed_section module" href="multipackage.utilities.managed_section.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.utilities.html">multipackage.utilities package</a> &raquo;</li>
+        
+      <li>multipackage.utilities.obj_hash module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.utilities.obj_hash.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.utilities.obj_hash">
+<span id="multipackage-utilities-obj-hash-module"></span><h1>multipackage.utilities.obj_hash module<a class="headerlink" href="#module-multipackage.utilities.obj_hash" title="Permalink to this headline">¶</a></h1>
+<p>Calculate a hex checksum over a list of lines.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Functions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.utilities.obj_hash.dict_hash" title="multipackage.utilities.obj_hash.dict_hash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_hash</span></code></a></td>
+<td>Calculate a hash over a json-serializable dictionary.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.utilities.obj_hash.directory_hash" title="multipackage.utilities.obj_hash.directory_hash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">directory_hash</span></code></a></td>
+<td>Hash all files in a given folder.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.utilities.obj_hash.line_hash" title="multipackage.utilities.obj_hash.line_hash"><code class="xref py py-obj docutils literal notranslate"><span class="pre">line_hash</span></code></a></td>
+<td>Calculate a hash over a list of strings.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="multipackage.utilities.obj_hash.line_hash">
+<code class="descclassname">multipackage.utilities.obj_hash.</code><code class="descname">line_hash</code><span class="sig-paren">(</span><em>lines</em>, <em>method='md5'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/obj_hash.html#line_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.obj_hash.line_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a hash over a list of strings.</p>
+<p>The strings are all joined with ‘n’ characters to canonicalize them so
+that line endings are not part of the calculated hash.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lines</strong> (<em>list of str</em>) – The list of strings to hash</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the hash method, currently
+only md5 is supported.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The hash digest as a hex string in uppercase.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.utilities.obj_hash.dict_hash">
+<code class="descclassname">multipackage.utilities.obj_hash.</code><code class="descname">dict_hash</code><span class="sig-paren">(</span><em>obj</em>, <em>method='md5'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/obj_hash.html#dict_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.obj_hash.dict_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a hash over a json-serializable dictionary.</p>
+<p>The obj argument will be dumped to a json string with sorted
+keys encoded as utf-8 and then that string will be hashed to
+produce the hash value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – The json serializable dictionary that should
+be hashed.</li>
+<li><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the hash method, currently
+only md5 is supported.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The hash digest as a hex string in uppercase.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.utilities.obj_hash.directory_hash">
+<code class="descclassname">multipackage.utilities.obj_hash.</code><code class="descname">directory_hash</code><span class="sig-paren">(</span><em>path</em>, <em>glob='*'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/obj_hash.html#directory_hash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.obj_hash.directory_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hash all files in a given folder.</p>
+<p>This will return a hash value that will tell you if any file has changed
+in the given directory.  You can calculate the hash only over a specific
+subset of the files by using glob which will be passed to fnmatch to
+select files.</p>
+<dl class="docutils">
+<dt>The hash value will detect:</dt>
+<dd><ul class="first last simple">
+<li>a file is added</li>
+<li>a file is removed</li>
+<li>a file name is changed</li>
+<li>a file is changed in anyway</li>
+</ul>
+</dd>
+</dl>
+<p>The hash value is stable on multiple operating systems and across line
+endings for text files.  The name of the parent directory is not part of
+the hash value so it is useful for ensuring that a given folder has the
+same contents.</p>
+<p><strong>This function assumes all files are text files and calculates a
+line-ending independing hash</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the directory that we want to hash.</li>
+<li><strong>glob</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional wildcard specifier for selecting which
+files should be hashed.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The hash digest as a hex string in uppercase.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.utilities.packages.html" class="btn btn-neutral float-right" title="multipackage.utilities.packages module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.utilities.managed_section.html" class="btn btn-neutral" title="multipackage.utilities.managed_section module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.data.scripts.better_apidocs module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.data.scripts.generate_api module" href="multipackage.data.scripts.generate_api.html" />
+    <link rel="prev" title="multipackage.data.scripts package" href="multipackage.data.scripts.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.data.html">multipackage.data package</a> &raquo;</li>
+        
+          <li><a href="multipackage.data.scripts.html">multipackage.data.scripts package</a> &raquo;</li>
+        
+      <li>multipackage.data.scripts.better_apidocs module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.data.scripts.better_apidocs.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.data.scripts.better_apidocs">
+<span id="multipackage-data-scripts-better-apidocs-module"></span><h1>multipackage.data.scripts.better_apidocs module<a class="headerlink" href="#module-multipackage.data.scripts.better_apidocs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="better-apidoc">
+<h2>better apidoc<a class="headerlink" href="#better-apidoc" title="Permalink to this headline">¶</a></h2>
+<p>Parses a directory tree looking for Python modules and packages and creates
+ReST files appropriately to create code documentation with Sphinx.  It also
+creates a modules index (named modules.&lt;suffix&gt;).</p>
+<p>This is derived from the “sphinx-apidoc” script, which is:
+Copyright 2007-2016 by the Sphinx team
+<a class="reference external" href="http://www.sphinx-doc.org">http://www.sphinx-doc.org</a></p>
+<p>It extends “sphinx-apidoc” by the –template / -t option, which allows to
+render the output ReST files based on arbitrary Jinja templates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body">Copyright 2017-2018 by Michael Goerz</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body">BSD, see LICENSE for details.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>Functions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.add_get_members_to_template_env" title="multipackage.data.scripts.better_apidocs.add_get_members_to_template_env"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_get_members_to_template_env</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.create_module_file" title="multipackage.data.scripts.better_apidocs.create_module_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_module_file</span></code></a></td>
+<td>Generate RST for a top-level module (i.e., not part of a package)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.create_modules_toc_file" title="multipackage.data.scripts.better_apidocs.create_modules_toc_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_modules_toc_file</span></code></a></td>
+<td>Create the module’s index.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.create_package_file" title="multipackage.data.scripts.better_apidocs.create_package_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_package_file</span></code></a></td>
+<td>Build the text of the file and write the file.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.extract_summary" title="multipackage.data.scripts.better_apidocs.extract_summary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_summary</span></code></a></td>
+<td>Extract summary from docstring.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.format_directive" title="multipackage.data.scripts.better_apidocs.format_directive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_directive</span></code></a></td>
+<td>Create the automodule directive and add the options.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.format_heading" title="multipackage.data.scripts.better_apidocs.format_heading"><code class="xref py py-obj docutils literal notranslate"><span class="pre">format_heading</span></code></a></td>
+<td>Create a heading of &lt;level&gt; [1, 2 or 3 supported].</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.is_excluded" title="multipackage.data.scripts.better_apidocs.is_excluded"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_excluded</span></code></a></td>
+<td>Check if the directory is in the exclude list.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.main" title="multipackage.data.scripts.better_apidocs.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></td>
+<td>Parse and check the command line arguments.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.makename" title="multipackage.data.scripts.better_apidocs.makename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">makename</span></code></a></td>
+<td>Join package and module with a dot.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.normalize_excludes" title="multipackage.data.scripts.better_apidocs.normalize_excludes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_excludes</span></code></a></td>
+<td>Normalize the excluded directory list.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.recurse_tree" title="multipackage.data.scripts.better_apidocs.recurse_tree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">recurse_tree</span></code></a></td>
+<td>Look for every file in the directory tree and create the corresponding ReST files.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.shall_skip" title="multipackage.data.scripts.better_apidocs.shall_skip"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shall_skip</span></code></a></td>
+<td>Check if we want to skip this module.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.better_apidocs.write_file" title="multipackage.data.scripts.better_apidocs.write_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_file</span></code></a></td>
+<td>Write the output file for module/package &lt;name&gt;.</td>
+</tr>
+</tbody>
+</table>
+<p>Data:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">EXTENSIONS</span></code></td>
+<td>Dictionary that remembers insertion order</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">INITPY</span></code></td>
+<td>str(object=’‘) -&gt; str str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">OPTIONS</span></code></td>
+<td>list() -&gt; new empty list list(iterable) -&gt; new list initialized from iterable’s items</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">PY_SUFFIXES</span></code></td>
+<td>set() -&gt; new empty set object set(iterable) -&gt; new set object</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">periods_re</span></code></td>
+<td>Compiled regular expression objects</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">state_classes</span></code></td>
+<td>tuple() -&gt; empty tuple tuple(iterable) -&gt; tuple initialized from iterable’s items</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h3>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.makename">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">makename</code><span class="sig-paren">(</span><em>package</em>, <em>module</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#makename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.makename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join package and module with a dot.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.write_file">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">write_file</code><span class="sig-paren">(</span><em>name</em>, <em>text</em>, <em>opts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#write_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.write_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the output file for module/package &lt;name&gt;.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.format_heading">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">format_heading</code><span class="sig-paren">(</span><em>level</em>, <em>text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#format_heading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.format_heading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a heading of &lt;level&gt; [1, 2 or 3 supported].</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.format_directive">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">format_directive</code><span class="sig-paren">(</span><em>module</em>, <em>package=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#format_directive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.format_directive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the automodule directive and add the options.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.create_module_file">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">create_module_file</code><span class="sig-paren">(</span><em>package</em>, <em>module</em>, <em>opts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#create_module_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.create_module_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate RST for a top-level module (i.e., not part of a package)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.extract_summary">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">extract_summary</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#extract_summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.extract_summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract summary from docstring.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.add_get_members_to_template_env">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">add_get_members_to_template_env</code><span class="sig-paren">(</span><em>template_env</em>, <em>fullname</em>, <em>opts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#add_get_members_to_template_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.add_get_members_to_template_env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.create_package_file">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">create_package_file</code><span class="sig-paren">(</span><em>root</em>, <em>master_package</em>, <em>subroot</em>, <em>py_files</em>, <em>opts</em>, <em>subs</em>, <em>is_namespace</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#create_package_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.create_package_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the text of the file and write the file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.create_modules_toc_file">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">create_modules_toc_file</code><span class="sig-paren">(</span><em>modules</em>, <em>opts</em>, <em>name='modules'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#create_modules_toc_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.create_modules_toc_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the module’s index.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.shall_skip">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">shall_skip</code><span class="sig-paren">(</span><em>module</em>, <em>opts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#shall_skip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.shall_skip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if we want to skip this module.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.recurse_tree">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">recurse_tree</code><span class="sig-paren">(</span><em>rootpath</em>, <em>excludes</em>, <em>opts</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#recurse_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.recurse_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look for every file in the directory tree and create the corresponding
+ReST files.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.normalize_excludes">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">normalize_excludes</code><span class="sig-paren">(</span><em>rootpath</em>, <em>excludes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#normalize_excludes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.normalize_excludes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize the excluded directory list.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.is_excluded">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">is_excluded</code><span class="sig-paren">(</span><em>root</em>, <em>excludes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#is_excluded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.is_excluded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if the directory is in the exclude list.</p>
+<dl class="docutils">
+<dt>Note: by having trailing slashes, we avoid common prefix issues, like</dt>
+<dd>e.g. an exlude “foo” also accidentally excluding “foobar”.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.better_apidocs.main">
+<code class="descclassname">multipackage.data.scripts.better_apidocs.</code><code class="descname">main</code><span class="sig-paren">(</span><em>argv=['/home/travis/virtualenv/python3.6.7/bin/sphinx-build', '-W', '-E', '-b', 'html', 'scripts/../.tmp_docs', 'scripts/../built_docs']</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/better_apidocs.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.better_apidocs.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse and check the command line arguments.</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.data.scripts.generate_api.html" class="btn btn-neutral float-right" title="multipackage.data.scripts.generate_api module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.data.scripts.html" class="btn btn-neutral" title="multipackage.data.scripts package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

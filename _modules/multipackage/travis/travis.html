@@ -1,0 +1,430 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.travis.travis &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.travis.travis</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.travis.travis</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Wrapper class for Travis CI API v3.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib</span> <span class="k">import</span> <span class="n">quote</span>  <span class="c1"># Python 2.X</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">quote</span>  <span class="c1"># Python 3+</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="k">import</span> <span class="n">PKCS1_v1_5</span>
+<span class="kn">from</span> <span class="nn">Crypto.PublicKey</span> <span class="k">import</span> <span class="n">RSA</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">InternalError</span>
+
+
+<div class="viewcode-block" id="TravisCI"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI">[docs]</a><span class="k">class</span> <span class="nc">TravisCI</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper for Travis CI API v3.</span>
+
+<span class="sd">    This wrapper is not complete but currently just implements the features</span>
+<span class="sd">    needed for multipackage including setting up a repository and encrypting</span>
+<span class="sd">    data.</span>
+
+<span class="sd">    Note that repositories can run builds on either travis-ci.org or travis-ci.com.</span>
+<span class="sd">    When encrypting environment variables, it&#39;s required that the variable be</span>
+<span class="sd">    encrypted with the public key for either .com or .org, otherwise the variable</span>
+<span class="sd">    will not decrypt correctly.</span>
+
+<span class="sd">    You must have environment variables set for:</span>
+
+<span class="sd">      - TRAVIS_TOKEN_COM: Your travis-ci.com token</span>
+<span class="sd">      - TRAVIS_TOKEN_ORG: YOur travis-ci.org token</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        com_token (str): Optional API token for travis-ci.com.  If not</span>
+<span class="sd">            specified it is read from the environment variables</span>
+<span class="sd">            TRAVIS_TOKEN_COM. If the environment variable is not specified, an</span>
+<span class="sd">            exception is raised.</span>
+<span class="sd">        org_token (str): Optional API token for travis-ci.org.  If not</span>
+<span class="sd">            specified it is read from the environment variables</span>
+<span class="sd">            TRAVIS_TOKEN_ORG. If the environment variable is not specified, an</span>
+<span class="sd">            exception is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">TRAVIS_BASE_COM</span> <span class="o">=</span> <span class="s2">&quot;https://api.travis-ci.com&quot;</span>
+    <span class="n">TRAVIS_BASE_ORG</span> <span class="o">=</span> <span class="s2">&quot;https://api.travis-ci.org&quot;</span>
+
+    <span class="n">NO_ENV_REASON</span> <span class="o">=</span> <span class="s2">&quot;Needed to authenticate to the Travis CI API&quot;</span>
+    <span class="n">INVALID_REASON</span> <span class="o">=</span> <span class="s2">&quot;You have a token but it was rejected by Travis&quot;</span>
+    <span class="n">SUGGESTION_COM</span> <span class="o">=</span> <span class="s2">&quot;Your travis-ci.COM token is on the settings tab of your travis-ci profile: https://travis-ci.com/account/preferences&quot;</span>
+    <span class="n">SUGGESTION_ORG</span> <span class="o">=</span> <span class="s2">&quot;Your travis-ci.ORG token is on the settings tab of your travis-ci profile: https://travis-ci.org/account/preferences&quot;</span>
+
+    <span class="n">_key_cache</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">com_token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">org_token</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">com_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">com_token</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_COM&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">org_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">org_token</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">com_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_COM&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_COM</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">com_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_ORG</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_com_token</span> <span class="o">=</span> <span class="n">com_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_org_token</span> <span class="o">=</span> <span class="n">org_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">org</span><span class="p">:</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRAVIS_BASE_ORG</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">org_token</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRAVIS_BASE_COM</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com_token</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s1">&#39;token </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">),</span>
+                   <span class="s2">&quot;Travis-API-Version&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">url</span>
+
+        <span class="n">resource</span> <span class="o">=</span> <span class="n">base</span> <span class="o">+</span> <span class="n">url</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;HTTP GET </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resource</span><span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;HTTP RESPONSE: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">resp</span>
+
+    <span class="k">def</span> <span class="nf">_get_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">org</span><span class="o">=</span><span class="n">org</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">200</span> <span class="ow">and</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Could not access URL </span><span class="si">{}</span><span class="s2">, error code </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="p">),</span>
+                            <span class="s2">&quot;Make sure the API endpoint exists&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TravisCI.ensure_token"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.ensure_token">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure that the Travis CI access token is valid.&quot;&quot;&quot;</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">200</span> <span class="ow">and</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Token check failed, response: </span><span class="si">%s</span><span class="s2">, content=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_REASON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUGGESTION</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_encode_repo_slug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+        <span class="c1"># Allow (org, repository) format for repo_slug</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">repo_slug</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">quote</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TravisCI.get_info"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get info about this repository on Travis CI.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            repo_slug (str): The repository slug to set up.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The repository info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">encoded_slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_repo_slug</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parse</span><span class="p">(</span><span class="s2">&quot;repo/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoded_slug</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Repository info on </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="TravisCI.use_travis_org"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.use_travis_org">[docs]</a>    <span class="k">def</span> <span class="nf">use_travis_org</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check and see if this repo is on travis.org or com.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if on travis-ci.org, False if on travis-ci.com.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">encoded_slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_repo_slug</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parse</span><span class="p">(</span><span class="s2">&quot;repo/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoded_slug</span><span class="p">),</span> <span class="n">org</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;active_on_org&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parse</span><span class="p">(</span><span class="s2">&quot;repo/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoded_slug</span><span class="p">),</span> <span class="n">org</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;active_on_org&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Could not find repository </span><span class="si">%s</span><span class="s2"> on either travis-ci.org or travis-ci.com&quot;</span> <span class="o">%</span> <span class="n">encoded_slug</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TravisCI.get_key"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.get_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the encryption key for a repository by its slug.</span>
+
+<span class="sd">        This method will automatically get the correct key for the repository</span>
+<span class="sd">        whether it is running on travis-ci.com or travis-ci.org.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">org</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_travis_org</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">org</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting encryption key for </span><span class="si">%s</span><span class="s2"> on travis-ci.org&quot;</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting encryption key for </span><span class="si">%s</span><span class="s2"> on travis-ci.com&quot;</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">)</span>
+
+        <span class="n">encoded_slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encode_repo_slug</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
+
+        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parse</span><span class="p">(</span><span class="s2">&quot;repo/</span><span class="si">{}</span><span class="s2">/key_pair/generated&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">encoded_slug</span><span class="p">),</span> <span class="n">org</span><span class="o">=</span><span class="n">org</span><span class="p">)</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;public_key&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unknown response from Travis CI in get_key: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Unknown response from Travis-CI API: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">resp</span><span class="p">),</span>
+                                <span class="s2">&quot;Check the API documentation&quot;</span><span class="p">)</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key_cache</span><span class="p">[</span><span class="n">repo_slug</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+
+        <span class="k">return</span> <span class="n">key</span></div>
+
+<div class="viewcode-block" id="TravisCI.encrypt_string"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.encrypt_string">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encrypt a string using the repo&#39;s public key.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Encrypting &#39;</span><span class="si">%s</span><span class="s2">&#39; for repo &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="n">key_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_key</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">RSA</span><span class="o">.</span><span class="n">importKey</span><span class="p">(</span><span class="n">key_data</span><span class="p">)</span>
+
+        <span class="n">cipher</span> <span class="o">=</span> <span class="n">PKCS1_v1_5</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">ciphertext</span> <span class="o">=</span> <span class="n">cipher</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TravisCI.encrypt_env"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.encrypt_env">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="o">*</span><span class="n">env_names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encrypt one or more environment variables.</span>
+
+<span class="sd">        The resulting string is suitable for pasting directly into a</span>
+<span class="sd">        .travis.yml file, i.e. it is of the form secure: &lt;encrypted value&gt;</span>
+
+<span class="sd">        See https://github.com/travis-ci/travis-ci/issues/9548 for why it</span>
+<span class="sd">        is necessary to include all secure environment variables in a</span>
+<span class="sd">        single line.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">raw_envs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">env_name</span> <span class="ow">in</span> <span class="n">env_names</span><span class="p">:</span>
+            <span class="n">env_value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">env_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="s2">&quot;Needed to store as encrypted environment variable&quot;</span><span class="p">,</span>
+                                              <span class="s2">&quot;Make sure your environment variables are set correctly&quot;</span><span class="p">)</span>
+
+            <span class="n">raw_txt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">=</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">env_name</span><span class="p">,</span> <span class="n">env_value</span><span class="p">)</span>
+            <span class="n">raw_envs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_txt</span><span class="p">)</span>
+
+        <span class="n">raw_txt</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">raw_envs</span><span class="p">)</span>
+
+        <span class="n">enc_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encrypt_string</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">,</span> <span class="n">raw_txt</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s2">&quot;secure: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">enc_text</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

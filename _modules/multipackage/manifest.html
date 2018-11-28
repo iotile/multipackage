@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.manifest &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.manifest</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.manifest</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A hash based manifest file.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">open</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">future.utils</span> <span class="k">import</span> <span class="n">viewitems</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">line_hash</span><span class="p">,</span> <span class="n">dict_hash</span><span class="p">,</span> <span class="n">atomic_json</span><span class="p">,</span> <span class="n">ManagedFileSection</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">InternalError</span>
+
+<span class="n">VALID</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">NOT_PRESENT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">INVALID_HASH</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">PRESENT_UNKNOWN</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="n">ManagedFile</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;ManagedFile&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;relative_path&quot;</span><span class="p">,</span> <span class="s2">&quot;absolute_path&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;expected_hash&quot;</span><span class="p">,</span> <span class="s2">&quot;hash_type&quot;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="ManifestFile"><a class="viewcode-back" href="../../api/multipackage.manifest.html#multipackage.manifest.ManifestFile">[docs]</a><span class="k">class</span> <span class="nc">ManifestFile</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A hash based manifest file.</span>
+
+<span class="sd">    This class will load a json file that contains relative file paths and</span>
+<span class="sd">    hash values.  It can detect changes in the files using the hashes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): The path to the manifest file.  If it does not exist it</span>
+<span class="sd">            will be initialized as empty.</span>
+<span class="sd">        reporter (object): An error reporter class that has an add_warning</span>
+<span class="sd">            and add_error method.  This is compatible with the signatures</span>
+<span class="sd">            of the Repository class so it can be passed directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">reporter</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relative_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_relative_base</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reporter</span> <span class="o">=</span> <span class="n">reporter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_try_load</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_try_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reporter</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_relative_path</span><span class="p">,</span> <span class="s2">&quot;Manifest file does not exist&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;Run `multipackage init --force`&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error parsing manifest file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reporter</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_relative_path</span><span class="p">,</span> <span class="s2">&quot;Could not parse JSON in manifest file&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;Run `multipackage init --force`&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error loading manifest file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reporter</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_relative_path</span><span class="p">,</span> <span class="s2">&quot;Could not load manifest file&quot;</span><span class="p">,</span>
+                                     <span class="s2">&quot;Run `multipackage init --force`&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">PRESENT_UNKNOWN</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_relative_base</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">NOT_PRESENT</span>
+
+            <span class="n">hash_value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hash&#39;</span><span class="p">)</span>
+            <span class="n">hash_type</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;hash_type&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">hash_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">hash_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid manifest file entry for key </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reporter</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_relative_path</span><span class="p">,</span> <span class="s2">&quot;Invalid manifest entry for key </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">,</span>
+                                         <span class="s2">&quot;Run `multipackage init --force`&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ManagedFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">hash_value</span><span class="p">,</span> <span class="n">hash_type</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ManifestFile.verify_all"><a class="viewcode-back" href="../../api/multipackage.manifest.html#multipackage.manifest.ManifestFile.verify_all">[docs]</a>    <span class="k">def</span> <span class="nf">verify_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Verify the hashes of all managed files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            report (bool): Report errors for all invalid files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">):</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">NOT_PRESENT</span>
+
+            <span class="n">actual_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">absolute_path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">hash_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">actual_hash</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">actual_hash</span> <span class="o">!=</span> <span class="n">info</span><span class="o">.</span><span class="n">expected_hash</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid hash for file </span><span class="si">%s</span><span class="s2">, found </span><span class="si">%s</span><span class="s2">, expected: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                                   <span class="n">info</span><span class="o">.</span><span class="n">absolute_path</span><span class="p">,</span> <span class="n">actual_hash</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">expected_hash</span><span class="p">)</span>
+
+                <span class="n">status</span> <span class="o">=</span> <span class="n">INVALID_HASH</span>
+
+                <span class="k">if</span> <span class="n">report</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_reporter</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;File hash does not match&quot;</span><span class="p">,</span>
+                                             <span class="s2">&quot;Run `multipackage update`&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ManagedFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">absolute_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">expected_hash</span><span class="p">,</span> <span class="n">info</span><span class="o">.</span><span class="n">hash_type</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ManifestFile.verify_file"><a class="viewcode-back" href="../../api/multipackage.manifest.html#multipackage.manifest.ManifestFile.verify_file">[docs]</a>    <span class="k">def</span> <span class="nf">verify_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Verify the status of a given file.</span>
+
+<span class="sd">        The argument should be the path to a given file.  If the file is</span>
+<span class="sd">        not inside the manifest an InternalError is raised.  Otherwise</span>
+<span class="sd">        this method will return a string indicating the file&#39;s status.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str): The path to the file to check.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The status of the file.</span>
+
+<span class="sd">            Possible options are:</span>
+
+<span class="sd">              - not_present: The file is not present</span>
+<span class="sd">              - changed: The file is present but does not match the</span>
+<span class="sd">                recorded hash.</span>
+<span class="sd">              - unchanged: The file is present and its hash is the</span>
+<span class="sd">                same as what was recorded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_key</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;ManifestFile.verify_file called on file that is not in the manifest: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="n">actual_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">absolute_path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="n">info</span><span class="o">.</span><span class="n">hash_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">actual_hash</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;not_present&quot;</span>
+
+        <span class="k">if</span> <span class="n">actual_hash</span> <span class="o">==</span> <span class="n">info</span><span class="o">.</span><span class="n">expected_hash</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;unchanged&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;changed&quot;</span></div>
+
+<div class="viewcode-block" id="ManifestFile.update_file"><a class="viewcode-back" href="../../api/multipackage.manifest.html#multipackage.manifest.ManifestFile.update_file">[docs]</a>    <span class="k">def</span> <span class="nf">update_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add or update the hash for a given file.</span>
+
+<span class="sd">        If the file does not exist, an error is logged and the file is added</span>
+<span class="sd">        to the manifest as NOT_PRESENT.  Otherwise it is added with the</span>
+<span class="sd">        correct hash value.</span>
+
+<span class="sd">        The new manifest data is written out automatically back to the</span>
+<span class="sd">        manifest file on disk.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str): The path to the file that we wish to add to the</span>
+<span class="sd">                manifest.</span>
+<span class="sd">            hash_type (str): Optional specifier of how to calculate the file&#39;s</span>
+<span class="sd">                hash. Supported options are line, json or section.  ``line``</span>
+<span class="sd">                means that the lines are hashed one at a time with line</span>
+<span class="sd">                endings ignored. ``json`` means that the file is valid json</span>
+<span class="sd">                which is loaded and then the dict is normalized and hashed.</span>
+<span class="sd">                ``section`` means that a section of the file is managed while</span>
+<span class="sd">                the rest is not.  Default: &quot;line&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">hash_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;line&#39;</span><span class="p">,</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="s1">&#39;section&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Invalid hash type in update_file: </span><span class="si">%s</span><span class="s2">, supported: line, json&quot;</span><span class="p">,</span> <span class="n">hash_type</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;update_file called with invalid hash type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">hash_type</span><span class="p">)</span>
+
+        <span class="n">abspath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">actual_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="n">hash_type</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_key</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">actual_hash</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">NOT_PRESENT</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;ManifestFile.update_file called on path that does not exist: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">VALID</span>
+
+        <span class="n">info</span> <span class="o">=</span> <span class="n">ManagedFile</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">actual_hash</span><span class="p">,</span> <span class="n">hash_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="ManifestFile.remove_file"><a class="viewcode-back" href="../../api/multipackage.manifest.html#multipackage.manifest.ManifestFile.remove_file">[docs]</a>    <span class="k">def</span> <span class="nf">remove_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a managed file from the manifest.</span>
+
+<span class="sd">        This will remove the entry from this manifest for the file.</span>
+<span class="sd">        If the entry does not exist and force is False, an exception will</span>
+<span class="sd">        be raised.  If force is True, then this error will be silently ignored.</span>
+
+<span class="sd">        This method does not actually touch the file on disk, it just removes</span>
+<span class="sd">        the corresponding entry in this manifest file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path (str): The path to the file to remove.</span>
+<span class="sd">            force (bool): Whether we should throw an error if the file is not</span>
+<span class="sd">                present in the manifest.  Default is False, which means throw</span>
+<span class="sd">                an error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_key</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Attempted to remove unkown file </span><span class="si">%s</span><span class="s2"> from manifest&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Attempted to remove file </span><span class="si">%s</span><span class="s2"> from Manifest but it was not present&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Try using ManifestFile.remove_file(path, force=True)&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ManifestFile.save"><a class="viewcode-back" href="../../api/multipackage.manifest.html#multipackage.manifest.ManifestFile.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Atomically save this file to disk.&quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hash&#39;</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">expected_hash</span><span class="p">,</span> <span class="s1">&#39;hash_type&#39;</span><span class="p">:</span> <span class="n">info</span><span class="o">.</span><span class="n">hash_type</span><span class="p">}</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">viewitems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)}</span>
+        <span class="n">atomic_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="n">abspath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">abspath</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_relative_base</span><span class="p">))</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">key</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_load_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">delimiter_start</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">delimiter_end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">hash_type</span> <span class="o">==</span> <span class="s1">&#39;line&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">line_hash</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hash_type</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">dict_hash</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hash_type</span> <span class="o">==</span> <span class="s1">&#39;section&#39;</span><span class="p">:</span>
+            <span class="n">section</span> <span class="o">=</span> <span class="n">ManagedFileSection</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">delimiter_start</span><span class="o">=</span><span class="n">delimiter_start</span><span class="p">,</span>
+                                         <span class="n">delimiter_end</span><span class="o">=</span><span class="n">delimiter_end</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">section</span><span class="o">.</span><span class="n">actual_hash</span>
+
+        <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;ManifestFile._load_file called with invalid hash type: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">hash_type</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

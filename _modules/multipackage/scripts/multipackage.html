@@ -1,0 +1,482 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.scripts.multipackage &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.scripts.multipackage</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.scripts.multipackage</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Main entry point for multipackage console script.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span><span class="p">,</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">multipackage</span> <span class="k">import</span> <span class="n">Repository</span>
+<span class="kn">from</span> <span class="nn">multipackage.travis</span> <span class="k">import</span> <span class="n">TravisCI</span>
+<span class="kn">from</span> <span class="nn">multipackage.exceptions</span> <span class="k">import</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">UsageError</span>
+<span class="kn">from</span> <span class="nn">multipackage.utilities</span> <span class="k">import</span> <span class="n">GITRepository</span>
+
+<span class="n">DESCRIPTION</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;Manage the build, test and release scripts of a multipackage python repo.</span>
+
+<span class="sd">This command line tool installs and updates a set of scripts that automate the</span>
+<span class="sd">testing and release process of a repository hosted on GitHub and tested on</span>
+<span class="sd">Travis CI.  It specializes in repositories that host multiple related python</span>
+<span class="sd">packages that are released separately to PyPI.</span>
+
+<span class="sd">The major things you can do are:</span>
+
+<span class="sd">$ multipackage init &lt;path to repo or cwd&gt;</span>
+
+<span class="sd">    Provision an initial set of scripts into the repository at the given</span>
+<span class="sd">    path or the CWD if path is not specified.  The program will ask you</span>
+<span class="sd">    a series of questions to confirm actions its taking and make sure</span>
+<span class="sd">    everything is setup correctly.</span>
+
+<span class="sd">$ multipackage update &lt;path to repo or cwd&gt;</span>
+
+<span class="sd">    Update the build and release scripts in the given repository to the</span>
+<span class="sd">    latest version included with this multipackage program.</span>
+
+<span class="sd">$ multipackage doctor</span>
+
+<span class="sd">    Verify that all of your environment variables are set correctly for</span>
+<span class="sd">    running init or update on a repository.</span>
+
+<span class="sd">$ multipackage info &lt;path to repo or cwd&gt;</span>
+
+<span class="sd">    Get information on the packages inside the given repository.  The</span>
+<span class="sd">    reposository must already have a working set of multipackage release</span>
+<span class="sd">    scripts installed via a previous call to multipackage init.</span>
+
+<span class="sd">    This will also verify that all of the multipackage build/release scripts</span>
+<span class="sd">    in the given repository are correctly installed and check for common</span>
+<span class="sd">    errors.</span>
+
+<span class="sd">$ multipackage release &lt;path to repo or cwd&gt; &lt;package name&gt; &lt;version&gt;</span>
+
+<span class="sd">    Tag the given package for release.  Note that this just tags the package</span>
+<span class="sd">    for release, it does not actually release it.  Releasing happens on Travis</span>
+<span class="sd">    CI once the tagged commit is built and verified.  This method will check</span>
+<span class="sd">    for and prevent common release mistakes like not being on master, not</span>
+<span class="sd">    having fetched the latest changes, etc.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="verify_environment"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_environment">[docs]</a><span class="k">def</span> <span class="nf">verify_environment</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Verify that all required environment settings are correct.&quot;&quot;&quot;</span>
+
+    <span class="n">travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
+    <span class="n">travis</span><span class="o">.</span><span class="n">ensure_token</span><span class="p">()</span>
+
+    <span class="n">GITRepository</span><span class="o">.</span><span class="n">version</span><span class="p">()</span></div>
+
+    <span class="c1">#travis.get_key(&#39;iotile/typedargs&#39;)</span>
+    <span class="c1">#encoded = travis.encrypt_string(&#39;iotile/typedargs&#39;, &quot;TEST_ENV=hello&quot;)</span>
+
+
+<div class="viewcode-block" id="create_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.create_repo">[docs]</a><span class="k">def</span> <span class="nf">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to create a Repository object.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">repo_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">repo_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">Repository</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="init_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.init_repo">[docs]</a><span class="k">def</span> <span class="nf">init_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">,</span> <span class="n">clean</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize or reinitialize a repository.&quot;&quot;&quot;</span>
+
+    <span class="n">repo</span> <span class="o">=</span> <span class="n">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
+    <span class="n">repo</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">clean</span><span class="o">=</span><span class="n">clean</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="update_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.update_repo">[docs]</a><span class="k">def</span> <span class="nf">update_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the installed files in a repository.&quot;&quot;&quot;</span>
+
+    <span class="n">repo</span> <span class="o">=</span> <span class="n">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">initialized</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STATUS: Repository has not been set up with multipackage.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set it up with:</span><span class="se">\n\n\t</span><span class="s2">multipackage init </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Repository has errors, please correct them first</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    multipackage info </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="n">repo</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="verify_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_repo">[docs]</a><span class="k">def</span> <span class="nf">verify_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get info on the given repository.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repo_path (str): The path to the repository.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: An error code indicating any issues.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">repo</span> <span class="o">=</span> <span class="n">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">repo_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">repo_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">GITRepository</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">UsageError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository is not a valid git repo.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Make sure your path is correct.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">initialized</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STATUS: Repository has not been set up with multipackage.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set it up with:</span><span class="se">\n\n\t</span><span class="s2">multipackage init </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="n">repo</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">verify_all</span><span class="p">(</span><span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1">#FIXME: There are missing branches on this logic tree</span>
+    <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">settings_changed</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository is up-to-date with no problems.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span> <span class="ow">and</span> <span class="n">repo</span><span class="o">.</span><span class="n">settings_changed</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository needs to be updated.</span><span class="se">\n</span><span class="s2">RUN TO UPDATE:</span><span class="se">\n\n</span><span class="s2">    multipackage update </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_path</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository has </span><span class="si">%d</span><span class="s2"> warning(s)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository has </span><span class="si">%d</span><span class="s2"> error(s) that need to be addressed</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">errors</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;COMPONENTS:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">    python-version=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">component</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERRORS:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">    Fix: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">error</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNINGS:&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">    Fix: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">warning</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="build_parser"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.build_parser">[docs]</a><span class="k">def</span> <span class="nf">build_parser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Build the argument parser.&quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">DESCRIPTION</span><span class="p">,</span> <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-v&#39;</span><span class="p">,</span> <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Increase logging level (goes error, warn, info, debug)&quot;</span><span class="p">)</span>
+    <span class="n">subparser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Supported Subcommands&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;action&#39;</span><span class="p">)</span>
+
+    <span class="n">init_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;init&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Initialize or forcibly clean and reinitialize a repository.&quot;</span><span class="p">,</span>
+                                       <span class="n">help</span><span class="o">=</span><span class="s1">&#39;initialize (or clean and reinitialize) a repo&#39;</span><span class="p">)</span>
+    <span class="n">init_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--force&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Forcibly clean and reinitialize the repo&quot;</span><span class="p">)</span>
+    <span class="n">init_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional path to repository, defaults to cwd&quot;</span><span class="p">)</span>
+
+    <span class="n">_doctor_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;doctor&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Verify your environment settings and connectivity.&quot;</span><span class="p">,</span>
+                                          <span class="n">help</span><span class="o">=</span><span class="s1">&#39;verify your enviornment for multipackage usage&#39;</span><span class="p">)</span>
+
+    <span class="n">info_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Get info on the given repository and verify it is correctly installed&quot;</span><span class="p">,</span>
+                                       <span class="n">help</span><span class="o">=</span><span class="s2">&quot;get info and any errors with a repository&quot;</span><span class="p">)</span>
+    <span class="n">info_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional path to repository, defaults to cwd&quot;</span><span class="p">)</span>
+
+    <span class="n">update_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update all managed files to their latest versions&quot;</span><span class="p">,</span>
+                                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;update all managed files to their latest versions&quot;</span><span class="p">)</span>
+    <span class="n">update_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional path to repository, defaults to cwd&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="setup_logging"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.setup_logging">[docs]</a><span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Setup log level and output.&quot;&quot;&quot;</span>
+
+    <span class="n">should_log</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">verbosity</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">should_log</span><span class="p">:</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">.</span><span class="si">%(msecs)03d</span><span class="s1"> </span><span class="si">%(levelname).3s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;%y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+
+        <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+
+        <span class="n">loglevels</span> <span class="o">=</span> <span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">verbosity</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="p">):</span>
+            <span class="n">verbosity</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">loglevels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="n">level</span> <span class="o">=</span> <span class="n">loglevels</span><span class="p">[</span><span class="n">verbosity</span><span class="p">]</span>
+
+        <span class="n">root</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">root</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NullHandler</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="print_environment_error"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.print_environment_error">[docs]</a><span class="k">def</span> <span class="nf">print_environment_error</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print an error about a missing or incorrect ENV variable.&quot;&quot;&quot;</span>
+
+    <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">variable_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: A required environment variable is not set correctly&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: A required environment variable is missing&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Variable Name: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">variable_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Current Value: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">variable_name</span><span class="p">))</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Use: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">reason</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Suggestion: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">suggestion</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="print_usage_error"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.print_usage_error">[docs]</a><span class="k">def</span> <span class="nf">print_usage_error</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print an error about incorrect usage.&quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;USAGE ERROR: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">suggestion</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Suggestion: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="o">.</span><span class="n">suggestion</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main entry point for multipackage console script.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">build_parser</span><span class="p">()</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+    <span class="n">setup_logging</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;doctor&#39;</span><span class="p">:</span>
+            <span class="n">verify_environment</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;info&#39;</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">verify_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;init&quot;</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">init_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">force</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;update&quot;</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">update_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Command Not Supported Yet&quot;</span><span class="p">)</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">except</span> <span class="n">UsageError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">print_usage_error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">except</span> <span class="n">InvalidEnvironmentError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">print_environment_error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

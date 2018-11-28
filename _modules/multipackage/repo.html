@@ -1,0 +1,600 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.repo &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.repo</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.repo</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Main entry point for dealing with repositories.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">open</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">InternalError</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">atomic_json</span><span class="p">,</span> <span class="n">ManagedFileSection</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">GITRepository</span><span class="p">,</span> <span class="n">find_toplevel_packages</span>
+<span class="kn">from</span> <span class="nn">.manifest</span> <span class="k">import</span> <span class="n">ManifestFile</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">subsystems</span>
+
+
+<span class="n">ErrorMessage</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;ErrorMessage&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;suggestion&#39;</span><span class="p">])</span>
+<span class="n">Component</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_path&#39;</span><span class="p">,</span> <span class="s1">&#39;compatibility&#39;</span><span class="p">,</span> <span class="s1">&#39;packages&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;High-level representation of an entire repository.</span>
+
+<span class="sd">    This is the main class inside ``multipackage`` that processes a complete</span>
+<span class="sd">    repository.  It reads two files from the repository:</span>
+
+<span class="sd">      - multipackage.json: The overall settings for this repository</span>
+<span class="sd">      - multipackage_manifest.json: A manifest file of all of the</span>
+<span class="sd">        files multipackage is managing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): A path to the repository root directory.</span>
+<span class="sd">        nogit (bool): Optional parameter to support creating a repository</span>
+<span class="sd">            from a non-git repository.  This is useful for testing purposes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">DEFAULT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;pypi_package&quot;</span>
+    <span class="n">SETTINGS_FILE</span> <span class="o">=</span> <span class="s2">&quot;multipackage.json&quot;</span>
+    <span class="n">MANIFEST_FILE</span> <span class="o">=</span> <span class="s2">&quot;multipackage_manifest.json&quot;</span>
+    <span class="n">SCRIPT_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;scripts&quot;</span>
+    <span class="n">COMPONENT_FILE</span> <span class="o">=</span> <span class="s2">&quot;components.txt&quot;</span>
+    <span class="n">COMPONENT_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(?P&lt;package&gt;[a-zA-Z_0-9]+):\s*(?P&lt;path&gt;[\.a-zA-Z_\-0-9</span><span class="se">\\</span><span class="s2">/]+)(\s*,\s*compatibility=(?P&lt;compat&gt;universal|python2|python3))?\s*$&quot;</span>
+    <span class="n">SETTINGS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">nogit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Path &#39;</span><span class="si">{}</span><span class="s2">&#39; should be a folder but it doesn&#39;t exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+                             <span class="s2">&quot;Check your path&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Path </span><span class="si">{}</span><span class="s2"> is not a folder&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
+                             <span class="s2">&quot;Check your path&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_try_load</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">ManifestFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_FILE</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nogit</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="o">=</span> <span class="n">GITRepository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_try_load_components</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Whether we have any errors.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">settings_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Whether our settings file on disk has been changed.&quot;&quot;&quot;</span>
+
+        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">verify_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;unchanged&quot;</span>
+
+<div class="viewcode-block" id="Repository.github_slug"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.github_slug">[docs]</a>    <span class="k">def</span> <span class="nf">github_slug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the github slug from this repository.</span>
+
+<span class="sd">        This is a string of the format user/repo_name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;You cannot call github_slug() if you pass nogit to the constructor&quot;</span><span class="p">)</span>
+
+        <span class="n">org</span><span class="p">,</span> <span class="n">repo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">github_name</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">org</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_try_load_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try to load the list of components from this repository.</span>
+
+<span class="sd">        The format of the components text file is a list of lines:</span>
+<span class="sd">        &lt;package_name&gt;: &lt;relative_path&gt;, compatibility=[universal|python2|python3]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">component_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">)</span>
+        <span class="n">relative_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">component_path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Missing components list&quot;</span><span class="p">,</span> <span class="s2">&quot;Run `multipackage update` to reinitialize&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_REGEX</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Could not parse line &#39;</span><span class="si">%s</span><span class="s2">&#39; in components file&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">,</span>
+                               <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">package</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">compat</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;package&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;compat&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">compat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">compat</span> <span class="o">=</span> <span class="s2">&quot;universal&quot;</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">path</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Component folder &#39;</span><span class="si">%s</span><span class="s2">&#39; specified in components file is not a directory&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span>
+                               <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">comp_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="n">packages</span> <span class="o">=</span> <span class="n">find_toplevel_packages</span><span class="p">(</span><span class="n">comp_path</span><span class="p">)</span>
+
+            <span class="n">component</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">compat</span><span class="p">,</span> <span class="n">packages</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding component </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">package</span><span class="p">]</span> <span class="o">=</span> <span class="n">component</span>
+
+    <span class="k">def</span> <span class="nf">_try_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Try to load settings for this repository.&quot;&quot;&quot;</span>
+
+        <span class="n">settings_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">settings_path</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">settings_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+                <span class="n">settings</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error opening file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">settings_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Could not load file due to IO error&quot;</span><span class="p">,</span> <span class="s2">&quot;Check the file&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error loading json from file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">settings_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;File does not contain valid json&quot;</span><span class="p">,</span> <span class="s2">&quot;Verify the file&#39;s contents&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Repository.add_error"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.add_error">[docs]</a>    <span class="k">def</span> <span class="nf">add_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Record an error.&quot;&quot;&quot;</span>
+
+        <span class="n">error</span> <span class="o">=</span> <span class="n">ErrorMessage</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.add_warning"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.add_warning">[docs]</a>    <span class="k">def</span> <span class="nf">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Record a warning.&quot;&quot;&quot;</span>
+
+        <span class="n">error</span> <span class="o">=</span> <span class="n">ErrorMessage</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_load_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load and validate settings dictionary.&quot;&quot;&quot;</span>
+
+        <span class="n">version</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Missing required version key&quot;</span><span class="p">,</span>
+                           <span class="s2">&quot;Run `multipackage init --force` or manually fix.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_VERSION</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Old file version (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">),</span>
+                             <span class="s2">&quot;Run `multipackage update`&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;template&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;options&#39;</span><span class="p">,</span> <span class="p">{})</span>
+
+<div class="viewcode-block" id="Repository.initialize"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">platforms</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;macos&#39;</span><span class="p">,</span> <span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="s1">&#39;linux&#39;</span><span class="p">),</span> <span class="n">python_versions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;3.6&#39;</span><span class="p">)):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize or reinitialize this repository.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">clean</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Cannot re-initialize an initialized repository unless --force is passed&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;multipackage init --force&quot;</span><span class="p">)</span>
+
+        <span class="n">valid_platforms</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;macos&#39;</span><span class="p">,</span> <span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="s1">&#39;linux&#39;</span><span class="p">)</span>
+        <span class="n">valid_python_versions</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;3.6&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">platform</span> <span class="ow">in</span> <span class="n">platforms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">platform</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_platforms</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Invalid platform specified: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">platform</span><span class="p">,</span>
+                                 <span class="s2">&quot;Valid platform options are: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">valid_platforms</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">python</span> <span class="ow">in</span> <span class="n">python_versions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">python</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_python_versions</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Invalid python version specified: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">python</span><span class="p">,</span>
+                                 <span class="s2">&quot;Valid platform options are: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">valid_python_versions</span><span class="p">)</span>
+
+        <span class="n">settings</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_VERSION</span><span class="p">,</span>
+            <span class="s1">&#39;template&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;test_matrix&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;platforms&#39;</span><span class="p">:</span> <span class="n">platforms</span><span class="p">,</span>
+                    <span class="s1">&#39;python_versions&#39;</span><span class="p">:</span> <span class="n">python_versions</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">atomic_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">),</span> <span class="n">settings</span><span class="p">)</span>
+        <span class="n">atomic_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_FILE</span><span class="p">),</span> <span class="p">{})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">),</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Make sure we start off with a blank components file if it doesn&#39;t exist already</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="s2">&quot;scripts&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;scripts/components.txt&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;components.txt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Repository.ensure_lines"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.ensure_lines">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">delimiter_start</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="n">delimiter_end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure that the following lines are in the given file.</span>
+
+<span class="sd">        This will create or update a ManagedSection and ensure that the</span>
+<span class="sd">        following lines are all present in that file.  The lines are assumed</span>
+<span class="sd">        to be unordered so they are added independently of each other.</span>
+
+<span class="sd">        This method is idempotent. It will only add a line to the file if it</span>
+<span class="sd">        does not already exist.</span>
+
+<span class="sd">        The lines are automatically saved to disk.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            relative_path (str): The relative path to the file that we want to</span>
+<span class="sd">                update.</span>
+<span class="sd">            lines (list of str): A list of strings to add to the given file if</span>
+<span class="sd">                they do not exist.</span>
+<span class="sd">            present (bool): If True, ensure lines are present (the default), if</span>
+<span class="sd">                False, ensure lines are absent.</span>
+<span class="sd">            delimiter_start (str): The character string that starts a managed file</span>
+<span class="sd">                section block header line.  This is usually a comment character</span>
+<span class="sd">                like &#39;#&#39;.</span>
+<span class="sd">            delimiter_end (str): Optional charcter string that ends</span>
+<span class="sd">                a managed file section block header line.  This defaults to</span>
+<span class="sd">                None but can be set to a value if comments need to be explicitly</span>
+<span class="sd">                closed such as delimiter_start=&quot;&lt;!-- &quot;, delimiter_end=&quot; --&gt;&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="n">ManagedFileSection</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">delimiter_start</span><span class="o">=</span><span class="n">delimiter_start</span><span class="p">,</span> <span class="n">delimiter_end</span><span class="o">=</span><span class="n">delimiter_end</span><span class="p">)</span>
+        <span class="n">section</span><span class="o">.</span><span class="n">ensure_lines</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="n">present</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;section&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.ensure_directory"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.ensure_directory">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">gitkeep</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure that a given directory exists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            relative_path (str): The relative path to the directory that we</span>
+<span class="sd">                wish to check.</span>
+<span class="sd">            gitkeep (bool): Also insert an unmanaged .gitkeep file to ensure</span>
+<span class="sd">                the directory is saved in the git repo history.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Cannot create directory, a file is in its place: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Remove or rename the file to make space for the directory&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">gitkeep</span><span class="p">:</span>
+            <span class="n">gitkeep_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;.gitkeep&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">gitkeep_path</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">gitkeep_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Repository.ensure_script"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.ensure_script">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_script</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure that a script file is copied.</span>
+
+<span class="sd">        This function will copy or remove the given script file. All script</span>
+<span class="sd">        files come from the multipackage/data/scripts folder.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            relative_path (str): The relative path to the file that we want to</span>
+<span class="sd">                update.</span>
+<span class="sd">            source (str): The name of the template file to render</span>
+<span class="sd">            present (bool): If True, ensure lines are present (the default), if</span>
+<span class="sd">                False, ensure lines are absent.</span>
+<span class="sd">            overwrite (bool): Overwrite the file if it exists already. Setting this</span>
+<span class="sd">                to False will ensure that the file is added only if is absent,</span>
+<span class="sd">                allowing for initializing files that are not present without</span>
+<span class="sd">                subsequently overwriting them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span><span class="p">,</span> <span class="n">Requirement</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">present</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="n">source_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resource_filename</span><span class="p">(</span><span class="n">Requirement</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;multipackage&quot;</span><span class="p">),</span> <span class="s2">&quot;multipackage/data/scripts&quot;</span><span class="p">),</span> <span class="n">source</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.ensure_template"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.ensure_template">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure that the contents of a given file match a template.</span>
+
+<span class="sd">        This function will render the given template shipped with the</span>
+<span class="sd">        multipackage package.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            relative_path (str): The relative path to the file that we want to</span>
+<span class="sd">                update.</span>
+<span class="sd">            template (str): The name of the template file to render</span>
+<span class="sd">            variables (dict): A set of substitution variables to fill into</span>
+<span class="sd">                the template.</span>
+<span class="sd">            present (bool): If True, ensure lines are present (the default), if</span>
+<span class="sd">                False, ensure lines are absent.</span>
+<span class="sd">            overwrite (bool): Overwrite the file if it exists already. Setting this</span>
+<span class="sd">                to False will ensure that the file is added only if is absent,</span>
+<span class="sd">                allowing for initializing files that are not present without</span>
+<span class="sd">                subsequently overwriting them.</span>
+<span class="sd">            raw (bool): Do not actually fill in the template, just copy it into place.</span>
+<span class="sd">                This is useful if the file itself is a jinja2 template that should</span>
+<span class="sd">                be rendered later.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">present</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">overwrite</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span><span class="p">,</span> <span class="n">Requirement</span>
+            <span class="n">source_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resource_filename</span><span class="p">(</span><span class="n">Requirement</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;multipackage&quot;</span><span class="p">),</span> <span class="s2">&quot;multipackage/data/templates&quot;</span><span class="p">),</span> <span class="n">template</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">source_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">render_template</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.update"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update all of the managed files in this multipackage installation.</span>
+
+<span class="sd">        This method delegates to all of the enabled multipackage subsystems to</span>
+<span class="sd">        actually update each subcomponent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;You must initialize a repository before updating it&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;multipackage init&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Correct repository errors before updating&quot;</span><span class="p">,</span>
+                             <span class="s2">&quot;multipackage info&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subsystems</span><span class="o">.</span><span class="n">BasicSubsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+            <span class="n">subsystems</span><span class="o">.</span><span class="n">LintingSubsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+            <span class="n">subsystems</span><span class="o">.</span><span class="n">TravisSubsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+            <span class="n">subsystems</span><span class="o">.</span><span class="n">DocumentationSubsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">),</span> <span class="n">hash_type</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">))</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

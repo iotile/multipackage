@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.utilities.managed_section &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.utilities.managed_section</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.utilities.managed_section</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Helper class for managing a block of content inside a text file.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">open</span>
+<span class="kn">from</span> <span class="nn">.obj_hash</span> <span class="k">import</span> <span class="n">line_hash</span>
+<span class="kn">from</span> <span class="nn">.file_ops</span> <span class="k">import</span> <span class="n">atomic_save</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">ManualInterventionError</span>
+
+
+<div class="viewcode-block" id="ManagedFileSection"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection">[docs]</a><span class="k">class</span> <span class="nc">ManagedFileSection</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A section of a text file that is managed by multipackage.</span>
+
+<span class="sd">    This class helps define a block of lines inside a file with</span>
+<span class="sd">    a fence around them.  The contents of the fence are hashed</span>
+<span class="sd">    so that modifications can be detected and the fence data</span>
+<span class="sd">    can be versioned.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        path (str): The path to the file that we want to manage.</span>
+<span class="sd">            This file does not need to exist and will be created</span>
+<span class="sd">            when you try to update it with data if it does not</span>
+<span class="sd">            currently exist.</span>
+<span class="sd">        delimiter_start (str): The character string that starts a managed file</span>
+<span class="sd">            section block header line.  This is usually a comment character</span>
+<span class="sd">            like &#39;#&#39;.</span>
+<span class="sd">        delimiter_end (str): Optional charcter string that ends a managed file</span>
+<span class="sd">            section block header line.  This defaults to an emptry string but</span>
+<span class="sd">            can be set to a value if comments need to be explicitly closed</span>
+<span class="sd">            such as delimiter_start=&quot;&lt;!-- &quot;, delimiter_end=&quot; --&gt;&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">SECTION_START</span> <span class="o">=</span> <span class="s2">&quot;BEGIN MULTIPACKAGE MANAGED SECTION, HASH=&quot;</span>
+    <span class="n">SECTION_END</span> <span class="o">=</span> <span class="s2">&quot;END MULTIPACKAGE MANAGED SECTION&quot;</span>
+    <span class="n">HASH_HEX_LENGTH</span> <span class="o">=</span> <span class="mi">32</span>
+
+    <span class="n">MANAGE_ERROR</span> <span class="o">=</span> <span class="s2">&quot;A file that needs to be managed by multipackage exists and is a directory, not a file&quot;</span>
+    <span class="n">MULTIPLE_SECTION_ERROR</span> <span class="o">=</span> <span class="s2">&quot;A file that is managed by multipackage has been corrupted&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">delimiter_start</span><span class="o">=</span><span class="s1">&#39;# &#39;</span><span class="p">,</span> <span class="n">delimiter_end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_start</span> <span class="o">=</span> <span class="n">delimiter_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span> <span class="o">=</span> <span class="n">delimiter_end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_ending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_native_line_ending</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ManualInterventionError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MANAGE_ERROR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_exists</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actual_hash</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_line</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file_exists</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_section</span><span class="p">()</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_native_line_ending</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Windows&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_infer_line_ending</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">):</span>
+        <span class="n">found_counts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">final_char</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">final_char</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\r</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="n">final_char</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+
+            <span class="k">if</span> <span class="n">final_char</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">found_counts</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">found_counts</span><span class="p">[</span><span class="n">final_char</span><span class="p">]</span> <span class="o">=</span> <span class="n">found_counts</span><span class="p">[</span><span class="n">final_char</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">found_counts</span><span class="p">[</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">found_counts</span><span class="p">[</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_native_line_ending</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">found_counts</span><span class="p">[</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">found_counts</span><span class="p">[</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span>
+
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="nf">_load_section</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Attempt to load a managed file section.&quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_ending</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_infer_line_ending</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="n">start_line</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">section_hash</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">end_line</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_start</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_start</span><span class="p">):]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span><span class="p">)]</span>
+
+            <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SECTION_START</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">start_line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ManualInterventionError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MULTIPLE_SECTION_ERROR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+                <span class="n">start_line</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">section_hash</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SECTION_START</span><span class="p">):]</span>
+            <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SECTION_END</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">start_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ManualInterventionError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MULTIPLE_SECTION_ERROR</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+                <span class="n">end_line</span> <span class="o">=</span> <span class="n">i</span>
+
+        <span class="k">if</span> <span class="n">start_line</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end_line</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">other_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Verify the section hash</span>
+        <span class="n">section_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[</span><span class="n">start_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">end_line</span><span class="p">]]</span>
+        <span class="n">other_lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[:</span><span class="n">start_line</span><span class="p">]</span> <span class="o">+</span> <span class="n">lines</span><span class="p">[</span><span class="n">end_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="n">other_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">other_lines</span><span class="p">]</span>
+
+        <span class="n">actual_hash</span> <span class="o">=</span> <span class="n">line_hash</span><span class="p">(</span><span class="n">section_lines</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">section_lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">other_lines</span> <span class="o">=</span> <span class="n">other_lines</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actual_hash</span> <span class="o">=</span> <span class="n">actual_hash</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="n">actual_hash</span> <span class="o">!=</span> <span class="n">section_hash</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_line</span> <span class="o">=</span> <span class="n">start_line</span>
+
+<div class="viewcode-block" id="ManagedFileSection.ensure_lines"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection.ensure_lines">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensure that the given lines are present or absent in this file.</span>
+
+<span class="sd">        Each line is added independently and no order is assumed. This method</span>
+<span class="sd">        is idempotent so that you can call it repeatedly and each line will</span>
+<span class="sd">        only be added once.  The lines must match exactly.</span>
+
+<span class="sd">        The lines must be distinct.  If there are multiple copies of the same</span>
+<span class="sd">        line in ``lines``, only one copy will be added to the file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lines (list of str): A list of lines to add to the</span>
+<span class="sd">                file if they are not present or remove from the file if they are.</span>
+<span class="sd">                Whether the lines are added or removed is controlled by the</span>
+<span class="sd">                ``present`` parameter.</span>
+<span class="sd">            present (bool): If True, ensure lines are present (the default), if</span>
+<span class="sd">                False, ensure lines are absent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">present</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">lines</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">line</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ManagedFileSection.update"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update or add a managed section into the file.</span>
+
+<span class="sd">        This method will add a new managed section into the file or update the</span>
+<span class="sd">        section that is currently there, replacing its contents with those</span>
+<span class="sd">        specified in update.  The resulting file will we written out to disk.</span>
+
+<span class="sd">        If the file does not currently exist, it will be created, otherwise</span>
+<span class="sd">        its contents will be replaced.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lines (list of str): A list of lines to add to the</span>
+<span class="sd">                file.  If this is passed as None, then the current value of</span>
+<span class="sd">                self.section_contents will be used instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">lines</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span>
+
+        <span class="k">if</span> <span class="n">lines</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">hash_hex</span> <span class="o">=</span> <span class="n">line_hash</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="n">start_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SECTION_START</span> <span class="o">+</span> <span class="n">hash_hex</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span>
+        <span class="n">end_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SECTION_END</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span>
+
+        <span class="n">new_section</span> <span class="o">=</span> <span class="p">[</span><span class="n">start_line</span><span class="p">]</span> <span class="o">+</span> <span class="n">lines</span> <span class="o">+</span> <span class="p">[</span><span class="n">end_line</span><span class="p">]</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_lines</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_line</span><span class="p">]</span> <span class="o">+</span> <span class="n">new_section</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">other_lines</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_line</span><span class="p">:]</span>
+
+        <span class="c1"># Always terminate with a final newline</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_ending</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_ending</span>
+        <span class="n">atomic_save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">new_section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_exists</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

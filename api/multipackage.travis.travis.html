@@ -1,0 +1,387 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.travis.travis module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.utilities package" href="multipackage.utilities.html" />
+    <link rel="prev" title="multipackage.travis package" href="multipackage.travis.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.travis.html">multipackage.travis package</a> &raquo;</li>
+        
+      <li>multipackage.travis.travis module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.travis.travis.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.travis.travis">
+<span id="multipackage-travis-travis-module"></span><h1>multipackage.travis.travis module<a class="headerlink" href="#module-multipackage.travis.travis" title="Permalink to this headline">¶</a></h1>
+<p>Wrapper class for Travis CI API v3.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.travis.travis.TravisCI" title="multipackage.travis.travis.TravisCI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TravisCI</span></code></a></td>
+<td>Wrapper for Travis CI API v3.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="multipackage.travis.travis.TravisCI">
+<em class="property">class </em><code class="descclassname">multipackage.travis.travis.</code><code class="descname">TravisCI</code><span class="sig-paren">(</span><em>com_token=None</em>, <em>org_token=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Wrapper for Travis CI API v3.</p>
+<p>This wrapper is not complete but currently just implements the features
+needed for multipackage including setting up a repository and encrypting
+data.</p>
+<p>Note that repositories can run builds on either travis-ci.org or travis-ci.com.
+When encrypting environment variables, it’s required that the variable be
+encrypted with the public key for either .com or .org, otherwise the variable
+will not decrypt correctly.</p>
+<p>You must have environment variables set for:</p>
+<blockquote>
+<div><ul class="simple">
+<li>TRAVIS_TOKEN_COM: Your travis-ci.com token</li>
+<li>TRAVIS_TOKEN_ORG: YOur travis-ci.org token</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>com_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional API token for travis-ci.com.  If not
+specified it is read from the environment variables
+TRAVIS_TOKEN_COM. If the environment variable is not specified, an
+exception is raised.</li>
+<li><strong>org_token</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional API token for travis-ci.org.  If not
+specified it is read from the environment variables
+TRAVIS_TOKEN_ORG. If the environment variable is not specified, an
+exception is raised.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="multipackage.travis.travis.TravisCI.TRAVIS_BASE_COM">
+<code class="descname">TRAVIS_BASE_COM</code><em class="property"> = 'https://api.travis-ci.com'</em><a class="headerlink" href="#multipackage.travis.travis.TravisCI.TRAVIS_BASE_COM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.travis.travis.TravisCI.TRAVIS_BASE_ORG">
+<code class="descname">TRAVIS_BASE_ORG</code><em class="property"> = 'https://api.travis-ci.org'</em><a class="headerlink" href="#multipackage.travis.travis.TravisCI.TRAVIS_BASE_ORG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.travis.travis.TravisCI.NO_ENV_REASON">
+<code class="descname">NO_ENV_REASON</code><em class="property"> = 'Needed to authenticate to the Travis CI API'</em><a class="headerlink" href="#multipackage.travis.travis.TravisCI.NO_ENV_REASON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.travis.travis.TravisCI.INVALID_REASON">
+<code class="descname">INVALID_REASON</code><em class="property"> = 'You have a token but it was rejected by Travis'</em><a class="headerlink" href="#multipackage.travis.travis.TravisCI.INVALID_REASON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.travis.travis.TravisCI.SUGGESTION_COM">
+<code class="descname">SUGGESTION_COM</code><em class="property"> = 'Your travis-ci.COM token is on the settings tab of your travis-ci profile: https://travis-ci.com/account/preferences'</em><a class="headerlink" href="#multipackage.travis.travis.TravisCI.SUGGESTION_COM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.travis.travis.TravisCI.SUGGESTION_ORG">
+<code class="descname">SUGGESTION_ORG</code><em class="property"> = 'Your travis-ci.ORG token is on the settings tab of your travis-ci profile: https://travis-ci.org/account/preferences'</em><a class="headerlink" href="#multipackage.travis.travis.TravisCI.SUGGESTION_ORG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="multipackage.travis.travis.TravisCI.ensure_token">
+<code class="descname">ensure_token</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.ensure_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.ensure_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the Travis CI access token is valid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.travis.travis.TravisCI.get_info">
+<code class="descname">get_info</code><span class="sig-paren">(</span><em>repo_slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.get_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.get_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get info about this repository on Travis CI.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>repo_slug</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The repository slug to set up.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The repository info</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.travis.travis.TravisCI.use_travis_org">
+<code class="descname">use_travis_org</code><span class="sig-paren">(</span><em>repo_slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.use_travis_org"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.use_travis_org" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check and see if this repo is on travis.org or com.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if on travis-ci.org, False if on travis-ci.com.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.travis.travis.TravisCI.get_key">
+<code class="descname">get_key</code><span class="sig-paren">(</span><em>repo_slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.get_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.get_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the encryption key for a repository by its slug.</p>
+<p>This method will automatically get the correct key for the repository
+whether it is running on travis-ci.com or travis-ci.org.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.travis.travis.TravisCI.encrypt_string">
+<code class="descname">encrypt_string</code><span class="sig-paren">(</span><em>repo_slug</em>, <em>text</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.encrypt_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.encrypt_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypt a string using the repo’s public key.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.travis.travis.TravisCI.encrypt_env">
+<code class="descname">encrypt_env</code><span class="sig-paren">(</span><em>repo_slug</em>, <em>*env_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.encrypt_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.encrypt_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypt one or more environment variables.</p>
+<p>The resulting string is suitable for pasting directly into a
+.travis.yml file, i.e. it is of the form secure: &lt;encrypted value&gt;</p>
+<p>See <a class="reference external" href="https://github.com/travis-ci/travis-ci/issues/9548">https://github.com/travis-ci/travis-ci/issues/9548</a> for why it
+is necessary to include all secure environment variables in a
+single line.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.utilities.html" class="btn btn-neutral float-right" title="multipackage.utilities package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.travis.html" class="btn btn-neutral" title="multipackage.travis package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.repo module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.data package" href="multipackage.data.html" />
+    <link rel="prev" title="multipackage.manifest module" href="multipackage.manifest.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="multipackage.exceptions.html">multipackage.exceptions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.manifest.html">multipackage.manifest module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">multipackage.repo module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+      <li>multipackage.repo module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.repo.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.repo">
+<span id="multipackage-repo-module"></span><h1>multipackage.repo module<a class="headerlink" href="#module-multipackage.repo" title="Permalink to this headline">¶</a></h1>
+<p>Main entry point for dealing with repositories.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.repo.Component" title="multipackage.repo.Component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Component</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.repo.ErrorMessage" title="multipackage.repo.ErrorMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ErrorMessage</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.repo.Repository" title="multipackage.repo.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></td>
+<td>High-level representation of an entire repository.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="multipackage.repo.ErrorMessage">
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">ErrorMessage</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.ErrorMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="multipackage.repo.ErrorMessage.file">
+<code class="descname">file</code><a class="headerlink" href="#multipackage.repo.ErrorMessage.file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.ErrorMessage.message">
+<code class="descname">message</code><a class="headerlink" href="#multipackage.repo.ErrorMessage.message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.ErrorMessage.suggestion">
+<code class="descname">suggestion</code><a class="headerlink" href="#multipackage.repo.ErrorMessage.suggestion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="multipackage.repo.Component">
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>name</em>, <em>relative_path</em>, <em>compatibility</em>, <em>packages</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.Component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="multipackage.repo.Component.compatibility">
+<code class="descname">compatibility</code><a class="headerlink" href="#multipackage.repo.Component.compatibility" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Component.name">
+<code class="descname">name</code><a class="headerlink" href="#multipackage.repo.Component.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Component.packages">
+<code class="descname">packages</code><a class="headerlink" href="#multipackage.repo.Component.packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Component.relative_path">
+<code class="descname">relative_path</code><a class="headerlink" href="#multipackage.repo.Component.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="multipackage.repo.Repository">
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Repository</code><span class="sig-paren">(</span><em>path</em>, <em>nogit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>High-level representation of an entire repository.</p>
+<p>This is the main class inside <code class="docutils literal notranslate"><span class="pre">multipackage</span></code> that processes a complete
+repository.  It reads two files from the repository:</p>
+<blockquote>
+<div><ul class="simple">
+<li>multipackage.json: The overall settings for this repository</li>
+<li>multipackage_manifest.json: A manifest file of all of the
+files multipackage is managing.</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A path to the repository root directory.</li>
+<li><strong>nogit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Optional parameter to support creating a repository
+from a non-git repository.  This is useful for testing purposes.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.DEFAULT_TEMPLATE">
+<code class="descname">DEFAULT_TEMPLATE</code><em class="property"> = 'pypi_package'</em><a class="headerlink" href="#multipackage.repo.Repository.DEFAULT_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.SETTINGS_FILE">
+<code class="descname">SETTINGS_FILE</code><em class="property"> = 'multipackage.json'</em><a class="headerlink" href="#multipackage.repo.Repository.SETTINGS_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.MANIFEST_FILE">
+<code class="descname">MANIFEST_FILE</code><em class="property"> = 'multipackage_manifest.json'</em><a class="headerlink" href="#multipackage.repo.Repository.MANIFEST_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.SCRIPT_FOLDER">
+<code class="descname">SCRIPT_FOLDER</code><em class="property"> = 'scripts'</em><a class="headerlink" href="#multipackage.repo.Repository.SCRIPT_FOLDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.COMPONENT_FILE">
+<code class="descname">COMPONENT_FILE</code><em class="property"> = 'components.txt'</em><a class="headerlink" href="#multipackage.repo.Repository.COMPONENT_FILE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.COMPONENT_REGEX">
+<code class="descname">COMPONENT_REGEX</code><em class="property"> = '^(?P&lt;package&gt;[a-zA-Z_0-9]+):\\s*(?P&lt;path&gt;[\\.a-zA-Z_\\-0-9\\\\/]+)(\\s*,\\s*compatibility=(?P&lt;compat&gt;universal|python2|python3))?\\s*$'</em><a class="headerlink" href="#multipackage.repo.Repository.COMPONENT_REGEX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.SETTINGS_VERSION">
+<code class="descname">SETTINGS_VERSION</code><em class="property"> = '1.0'</em><a class="headerlink" href="#multipackage.repo.Repository.SETTINGS_VERSION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.clean">
+<code class="descname">clean</code><a class="headerlink" href="#multipackage.repo.Repository.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether we have any errors.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.settings_changed">
+<code class="descname">settings_changed</code><a class="headerlink" href="#multipackage.repo.Repository.settings_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether our settings file on disk has been changed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.github_slug">
+<code class="descname">github_slug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.github_slug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.github_slug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the github slug from this repository.</p>
+<p>This is a string of the format user/repo_name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.add_error">
+<code class="descname">add_error</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record an error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.add_warning">
+<code class="descname">add_warning</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record a warning.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.initialize">
+<code class="descname">initialize</code><span class="sig-paren">(</span><em>clean=False</em>, <em>platforms=('macos'</em>, <em>'windows'</em>, <em>'linux')</em>, <em>python_versions=('2.7'</em>, <em>'3.6')</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.initialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.initialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize or reinitialize this repository.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.ensure_lines">
+<code class="descname">ensure_lines</code><span class="sig-paren">(</span><em>relative_path</em>, <em>lines</em>, <em>present=True</em>, <em>delimiter_start='#'</em>, <em>delimiter_end=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the following lines are in the given file.</p>
+<p>This will create or update a ManagedSection and ensure that the
+following lines are all present in that file.  The lines are assumed
+to be unordered so they are added independently of each other.</p>
+<p>This method is idempotent. It will only add a line to the file if it
+does not already exist.</p>
+<p>The lines are automatically saved to disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The relative path to the file that we want to
+update.</li>
+<li><strong>lines</strong> (<em>list of str</em>) – A list of strings to add to the given file if
+they do not exist.</li>
+<li><strong>present</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, ensure lines are present (the default), if
+False, ensure lines are absent.</li>
+<li><strong>delimiter_start</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The character string that starts a managed file
+section block header line.  This is usually a comment character
+like ‘#’.</li>
+<li><strong>delimiter_end</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional charcter string that ends
+a managed file section block header line.  This defaults to
+None but can be set to a value if comments need to be explicitly
+closed such as delimiter_start=”&lt;!– “, delimiter_end=” –&gt;”.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.ensure_directory">
+<code class="descname">ensure_directory</code><span class="sig-paren">(</span><em>relative_path</em>, <em>gitkeep=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that a given directory exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The relative path to the directory that we
+wish to check.</li>
+<li><strong>gitkeep</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Also insert an unmanaged .gitkeep file to ensure
+the directory is saved in the git repo history.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.ensure_script">
+<code class="descname">ensure_script</code><span class="sig-paren">(</span><em>relative_path</em>, <em>source</em>, <em>present=True</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_script"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_script" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that a script file is copied.</p>
+<p>This function will copy or remove the given script file. All script
+files come from the multipackage/data/scripts folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The relative path to the file that we want to
+update.</li>
+<li><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the template file to render</li>
+<li><strong>present</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, ensure lines are present (the default), if
+False, ensure lines are absent.</li>
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Overwrite the file if it exists already. Setting this
+to False will ensure that the file is added only if is absent,
+allowing for initializing files that are not present without
+subsequently overwriting them.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.ensure_template">
+<code class="descname">ensure_template</code><span class="sig-paren">(</span><em>relative_path</em>, <em>template</em>, <em>variables=None</em>, <em>present=True</em>, <em>overwrite=True</em>, <em>raw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the contents of a given file match a template.</p>
+<p>This function will render the given template shipped with the
+multipackage package.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>relative_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The relative path to the file that we want to
+update.</li>
+<li><strong>template</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the template file to render</li>
+<li><strong>variables</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A set of substitution variables to fill into
+the template.</li>
+<li><strong>present</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, ensure lines are present (the default), if
+False, ensure lines are absent.</li>
+<li><strong>overwrite</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Overwrite the file if it exists already. Setting this
+to False will ensure that the file is added only if is absent,
+allowing for initializing files that are not present without
+subsequently overwriting them.</li>
+<li><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Do not actually fill in the template, just copy it into place.
+This is useful if the file itself is a jinja2 template that should
+be rendered later.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.update">
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update all of the managed files in this multipackage installation.</p>
+<p>This method delegates to all of the enabled multipackage subsystems to
+actually update each subcomponent.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.data.html" class="btn btn-neutral float-right" title="multipackage.data package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.manifest.html" class="btn btn-neutral" title="multipackage.manifest module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

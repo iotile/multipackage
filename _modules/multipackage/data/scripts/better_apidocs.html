@@ -1,0 +1,1016 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.data.scripts.better_apidocs &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.data.scripts.better_apidocs</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.data.scripts.better_apidocs</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    better apidoc</span>
+<span class="sd">    ~~~~~~~~~~~~~</span>
+
+<span class="sd">    Parses a directory tree looking for Python modules and packages and creates</span>
+<span class="sd">    ReST files appropriately to create code documentation with Sphinx.  It also</span>
+<span class="sd">    creates a modules index (named modules.&lt;suffix&gt;).</span>
+
+<span class="sd">    This is derived from the &quot;sphinx-apidoc&quot; script, which is:</span>
+<span class="sd">    Copyright 2007-2016 by the Sphinx team</span>
+<span class="sd">    http://www.sphinx-doc.org</span>
+
+<span class="sd">    It extends &quot;sphinx-apidoc&quot; by the --template / -t option, which allows to</span>
+<span class="sd">    render the output ReST files based on arbitrary Jinja templates.</span>
+
+<span class="sd">    :copyright: Copyright 2017-2018 by Michael Goerz</span>
+<span class="sd">    :license: BSD, see LICENSE for details.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">binary_type</span>
+<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="k">import</span> <span class="n">fnmatch</span>
+<span class="kn">from</span> <span class="nn">docutils</span> <span class="k">import</span> <span class="n">nodes</span>
+<span class="kn">from</span> <span class="nn">docutils.parsers.rst.states</span> <span class="k">import</span> <span class="n">RSTStateMachine</span><span class="p">,</span> <span class="n">state_classes</span>
+<span class="kn">from</span> <span class="nn">docutils.utils</span> <span class="k">import</span> <span class="n">new_document</span><span class="p">,</span> <span class="n">Reporter</span> <span class="k">as</span> <span class="n">NullReporter</span>
+
+<span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">FileSystemLoader</span><span class="p">,</span> <span class="n">TemplateNotFound</span>
+<span class="kn">from</span> <span class="nn">jinja2.sandbox</span> <span class="k">import</span> <span class="n">SandboxedEnvironment</span>
+
+<span class="kn">from</span> <span class="nn">sphinx.util.osutil</span> <span class="k">import</span> <span class="n">FileAvoidWrite</span><span class="p">,</span> <span class="n">walk</span>
+<span class="c1">#from sphinx import __display_version__</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sphinx.cmd.quickstart</span> <span class="k">import</span> <span class="n">EXTENSIONS</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">sphinx.quickstart</span> <span class="k">import</span> <span class="n">EXTENSIONS</span>
+<span class="kn">from</span> <span class="nn">sphinx.ext.autosummary</span> <span class="k">import</span> <span class="n">get_documenter</span>
+<span class="kn">from</span> <span class="nn">sphinx.util.inspect</span> <span class="k">import</span> <span class="n">safe_getattr</span>
+
+<span class="n">periods_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.(?:\s+)&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add documenters to AutoDirective registry</span>
+<span class="kn">from</span> <span class="nn">sphinx.ext.autodoc</span> <span class="k">import</span> <span class="n">add_documenter</span><span class="p">,</span> \
+    <span class="n">ModuleDocumenter</span><span class="p">,</span> <span class="n">ClassDocumenter</span><span class="p">,</span> <span class="n">ExceptionDocumenter</span><span class="p">,</span> <span class="n">DataDocumenter</span><span class="p">,</span> \
+    <span class="n">FunctionDocumenter</span><span class="p">,</span> <span class="n">MethodDocumenter</span><span class="p">,</span> <span class="n">AttributeDocumenter</span><span class="p">,</span> \
+    <span class="n">InstanceAttributeDocumenter</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">ModuleDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">ClassDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">ExceptionDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">DataDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">FunctionDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">MethodDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">AttributeDocumenter</span><span class="p">)</span>
+<span class="n">add_documenter</span><span class="p">(</span><span class="n">InstanceAttributeDocumenter</span><span class="p">)</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.2.0&#39;</span>
+<span class="n">__display_version__</span> <span class="o">=</span> <span class="n">__version__</span>
+
+<span class="k">if</span> <span class="kc">False</span><span class="p">:</span>
+    <span class="c1"># For type annotation</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>  <span class="c1"># NOQA</span>
+
+<span class="c1"># automodule options</span>
+<span class="k">if</span> <span class="s1">&#39;SPHINX_APIDOC_OPTIONS&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;SPHINX_APIDOC_OPTIONS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;members&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;undoc-members&#39;</span><span class="p">,</span>
+        <span class="c1"># &#39;inherited-members&#39;, # disabled because there&#39;s a bug in sphinx</span>
+        <span class="s1">&#39;show-inheritance&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+<span class="n">INITPY</span> <span class="o">=</span> <span class="s1">&#39;__init__.py&#39;</span>
+<span class="n">PY_SUFFIXES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;.py&#39;</span><span class="p">,</span> <span class="s1">&#39;.pyx&#39;</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">_warn</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="c1"># type: (unicode) -&gt; None</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: &#39;</span> <span class="o">+</span> <span class="n">msg</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="makename"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.makename">[docs]</a><span class="k">def</span> <span class="nf">makename</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, unicode) -&gt; unicode</span>
+    <span class="sd">&quot;&quot;&quot;Join package and module with a dot.&quot;&quot;&quot;</span>
+    <span class="c1"># Both package and module can be None/empty.</span>
+    <span class="k">if</span> <span class="n">package</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">package</span>
+        <span class="k">if</span> <span class="n">module</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">+=</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">module</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">module</span>
+    <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="write_file"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.write_file">[docs]</a><span class="k">def</span> <span class="nf">write_file</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, unicode, Any) -&gt; None</span>
+    <span class="sd">&quot;&quot;&quot;Write the output file for module/package &lt;name&gt;.&quot;&quot;&quot;</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">destdir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">opts</span><span class="o">.</span><span class="n">suffix</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Would create file </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">force</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File </span><span class="si">%s</span><span class="s1"> already exists, skipping.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating file </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">FileAvoidWrite</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="format_heading"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.format_heading">[docs]</a><span class="k">def</span> <span class="nf">format_heading</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+    <span class="c1"># type: (int, unicode) -&gt; unicode</span>
+    <span class="sd">&quot;&quot;&quot;Create a heading of &lt;level&gt; [1, 2 or 3 supported].&quot;&quot;&quot;</span>
+    <span class="n">underlining</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="p">][</span><span class="n">level</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">underlining</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="format_directive"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.format_directive">[docs]</a><span class="k">def</span> <span class="nf">format_directive</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, unicode) -&gt; unicode</span>
+    <span class="sd">&quot;&quot;&quot;Create the automodule directive and add the options.&quot;&quot;&quot;</span>
+    <span class="n">directive</span> <span class="o">=</span> <span class="s1">&#39;.. automodule:: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">makename</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">OPTIONS</span><span class="p">:</span>
+        <span class="n">directive</span> <span class="o">+=</span> <span class="s1">&#39;    :</span><span class="si">%s</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">option</span>
+    <span class="k">return</span> <span class="n">directive</span></div>
+
+
+<div class="viewcode-block" id="create_module_file"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.create_module_file">[docs]</a><span class="k">def</span> <span class="nf">create_module_file</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, unicode, Any) -&gt; None</span>
+    <span class="sd">&quot;&quot;&quot;Generate RST for a top-level module (i.e., not part of a package)&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">noheadings</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> module&#39;</span> <span class="o">%</span> <span class="n">module</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="c1"># text += format_heading(2, &#39;:mod:`%s` Module&#39; % module)</span>
+    <span class="n">text</span> <span class="o">+=</span> <span class="n">format_directive</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">package</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">:</span>
+        <span class="n">template_loader</span> <span class="o">=</span> <span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">)</span>
+        <span class="n">template_env</span> <span class="o">=</span> <span class="n">SandboxedEnvironment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">template_loader</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mod_ns</span> <span class="o">=</span> <span class="n">_get_mod_ns</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">module</span><span class="p">,</span> <span class="n">fullname</span><span class="o">=</span><span class="n">module</span><span class="p">,</span>
+                <span class="n">includeprivate</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">includeprivate</span><span class="p">)</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">template_env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;module.rst&#39;</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">mod_ns</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_warn</span><span class="p">(</span><span class="s1">&#39;failed to import </span><span class="si">%r</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="n">add_get_members_to_template_env</span><span class="p">(</span><span class="n">template_env</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="n">write_file</span><span class="p">(</span><span class="n">makename</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">module</span><span class="p">),</span> <span class="n">text</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_members</span><span class="p">(</span>
+        <span class="n">mod</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_imported</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">out_format</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">,</span>
+        <span class="n">in_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">known_refs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get (filtered) public/total members of the module or package `mod`.</span>
+
+
+<span class="sd">    Returns:</span>
+<span class="sd">        lists `public` and `items`. The lists contains the public and private +</span>
+<span class="sd">        public members, as strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">roles</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;function&#39;</span><span class="p">:</span> <span class="s1">&#39;func&#39;</span><span class="p">,</span> <span class="s1">&#39;module&#39;</span><span class="p">:</span> <span class="s1">&#39;mod&#39;</span><span class="p">,</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;class&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;exception&#39;</span><span class="p">:</span> <span class="s1">&#39;exc&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="s1">&#39;data&#39;</span><span class="p">}</span>
+    <span class="c1"># not included, because they cannot occur at modul level:</span>
+    <span class="c1">#   &#39;method&#39;: &#39;meth&#39;, &#39;attribute&#39;: &#39;attr&#39;, &#39;instanceattribute&#39;: &#39;attr&#39;</span>
+
+    <span class="n">out_formats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="s1">&#39;fullnames&#39;</span><span class="p">,</span> <span class="s1">&#39;refs&#39;</span><span class="p">,</span> <span class="s1">&#39;table&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">out_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">out_formats</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;out_format </span><span class="si">%s</span><span class="s2"> not in </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">out_format</span><span class="p">,</span> <span class="n">out_formats</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">check_typ</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">member</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if mod.member is of the desired typ&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">ismodule</span><span class="p">(</span><span class="n">member</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">documenter</span> <span class="o">=</span> <span class="n">get_documenter</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">mod</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">typ</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">typ</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">documenter</span><span class="p">,</span> <span class="s1">&#39;objtype&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">documenter</span><span class="p">,</span> <span class="s1">&#39;directivetype&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">roles</span><span class="p">[</span><span class="n">typ</span><span class="p">]</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">documenter</span><span class="p">,</span> <span class="s1">&#39;directivetype&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_local</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check whether mod.member is defined locally in module mod&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="s1">&#39;__module__&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="s1">&#39;__module__&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># we take missing __module__ to mean the member is a data object</span>
+            <span class="c1"># it is recommended to filter data by e.g. __all__</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">typ</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">typ</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">roles</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;typ must be None or one of </span><span class="si">%s</span><span class="s2">&quot;</span>
+                         <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">roles</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">public</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">known_refs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">known_refs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">known_refs</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">known_refs</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">known_refs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">in_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">in_list</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">in_list</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">in_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">member</span> <span class="o">=</span> <span class="n">safe_getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">check_typ</span><span class="p">(</span><span class="n">typ</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">member</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">in_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">in_list</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">include_imported</span> <span class="ow">or</span> <span class="n">is_local</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">member</span><span class="p">,</span> <span class="n">name</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">out_format</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="s1">&#39;refs&#39;</span><span class="p">]:</span>
+                <span class="n">documenter</span> <span class="o">=</span> <span class="n">get_documenter</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">mod</span><span class="p">)</span>
+                <span class="n">role</span> <span class="o">=</span> <span class="n">roles</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">documenter</span><span class="o">.</span><span class="n">objtype</span><span class="p">,</span> <span class="s1">&#39;obj&#39;</span><span class="p">)</span>
+                <span class="n">ref</span> <span class="o">=</span> <span class="n">_get_member_ref_str</span><span class="p">(</span>
+                        <span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">member</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">,</span>
+                        <span class="n">known_refs</span><span class="o">=</span><span class="n">known_refs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">out_format</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
+                <span class="n">docsummary</span> <span class="o">=</span> <span class="n">extract_summary</span><span class="p">(</span><span class="n">member</span><span class="p">)</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ref</span><span class="p">,</span> <span class="n">docsummary</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="n">public</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">ref</span><span class="p">,</span> <span class="n">docsummary</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">out_format</span> <span class="o">==</span> <span class="s1">&#39;refs&#39;</span><span class="p">:</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="n">public</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ref</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">out_format</span> <span class="o">==</span> <span class="s1">&#39;fullnames&#39;</span><span class="p">:</span>
+                <span class="n">fullname</span> <span class="o">=</span> <span class="n">_get_fullname</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="n">member</span><span class="p">)</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="n">public</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">out_format</span> <span class="o">==</span> <span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_format</span><span class="p">)</span>
+                <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">):</span>
+                    <span class="n">public</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">out_format</span> <span class="o">==</span> <span class="s1">&#39;table&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_assemble_table</span><span class="p">(</span><span class="n">public</span><span class="p">),</span> <span class="n">_assemble_table</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">public</span><span class="p">,</span> <span class="n">items</span>
+
+
+<span class="k">def</span> <span class="nf">_assemble_table</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;.. list-table::&#39;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;   * - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;     - </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">col</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lines</span>
+
+
+<div class="viewcode-block" id="extract_summary"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.extract_summary">[docs]</a><span class="k">def</span> <span class="nf">extract_summary</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="c1"># type: (List[unicode], Any) -&gt; unicode</span>
+    <span class="sd">&quot;&quot;&quot;Extract summary from docstring.&quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="c1"># Skip a blank lines at the top</span>
+    <span class="k">while</span> <span class="n">doc</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">doc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># If there&#39;s a blank line, then we can assume the first sentence /</span>
+    <span class="c1"># paragraph has ended, so anything after shouldn&#39;t be part of the</span>
+    <span class="c1"># summary</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">piece</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">piece</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">break</span>
+
+    <span class="c1"># Try to find the &quot;first sentence&quot;, which may span multiple lines</span>
+    <span class="n">sentences</span> <span class="o">=</span> <span class="n">periods_re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">doc</span><span class="p">))</span>  <span class="c1"># type: ignore</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">sentences</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">state_machine</span> <span class="o">=</span> <span class="n">RSTStateMachine</span><span class="p">(</span><span class="n">state_classes</span><span class="p">,</span> <span class="s1">&#39;Body&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">sentences</span><span class="p">:</span>
+            <span class="n">summary</span> <span class="o">+=</span> <span class="n">sentences</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">new_document</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">reporter</span> <span class="o">=</span> <span class="n">NullReporter</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">999</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">pep_references</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">node</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">rfc_references</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">state_machine</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">summary</span><span class="p">],</span> <span class="n">node</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">node</span><span class="o">.</span><span class="n">traverse</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">system_message</span><span class="p">):</span>
+                <span class="c1"># considered as that splitting by period does not break inline</span>
+                <span class="c1"># markups</span>
+                <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">summary</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_member_ref_str</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="s1">&#39;obj&#39;</span><span class="p">,</span> <span class="n">known_refs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generate a ReST-formmated reference link to the given `obj` of type</span>
+<span class="sd">    `role`, using `name` as the link text&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">known_refs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">known_refs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">known_refs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+    <span class="n">ref</span> <span class="o">=</span> <span class="n">_get_fullname</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;:</span><span class="si">%s</span><span class="s2">:`</span><span class="si">%s</span><span class="s2"> &lt;</span><span class="si">%s</span><span class="s2">&gt;`&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">role</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ref</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_fullname</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__qualname__&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__qualname__</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># e.g. obj.__name__ is None</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;__name__&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__module__</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__name__</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>  <span class="c1"># e.g. obj.__name__ is None</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="k">return</span> <span class="n">ref</span>
+
+
+<span class="k">def</span> <span class="nf">_get_mod_ns</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">includeprivate</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the template context of module identified by `fullname` as a</span>
+<span class="sd">    dict&quot;&quot;&quot;</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="p">{</span>  <span class="c1"># template variables</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s1">&#39;fullname&#39;</span><span class="p">:</span> <span class="n">fullname</span><span class="p">,</span> <span class="s1">&#39;members&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;functions&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;classes&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;exceptions&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;subpackages&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;submodules&#39;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">includeprivate</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s1">&#39;members&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">mod</span><span class="p">)[</span><span class="n">p</span><span class="p">]</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s1">&#39;functions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;function&#39;</span><span class="p">)[</span><span class="n">p</span><span class="p">]</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;class&#39;</span><span class="p">)[</span><span class="n">p</span><span class="p">]</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s1">&#39;exceptions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;exception&#39;</span><span class="p">)[</span><span class="n">p</span><span class="p">]</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_get_members</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)[</span><span class="n">p</span><span class="p">]</span>
+    <span class="n">ns</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="vm">__doc__</span>
+    <span class="k">return</span> <span class="n">ns</span>
+
+
+<div class="viewcode-block" id="add_get_members_to_template_env"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.add_get_members_to_template_env">[docs]</a><span class="k">def</span> <span class="nf">add_get_members_to_template_env</span><span class="p">(</span><span class="n">template_env</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">get_members</span><span class="p">(</span>
+            <span class="n">fullname</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_imported</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">out_format</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">,</span>
+            <span class="n">in_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">includeprivate</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">includeprivate</span><span class="p">,</span> <span class="n">known_refs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of members</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            fullname (str): The full name of the module for which to get the</span>
+<span class="sd">                members (including the dot-separated package path)</span>
+<span class="sd">            typ (None or str): One of None, &#39;function&#39;, &#39;class&#39;, &#39;exception&#39;,</span>
+<span class="sd">                &#39;data&#39;. If not None, only members of the corresponding type</span>
+<span class="sd">                 will be returned</span>
+<span class="sd">            include_imported (bool): If True, include members that are imported</span>
+<span class="sd">                from other modules. If False, only return members that are</span>
+<span class="sd">                defined directly in the module.</span>
+<span class="sd">            out_format (str): One of &#39;names&#39;, &#39;fullnames&#39;, &#39;refs&#39;, and &#39;table&#39;</span>
+<span class="sd">            in_list (None or str): If not None, name of a module</span>
+<span class="sd">                attribute (e.g. &#39;__all__&#39;). Only members whose names appears in</span>
+<span class="sd">                the list will be returned.</span>
+<span class="sd">            includeprivate (bool): If True, include members whose names starts</span>
+<span class="sd">                with an underscore</span>
+<span class="sd">            know_refs (None or dict or str): If not None, a mapping of names to</span>
+<span class="sd">                rull rst-formatted references. If given as a str, the mapping</span>
+<span class="sd">                will be taken from the module attribute of the given name. This</span>
+<span class="sd">                is used only in conjunction with ``out_format=refs``, to</span>
+<span class="sd">                override automatically detected reference location, or to</span>
+<span class="sd">                provide references for object that cannot be located</span>
+<span class="sd">                automatically (data objects).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of strings, depending on `out_format`.</span>
+
+<span class="sd">            If &#39;names&#39; (default), return a list of the simple names of all</span>
+<span class="sd">            members.</span>
+
+<span class="sd">            If &#39;fullnames&#39;, return a list of the fully qualified names</span>
+<span class="sd">            of the members.</span>
+
+<span class="sd">            If &#39;refs&#39;, return a list of rst-formatted links.</span>
+
+<span class="sd">            If &#39;table&#39;, return a list of lines for a rst table similar to that</span>
+<span class="sd">            generated by the autosummary plugin (left column is linked member</span>
+<span class="sd">            names, right column is first sentence of the docstring)</span>
+
+
+<span class="sd">        Note:</span>
+<span class="sd">            For data members, it is not always possible to determine whther</span>
+<span class="sd">            they are imported or defined locally. In this case, `in_list` and</span>
+<span class="sd">            `known_refs` may be used to achieve the desired result.</span>
+
+<span class="sd">            If using ``in_list=&#39;__all__&#39;`` for a package you may also have to</span>
+<span class="sd">            use ``include_imported=True`` to get the full list (as packages</span>
+<span class="sd">            typically export members imported from their sub-modules)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">includeprivate</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="n">_get_members</span><span class="p">(</span>
+            <span class="n">mod</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">typ</span><span class="p">,</span> <span class="n">include_imported</span><span class="o">=</span><span class="n">include_imported</span><span class="p">,</span>
+            <span class="n">out_format</span><span class="o">=</span><span class="n">out_format</span><span class="p">,</span> <span class="n">in_list</span><span class="o">=</span><span class="n">in_list</span><span class="p">,</span> <span class="n">known_refs</span><span class="o">=</span><span class="n">known_refs</span><span class="p">)[</span><span class="n">p</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">members</span>
+
+    <span class="n">template_env</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="s1">&#39;get_members&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">get_members</span><span class="p">,</span> <span class="n">fullname</span><span class="o">=</span><span class="n">fullname</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_package_file"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.create_package_file">[docs]</a><span class="k">def</span> <span class="nf">create_package_file</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">master_package</span><span class="p">,</span> <span class="n">subroot</span><span class="p">,</span> <span class="n">py_files</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">subs</span><span class="p">,</span> <span class="n">is_namespace</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, unicode, unicode, List[unicode], Any, List[unicode], bool) -&gt; None</span>
+    <span class="sd">&quot;&quot;&quot;Build the text of the file and write the file.&quot;&quot;&quot;</span>
+
+    <span class="n">use_templates</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">fullname</span> <span class="o">=</span> <span class="n">makename</span><span class="p">(</span><span class="n">master_package</span><span class="p">,</span> <span class="n">subroot</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">:</span>
+        <span class="n">use_templates</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">template_loader</span> <span class="o">=</span> <span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">)</span>
+        <span class="n">template_env</span> <span class="o">=</span> <span class="n">SandboxedEnvironment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">template_loader</span><span class="p">)</span>
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">format_heading</span><span class="p">(</span>
+        <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> package&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_namespace</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> namespace&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="n">fullname</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">modulefirst</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_namespace</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="n">format_directive</span><span class="p">(</span><span class="n">subroot</span><span class="p">,</span> <span class="n">master_package</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="c1"># build a list of directories that are szvpackages (contain an INITPY file)</span>
+    <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">sub</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subs</span> <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">sub</span><span class="p">,</span> <span class="n">INITPY</span><span class="p">))]</span>
+    <span class="c1"># if there are some package directories, add a TOC for theses subpackages</span>
+    <span class="k">if</span> <span class="n">subs</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Subpackages&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;.. toctree::</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;    </span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">makename</span><span class="p">(</span><span class="n">master_package</span><span class="p">,</span> <span class="n">subroot</span><span class="p">),</span> <span class="n">sub</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="n">submods</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">sub</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">py_files</span>
+               <span class="k">if</span> <span class="ow">not</span> <span class="n">shall_skip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">sub</span><span class="p">),</span> <span class="n">opts</span><span class="p">)</span> <span class="ow">and</span>
+               <span class="n">sub</span> <span class="o">!=</span> <span class="n">INITPY</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">use_templates</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">package_ns</span> <span class="o">=</span> <span class="n">_get_mod_ns</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">subroot</span><span class="p">,</span> <span class="n">fullname</span><span class="o">=</span><span class="n">fullname</span><span class="p">,</span>
+                                     <span class="n">includeprivate</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">includeprivate</span><span class="p">)</span>
+            <span class="n">package_ns</span><span class="p">[</span><span class="s1">&#39;subpackages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subs</span>
+            <span class="n">package_ns</span><span class="p">[</span><span class="s1">&#39;submodules&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">submods</span>
+        <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">_warn</span><span class="p">(</span><span class="s1">&#39;failed to import </span><span class="si">%r</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">submods</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Submodules&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">separatemodules</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;.. toctree::</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+            <span class="k">for</span> <span class="n">submod</span> <span class="ow">in</span> <span class="n">submods</span><span class="p">:</span>
+                <span class="n">modfile</span> <span class="o">=</span> <span class="n">makename</span><span class="p">(</span><span class="n">master_package</span><span class="p">,</span> <span class="n">makename</span><span class="p">(</span><span class="n">subroot</span><span class="p">,</span> <span class="n">submod</span><span class="p">))</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">modfile</span>
+
+                <span class="c1"># generate separate file for this module</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">noheadings</span><span class="p">:</span>
+                    <span class="n">filetext</span> <span class="o">=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> module&#39;</span> <span class="o">%</span> <span class="n">modfile</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">filetext</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">filetext</span> <span class="o">+=</span> <span class="n">format_directive</span><span class="p">(</span><span class="n">makename</span><span class="p">(</span><span class="n">subroot</span><span class="p">,</span> <span class="n">submod</span><span class="p">),</span>
+                                             <span class="n">master_package</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">use_templates</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">mod_ns</span> <span class="o">=</span> <span class="n">_get_mod_ns</span><span class="p">(</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">submod</span><span class="p">,</span> <span class="n">fullname</span><span class="o">=</span><span class="n">modfile</span><span class="p">,</span>
+                            <span class="n">includeprivate</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">includeprivate</span><span class="p">)</span>
+                        <span class="n">template</span> <span class="o">=</span> <span class="n">template_env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;module.rst&#39;</span><span class="p">)</span>
+                        <span class="n">add_get_members_to_template_env</span><span class="p">(</span>
+                            <span class="n">template_env</span><span class="p">,</span> <span class="n">modfile</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+                        <span class="n">filetext</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">mod_ns</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">_warn</span><span class="p">(</span><span class="s1">&#39;failed to import </span><span class="si">%r</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">modfile</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+                <span class="n">write_file</span><span class="p">(</span><span class="n">modfile</span><span class="p">,</span> <span class="n">filetext</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">submod</span> <span class="ow">in</span> <span class="n">submods</span><span class="p">:</span>
+                <span class="n">modfile</span> <span class="o">=</span> <span class="n">makename</span><span class="p">(</span><span class="n">master_package</span><span class="p">,</span> <span class="n">makename</span><span class="p">(</span><span class="n">subroot</span><span class="p">,</span> <span class="n">submod</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">noheadings</span><span class="p">:</span>
+                    <span class="n">text</span> <span class="o">+=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> module&#39;</span> <span class="o">%</span> <span class="n">modfile</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="n">format_directive</span><span class="p">(</span><span class="n">makename</span><span class="p">(</span><span class="n">subroot</span><span class="p">,</span> <span class="n">submod</span><span class="p">),</span>
+                                         <span class="n">master_package</span><span class="p">)</span>
+                <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="k">if</span> <span class="n">use_templates</span><span class="p">:</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="n">template_env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s1">&#39;package.rst&#39;</span><span class="p">)</span>
+        <span class="n">add_get_members_to_template_env</span><span class="p">(</span><span class="n">template_env</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="o">**</span><span class="n">package_ns</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">modulefirst</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_namespace</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Module contents&#39;</span><span class="p">)</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">format_directive</span><span class="p">(</span><span class="n">subroot</span><span class="p">,</span> <span class="n">master_package</span><span class="p">)</span>
+
+    <span class="n">write_file</span><span class="p">(</span><span class="n">makename</span><span class="p">(</span><span class="n">master_package</span><span class="p">,</span> <span class="n">subroot</span><span class="p">),</span> <span class="n">text</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="create_modules_toc_file"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.create_modules_toc_file">[docs]</a><span class="k">def</span> <span class="nf">create_modules_toc_file</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;modules&#39;</span><span class="p">):</span>
+    <span class="c1"># type: (List[unicode], Any, unicode) -&gt; None</span>
+    <span class="sd">&quot;&quot;&quot;Create the module&#39;s index.&quot;&quot;&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">format_heading</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">opts</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;.. toctree::</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;   :maxdepth: </span><span class="si">%s</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">opts</span><span class="o">.</span><span class="n">maxdepth</span>
+
+    <span class="n">modules</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">prev_module</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># type: unicode</span>
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="c1"># look if the module is a subpackage and, if yes, ignore it</span>
+        <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prev_module</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">prev_module</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">module</span>
+
+    <span class="n">write_file</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="shall_skip"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.shall_skip">[docs]</a><span class="k">def</span> <span class="nf">shall_skip</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, Any) -&gt; bool</span>
+    <span class="sd">&quot;&quot;&quot;Check if we want to skip this module.&quot;&quot;&quot;</span>
+    <span class="c1"># skip if the file doesn&#39;t exist and not using implicit namespaces</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">implicit_namespaces</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># skip it if there is nothing (or just \n or \r\n) in the file</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="ow">and</span> <span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># skip if it has a &quot;private&quot; name and this is selected</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="o">!=</span> <span class="s1">&#39;__init__.py&#39;</span> <span class="ow">and</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> \
+       <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">includeprivate</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="recurse_tree"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.recurse_tree">[docs]</a><span class="k">def</span> <span class="nf">recurse_tree</span><span class="p">(</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">excludes</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, List[unicode], Any) -&gt; List[unicode]</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Look for every file in the directory tree and create the corresponding</span>
+<span class="sd">    ReST files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check if the base directory is a package and get its name</span>
+    <span class="k">if</span> <span class="n">INITPY</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">rootpath</span><span class="p">):</span>
+        <span class="n">root_package</span> <span class="o">=</span> <span class="n">rootpath</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># otherwise, the base is a directory with packages</span>
+        <span class="n">root_package</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">toplevels</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">followlinks</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="s1">&#39;followlinks&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">includeprivate</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="s1">&#39;includeprivate&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">implicit_namespaces</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="s1">&#39;implicit_namespaces&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">subs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="n">followlinks</span><span class="p">):</span>
+        <span class="c1"># document only Python module files (that aren&#39;t excluded)</span>
+        <span class="n">py_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span>
+                          <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">PY_SUFFIXES</span> <span class="ow">and</span>
+                          <span class="ow">not</span> <span class="n">is_excluded</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="n">excludes</span><span class="p">))</span>
+        <span class="n">is_pkg</span> <span class="o">=</span> <span class="n">INITPY</span> <span class="ow">in</span> <span class="n">py_files</span>
+        <span class="n">is_namespace</span> <span class="o">=</span> <span class="n">INITPY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">py_files</span> <span class="ow">and</span> <span class="n">implicit_namespaces</span>
+        <span class="k">if</span> <span class="n">is_pkg</span><span class="p">:</span>
+            <span class="n">py_files</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">INITPY</span><span class="p">)</span>
+            <span class="n">py_files</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">INITPY</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">root</span> <span class="o">!=</span> <span class="n">rootpath</span><span class="p">:</span>
+            <span class="c1"># only accept non-package at toplevel unless using implicit namespaces</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">implicit_namespaces</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">subs</span><span class="p">[:]</span>
+                <span class="k">continue</span>
+        <span class="c1"># remove hidden (&#39;.&#39;) and private (&#39;_&#39;) directories, as well as</span>
+        <span class="c1"># excluded dirs</span>
+        <span class="k">if</span> <span class="n">includeprivate</span><span class="p">:</span>
+            <span class="n">exclude_prefixes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,)</span>  <span class="c1"># type: Tuple[unicode, ...]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">exclude_prefixes</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">subs</span><span class="p">[:]</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sub</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">sub</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">exclude_prefixes</span><span class="p">)</span> <span class="ow">and</span>
+                         <span class="ow">not</span> <span class="n">is_excluded</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">sub</span><span class="p">),</span> <span class="n">excludes</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">is_pkg</span> <span class="ow">or</span> <span class="n">is_namespace</span><span class="p">:</span>
+            <span class="c1"># we are in a package with something to document</span>
+            <span class="k">if</span> <span class="n">subs</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">py_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">shall_skip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">INITPY</span><span class="p">),</span> <span class="n">opts</span><span class="p">):</span>
+                <span class="n">subpackage</span> <span class="o">=</span> <span class="n">root</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">rootpath</span><span class="p">):]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span><span class="o">.</span>\
+                    <span class="n">replace</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="c1"># if this is not a namespace or</span>
+                <span class="c1"># a namespace and there is something there to document</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_namespace</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">py_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">create_package_file</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">root_package</span><span class="p">,</span> <span class="n">subpackage</span><span class="p">,</span>
+                                        <span class="n">py_files</span><span class="p">,</span> <span class="n">opts</span><span class="p">,</span> <span class="n">subs</span><span class="p">,</span> <span class="n">is_namespace</span><span class="p">)</span>
+                    <span class="n">toplevels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">makename</span><span class="p">(</span><span class="n">root_package</span><span class="p">,</span> <span class="n">subpackage</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if we are at the root level, we don&#39;t require it to be a package</span>
+            <span class="k">assert</span> <span class="n">root</span> <span class="o">==</span> <span class="n">rootpath</span> <span class="ow">and</span> <span class="n">root_package</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">rootpath</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">py_file</span> <span class="ow">in</span> <span class="n">py_files</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">shall_skip</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">py_file</span><span class="p">),</span> <span class="n">opts</span><span class="p">):</span>
+                    <span class="n">module</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">py_file</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">create_module_file</span><span class="p">(</span><span class="n">root_package</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+                    <span class="n">toplevels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">:</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">toplevels</span></div>
+
+
+<div class="viewcode-block" id="normalize_excludes"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.normalize_excludes">[docs]</a><span class="k">def</span> <span class="nf">normalize_excludes</span><span class="p">(</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">excludes</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, List[unicode]) -&gt; List[unicode]</span>
+    <span class="sd">&quot;&quot;&quot;Normalize the excluded directory list.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span> <span class="k">for</span> <span class="n">exclude</span> <span class="ow">in</span> <span class="n">excludes</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="is_excluded"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.is_excluded">[docs]</a><span class="k">def</span> <span class="nf">is_excluded</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">excludes</span><span class="p">):</span>
+    <span class="c1"># type: (unicode, List[unicode]) -&gt; bool</span>
+    <span class="sd">&quot;&quot;&quot;Check if the directory is in the exclude list.</span>
+
+<span class="sd">    Note: by having trailing slashes, we avoid common prefix issues, like</span>
+<span class="sd">          e.g. an exlude &quot;foo&quot; also accidentally excluding &quot;foobar&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">exclude</span> <span class="ow">in</span> <span class="n">excludes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">fnmatch</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">exclude</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
+    <span class="c1"># type: (List[str]) -&gt; int</span>
+    <span class="sd">&quot;&quot;&quot;Parse and check the command line arguments.&quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">(</span>
+        <span class="n">usage</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">usage: %prog [options] -o &lt;output_path&gt; &lt;module_path&gt; [exclude_pattern, ...]</span>
+
+<span class="s2">Look recursively in &lt;module_path&gt; for Python modules and packages and create</span>
+<span class="s2">one reST file with automodule directives per package in the &lt;output_path&gt;.</span>
+
+<span class="s2">The &lt;exclude_pattern&gt;s can be file and/or directory patterns that will be</span>
+<span class="s2">excluded from generation.</span>
+
+<span class="s2">Note: By default this script will not overwrite already created files.&quot;&quot;&quot;</span><span class="p">)</span>
+
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="s1">&#39;--output-dir&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;destdir&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Directory to place all output&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--maxdepth&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;maxdepth&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Maximum depth of submodules to show in the TOC &#39;</span>
+                      <span class="s1">&#39;(default: 4)&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--force&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;force&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Overwrite existing files&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--follow-links&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;followlinks&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Follow symbolic links. Powerful when combined &#39;</span>
+                      <span class="s1">&#39;with collective.recipe.omelette.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;--dry-run&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;dryrun&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Run the script without creating files&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--separate&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;separatemodules&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Put documentation for each module on its own page&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-P&#39;</span><span class="p">,</span> <span class="s1">&#39;--private&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;includeprivate&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Include &quot;_private&quot; modules&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-T&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-toc&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;notoc&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t create a table of contents file&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-E&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-headings&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;noheadings&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Don</span><span class="se">\&#39;</span><span class="s1">t create headings for the module/package &#39;</span>
+                           <span class="s1">&#39;packages (e.g. when the docstrings already contain &#39;</span>
+                           <span class="s1">&#39;them). No effect in combination with -t&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-M&#39;</span><span class="p">,</span> <span class="s1">&#39;--module-first&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;modulefirst&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Put module documentation before submodule &#39;</span>
+                      <span class="s1">&#39;documentation (no effect in combination with -t)&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;--implicit-namespaces&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;implicit_namespaces&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Interpret module paths according to PEP-0420 &#39;</span>
+                           <span class="s1">&#39;implicit namespaces specification&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--suffix&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;suffix&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;file suffix (default: rst)&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;rst&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-F&#39;</span><span class="p">,</span> <span class="s1">&#39;--full&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;full&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Generate a full project with sphinx-quickstart&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--append-syspath&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;append_syspath&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Append module_path to sys.path, used when --full is given&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--templates&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                      <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;templates&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Custom template directory (default: </span><span class="si">%d</span><span class="s2">efault). &quot;</span>
+                      <span class="s2">&quot;Must contain template files package.rst and/or &quot;</span>
+                      <span class="s2">&quot;module.rst&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-H&#39;</span><span class="p">,</span> <span class="s1">&#39;--doc-project&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;header&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Project name (default: root module name)&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-A&#39;</span><span class="p">,</span> <span class="s1">&#39;--doc-author&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;author&#39;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;str&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Project author(s), used when --full is given&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-V&#39;</span><span class="p">,</span> <span class="s1">&#39;--doc-version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Project version, used when --full is given&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;-R&#39;</span><span class="p">,</span> <span class="s1">&#39;--doc-release&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;release&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Project release, used when --full is given, &#39;</span>
+                      <span class="s1">&#39;defaults to --doc-version&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;show_version&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Show version information and exit&#39;</span><span class="p">)</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_option_group</span><span class="p">(</span><span class="s1">&#39;Extension options&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">EXTENSIONS</span><span class="p">:</span>
+        <span class="n">group</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s1">&#39;--ext-&#39;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                         <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;ext_&#39;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;enable </span><span class="si">%s</span><span class="s1"> extension&#39;</span> <span class="o">%</span> <span class="n">ext</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">show_version</span><span class="p">:</span>
+        <span class="c1">#print(&#39;Sphinx (sphinx-apidoc) %s&#39; % __display_version__)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;better-apidoc </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">__display_version__</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;A package path is required.&#39;</span><span class="p">)</span>
+
+    <span class="n">rootpath</span><span class="p">,</span> <span class="n">excludes</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">destdir</span><span class="p">:</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;An output directory is required.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">opts</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">rootpath</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">suffix</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+        <span class="n">opts</span><span class="o">.</span><span class="n">suffix</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">rootpath</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a directory.&#39;</span> <span class="o">%</span> <span class="n">rootpath</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">destdir</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">destdir</span><span class="p">)</span>
+    <span class="n">rootpath</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">rootpath</span><span class="p">)</span>
+    <span class="n">excludes</span> <span class="o">=</span> <span class="n">normalize_excludes</span><span class="p">(</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">excludes</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">recurse_tree</span><span class="p">(</span><span class="n">rootpath</span><span class="p">,</span> <span class="n">excludes</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">TemplateNotFound</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Cannot find template in </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+              <span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">templates</span><span class="p">,</span> <span class="n">e</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">opts</span><span class="o">.</span><span class="n">full</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;--full not supported&quot;</span><span class="p">)</span>
+        <span class="c1"># This would only make sense if this script was integrated in Sphinx</span>
+        <span class="kn">from</span> <span class="nn">sphinx</span> <span class="k">import</span> <span class="n">quickstart</span> <span class="k">as</span> <span class="n">qs</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">prev_module</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>  <span class="c1"># type: unicode</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">module</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prev_module</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">prev_module</span> <span class="o">=</span> <span class="n">module</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;   </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">module</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">destdir</span><span class="p">,</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">dot</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span>
+            <span class="n">project</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">header</span><span class="p">,</span>
+            <span class="n">author</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">author</span> <span class="ow">or</span> <span class="s1">&#39;Author&#39;</span><span class="p">,</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">version</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">release</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">release</span> <span class="ow">or</span> <span class="n">opts</span><span class="o">.</span><span class="n">version</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">opts</span><span class="o">.</span><span class="n">suffix</span><span class="p">,</span>
+            <span class="n">master</span> <span class="o">=</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+            <span class="n">epub</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">ext_autodoc</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">ext_viewcode</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">ext_todo</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">makefile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">batchfile</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">mastertocmaxdepth</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">maxdepth</span><span class="p">,</span>
+            <span class="n">mastertoctree</span> <span class="o">=</span> <span class="n">text</span><span class="p">,</span>
+            <span class="n">language</span> <span class="o">=</span> <span class="s1">&#39;en&#39;</span><span class="p">,</span>
+            <span class="n">module_path</span> <span class="o">=</span> <span class="n">rootpath</span><span class="p">,</span>
+            <span class="n">append_syspath</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">append_syspath</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">enabled_exts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ext_&#39;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="s1">&#39;ext_&#39;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">EXTENSIONS</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">opts</span><span class="p">,</span> <span class="s1">&#39;ext_&#39;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)}</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">enabled_exts</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">author</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;author&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opts</span><span class="o">.</span><span class="n">release</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+            <span class="n">d</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;release&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">dryrun</span><span class="p">:</span>
+            <span class="n">qs</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">force</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="n">opts</span><span class="o">.</span><span class="n">notoc</span><span class="p">:</span>
+        <span class="n">create_modules_toc_file</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">opts</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<span class="c1"># So program can be started with &quot;python -m sphinx.apidoc ...&quot;</span>
+<span class="c1">#if __name__ == &quot;__main__&quot;:</span>
+    <span class="c1">#main()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

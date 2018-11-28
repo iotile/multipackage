@@ -1,0 +1,358 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.utilities.managed_section module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.utilities.obj_hash module" href="multipackage.utilities.obj_hash.html" />
+    <link rel="prev" title="multipackage.utilities.git module" href="multipackage.utilities.git.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.utilities.html">multipackage.utilities package</a> &raquo;</li>
+        
+      <li>multipackage.utilities.managed_section module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.utilities.managed_section.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.utilities.managed_section">
+<span id="multipackage-utilities-managed-section-module"></span><h1>multipackage.utilities.managed_section module<a class="headerlink" href="#module-multipackage.utilities.managed_section" title="Permalink to this headline">¶</a></h1>
+<p>Helper class for managing a block of content inside a text file.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.utilities.managed_section.ManagedFileSection" title="multipackage.utilities.managed_section.ManagedFileSection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManagedFileSection</span></code></a></td>
+<td>A section of a text file that is managed by multipackage.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection">
+<em class="property">class </em><code class="descclassname">multipackage.utilities.managed_section.</code><code class="descname">ManagedFileSection</code><span class="sig-paren">(</span><em>path</em>, <em>delimiter_start='# '</em>, <em>delimiter_end=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/managed_section.html#ManagedFileSection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A section of a text file that is managed by multipackage.</p>
+<p>This class helps define a block of lines inside a file with
+a fence around them.  The contents of the fence are hashed
+so that modifications can be detected and the fence data
+can be versioned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file that we want to manage.
+This file does not need to exist and will be created
+when you try to update it with data if it does not
+currently exist.</li>
+<li><strong>delimiter_start</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The character string that starts a managed file
+section block header line.  This is usually a comment character
+like ‘#’.</li>
+<li><strong>delimiter_end</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional charcter string that ends a managed file
+section block header line.  This defaults to an emptry string but
+can be set to a value if comments need to be explicitly closed
+such as delimiter_start=”&lt;!– “, delimiter_end=” –&gt;”.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.SECTION_START">
+<code class="descname">SECTION_START</code><em class="property"> = 'BEGIN MULTIPACKAGE MANAGED SECTION, HASH='</em><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.SECTION_START" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.SECTION_END">
+<code class="descname">SECTION_END</code><em class="property"> = 'END MULTIPACKAGE MANAGED SECTION'</em><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.SECTION_END" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.HASH_HEX_LENGTH">
+<code class="descname">HASH_HEX_LENGTH</code><em class="property"> = 32</em><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.HASH_HEX_LENGTH" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.MANAGE_ERROR">
+<code class="descname">MANAGE_ERROR</code><em class="property"> = 'A file that needs to be managed by multipackage exists and is a directory, not a file'</em><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.MANAGE_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.MULTIPLE_SECTION_ERROR">
+<code class="descname">MULTIPLE_SECTION_ERROR</code><em class="property"> = 'A file that is managed by multipackage has been corrupted'</em><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.MULTIPLE_SECTION_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.ensure_lines">
+<code class="descname">ensure_lines</code><span class="sig-paren">(</span><em>lines</em>, <em>present=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/managed_section.html#ManagedFileSection.ensure_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.ensure_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ensure that the given lines are present or absent in this file.</p>
+<p>Each line is added independently and no order is assumed. This method
+is idempotent so that you can call it repeatedly and each line will
+only be added once.  The lines must match exactly.</p>
+<p>The lines must be distinct.  If there are multiple copies of the same
+line in <code class="docutils literal notranslate"><span class="pre">lines</span></code>, only one copy will be added to the file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>lines</strong> (<em>list of str</em>) – A list of lines to add to the
+file if they are not present or remove from the file if they are.
+Whether the lines are added or removed is controlled by the
+<code class="docutils literal notranslate"><span class="pre">present</span></code> parameter.</li>
+<li><strong>present</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, ensure lines are present (the default), if
+False, ensure lines are absent.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.utilities.managed_section.ManagedFileSection.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>lines=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/managed_section.html#ManagedFileSection.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update or add a managed section into the file.</p>
+<p>This method will add a new managed section into the file or update the
+section that is currently there, replacing its contents with those
+specified in update.  The resulting file will we written out to disk.</p>
+<p>If the file does not currently exist, it will be created, otherwise
+its contents will be replaced.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>lines</strong> (<em>list of str</em>) – A list of lines to add to the
+file.  If this is passed as None, then the current value of
+self.section_contents will be used instead.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.utilities.obj_hash.html" class="btn btn-neutral float-right" title="multipackage.utilities.obj_hash module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.utilities.git.html" class="btn btn-neutral" title="multipackage.utilities.git module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

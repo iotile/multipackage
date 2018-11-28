@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.manifest module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.repo module" href="multipackage.repo.html" />
+    <link rel="prev" title="multipackage.exceptions module" href="multipackage.exceptions.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="multipackage.exceptions.html">multipackage.exceptions module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">multipackage.manifest module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.repo.html">multipackage.repo module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+      <li>multipackage.manifest module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.manifest.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.manifest">
+<span id="multipackage-manifest-module"></span><h1>multipackage.manifest module<a class="headerlink" href="#module-multipackage.manifest" title="Permalink to this headline">¶</a></h1>
+<p>A hash based manifest file.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.manifest.ManagedFile" title="multipackage.manifest.ManagedFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManagedFile</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.manifest.ManifestFile" title="multipackage.manifest.ManifestFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManifestFile</span></code></a></td>
+<td>A hash based manifest file.</td>
+</tr>
+</tbody>
+</table>
+<p>Data:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">INVALID_HASH</span></code></td>
+<td>int(x=0) -&gt; integer int(x, base=10) -&gt; integer</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">NOT_PRESENT</span></code></td>
+<td>int(x=0) -&gt; integer int(x, base=10) -&gt; integer</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRESENT_UNKNOWN</span></code></td>
+<td>int(x=0) -&gt; integer int(x, base=10) -&gt; integer</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">VALID</span></code></td>
+<td>int(x=0) -&gt; integer int(x, base=10) -&gt; integer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="multipackage.manifest.ManagedFile">
+<em class="property">class </em><code class="descclassname">multipackage.manifest.</code><code class="descname">ManagedFile</code><span class="sig-paren">(</span><em>relative_path</em>, <em>absolute_path</em>, <em>status</em>, <em>expected_hash</em>, <em>hash_type</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.manifest.ManagedFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="multipackage.manifest.ManagedFile.absolute_path">
+<code class="descname">absolute_path</code><a class="headerlink" href="#multipackage.manifest.ManagedFile.absolute_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.manifest.ManagedFile.expected_hash">
+<code class="descname">expected_hash</code><a class="headerlink" href="#multipackage.manifest.ManagedFile.expected_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.manifest.ManagedFile.hash_type">
+<code class="descname">hash_type</code><a class="headerlink" href="#multipackage.manifest.ManagedFile.hash_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.manifest.ManagedFile.relative_path">
+<code class="descname">relative_path</code><a class="headerlink" href="#multipackage.manifest.ManagedFile.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.manifest.ManagedFile.status">
+<code class="descname">status</code><a class="headerlink" href="#multipackage.manifest.ManagedFile.status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="multipackage.manifest.ManifestFile">
+<em class="property">class </em><code class="descclassname">multipackage.manifest.</code><code class="descname">ManifestFile</code><span class="sig-paren">(</span><em>path</em>, <em>reporter</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A hash based manifest file.</p>
+<p>This class will load a json file that contains relative file paths and
+hash values.  It can detect changes in the files using the hashes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the manifest file.  If it does not exist it
+will be initialized as empty.</li>
+<li><strong>reporter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An error reporter class that has an add_warning
+and add_error method.  This is compatible with the signatures
+of the Repository class so it can be passed directly.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="multipackage.manifest.ManifestFile.verify_all">
+<code class="descname">verify_all</code><span class="sig-paren">(</span><em>report=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile.verify_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile.verify_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify the hashes of all managed files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>report</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Report errors for all invalid files.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.manifest.ManifestFile.verify_file">
+<code class="descname">verify_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile.verify_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile.verify_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify the status of a given file.</p>
+<p>The argument should be the path to a given file.  If the file is
+not inside the manifest an InternalError is raised.  Otherwise
+this method will return a string indicating the file’s status.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The status of the file.<p>Possible options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>not_present: The file is not present</li>
+<li>changed: The file is present but does not match the
+recorded hash.</li>
+<li>unchanged: The file is present and its hash is the
+same as what was recorded.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.manifest.ManifestFile.update_file">
+<code class="descname">update_file</code><span class="sig-paren">(</span><em>path</em>, <em>hash_type='line'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile.update_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile.update_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add or update the hash for a given file.</p>
+<p>If the file does not exist, an error is logged and the file is added
+to the manifest as NOT_PRESENT.  Otherwise it is added with the
+correct hash value.</p>
+<p>The new manifest data is written out automatically back to the
+manifest file on disk.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file that we wish to add to the
+manifest.</li>
+<li><strong>hash_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional specifier of how to calculate the file’s
+hash. Supported options are line, json or section.  <code class="docutils literal notranslate"><span class="pre">line</span></code>
+means that the lines are hashed one at a time with line
+endings ignored. <code class="docutils literal notranslate"><span class="pre">json</span></code> means that the file is valid json
+which is loaded and then the dict is normalized and hashed.
+<code class="docutils literal notranslate"><span class="pre">section</span></code> means that a section of the file is managed while
+the rest is not.  Default: “line”</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.manifest.ManifestFile.remove_file">
+<code class="descname">remove_file</code><span class="sig-paren">(</span><em>path</em>, <em>force=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile.remove_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile.remove_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a managed file from the manifest.</p>
+<p>This will remove the entry from this manifest for the file.
+If the entry does not exist and force is False, an exception will
+be raised.  If force is True, then this error will be silently ignored.</p>
+<p>This method does not actually touch the file on disk, it just removes
+the corresponding entry in this manifest file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the file to remove.</li>
+<li><strong>force</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether we should throw an error if the file is not
+present in the manifest.  Default is False, which means throw
+an error.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.manifest.ManifestFile.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Atomically save this file to disk.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.repo.html" class="btn btn-neutral float-right" title="multipackage.repo module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.exceptions.html" class="btn btn-neutral" title="multipackage.exceptions module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,336 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.data.scripts.generate_api module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.scripts package" href="multipackage.scripts.html" />
+    <link rel="prev" title="multipackage.data.scripts.better_apidocs module" href="multipackage.data.scripts.better_apidocs.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.data.html">multipackage.data package</a> &raquo;</li>
+        
+          <li><a href="multipackage.data.scripts.html">multipackage.data.scripts package</a> &raquo;</li>
+        
+      <li>multipackage.data.scripts.generate_api module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.data.scripts.generate_api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.data.scripts.generate_api">
+<span id="multipackage-data-scripts-generate-api-module"></span><h1>multipackage.data.scripts.generate_api module<a class="headerlink" href="#module-multipackage.data.scripts.generate_api" title="Permalink to this headline">¶</a></h1>
+<p>Generate API docs for all subpackages.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Exceptions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.Error" title="multipackage.data.scripts.generate_api.Error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Error</span></code></a></td>
+<td>Exception that indicates an error message.</td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.build_parser" title="multipackage.data.scripts.generate_api.build_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_parser</span></code></a></td>
+<td>Build an argument parser.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.delete_with_retry" title="multipackage.data.scripts.generate_api.delete_with_retry"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete_with_retry</span></code></a></td>
+<td>Try multiple times to delete a folder.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.generate_api" title="multipackage.data.scripts.generate_api.generate_api"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_api</span></code></a></td>
+<td>Generate api files for a given input folder.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.main" title="multipackage.data.scripts.generate_api.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.verify_output" title="multipackage.data.scripts.generate_api.verify_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_output</span></code></a></td>
+<td>Verify that output path exists and is a directory.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.generate_api.verify_packages" title="multipackage.data.scripts.generate_api.verify_packages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_packages</span></code></a></td>
+<td>Verify that we have all required packages.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="multipackage.data.scripts.generate_api.Error">
+<em class="property">exception </em><code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">Error</code><span class="sig-paren">(</span><em>message</em>, <em>code=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception that indicates an error message.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.generate_api.delete_with_retry">
+<code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">delete_with_retry</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#delete_with_retry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.delete_with_retry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try multiple times to delete a folder.</p>
+<p>This is required on windows because of things like:
+<a class="reference external" href="https://bugs.python.org/issue15496">https://bugs.python.org/issue15496</a>
+<a class="reference external" href="https://blogs.msdn.microsoft.com/oldnewthing/20120907-00/?p=6663/">https://blogs.msdn.microsoft.com/oldnewthing/20120907-00/?p=6663/</a>
+<a class="reference external" href="https://mail.python.org/pipermail/python-dev/2013-September/128350.html">https://mail.python.org/pipermail/python-dev/2013-September/128350.html</a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.generate_api.build_parser">
+<code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">build_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#build_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.build_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build an argument parser.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.generate_api.verify_output">
+<code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">verify_output</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#verify_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.verify_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify that output path exists and is a directory.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The destination path.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.generate_api.verify_packages">
+<code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">verify_packages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#verify_packages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.verify_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify that we have all required packages.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.generate_api.generate_api">
+<code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">generate_api</code><span class="sig-paren">(</span><em>input_path</em>, <em>template_dir</em>, <em>output_path</em>, <em>remove</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#generate_api"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.generate_api" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate api files for a given input folder.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.generate_api.main">
+<code class="descclassname">multipackage.data.scripts.generate_api.</code><code class="descname">main</code><span class="sig-paren">(</span><em>argv=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/generate_api.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.generate_api.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.scripts.html" class="btn btn-neutral float-right" title="multipackage.scripts package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.data.scripts.better_apidocs.html" class="btn btn-neutral" title="multipackage.data.scripts.better_apidocs module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
