@@ -24,37 +24,68 @@ class TravisCI:
     needed for multipackage including setting up a repository and encrypting
     data.
 
+    Note that repositories can run builds on either travis-ci.org or travis-ci.com.
+    When encrypting environment variables, it's required that the variable be
+    encrypted with the public key for either .com or .org, otherwise the variable
+    will not decrypt correctly.
+
+    You must have environment variables set for:
+
+      - TRAVIS_TOKEN_COM: Your travis-ci.com token
+      - TRAVIS_TOKEN_ORG: YOur travis-ci.org token
+
     Args:
-        token (str): Optional Travis CI token.  If not specified it is read
-            from the environment variable TRAVIS_TOKEN.  If the environment
-            variable is not specified, an exception is raised.
+        com_token (str): Optional API token for travis-ci.com.  If not
+            specified it is read from the environment variables
+            TRAVIS_TOKEN_COM. If the environment variable is not specified, an
+            exception is raised.
+        org_token (str): Optional API token for travis-ci.org.  If not
+            specified it is read from the environment variables
+            TRAVIS_TOKEN_ORG. If the environment variable is not specified, an
+            exception is raised.
     """
 
-    TRAVIS_BASE = "https://api.travis-ci.org"
+    TRAVIS_BASE_COM = "https://api.travis-ci.com"
+    TRAVIS_BASE_ORG = "https://api.travis-ci.org"
 
     NO_ENV_REASON = "Needed to authenticate to the Travis CI API"
     INVALID_REASON = "You have a token but it was rejected by Travis"
-    SUGGESTION = "Your token is on the settings tab of your travis-ci profile: https://travis-ci.org/account/preferences"
+    SUGGESTION_COM = "Your travis-ci.COM token is on the settings tab of your travis-ci profile: https://travis-ci.com/account/preferences"
+    SUGGESTION_ORG = "Your travis-ci.ORG token is on the settings tab of your travis-ci profile: https://travis-ci.org/account/preferences"
 
     _key_cache = {}
 
-    def __init__(self, token=None):
-        if token is None:
-            token = os.environ.get("TRAVIS_TOKEN")
-            if token is None:
-                raise InvalidEnvironmentError("TRAVIS_TOKEN", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION)
+    def __init__(self, com_token=None, org_token=None):
+        if com_token is None:
+            com_token = os.environ.get("TRAVIS_TOKEN_COM")
+        if org_token is None:
+            org_token = os.environ.get("TRAVIS_TOKEN_ORG")
 
-        self.token = token
+        if com_token is None:
+            raise InvalidEnvironmentError("TRAVIS_TOKEN_COM", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_COM)
+
+        if com_token is None:
+            raise InvalidEnvironmentError("TRAVIS_TOKEN_ORG", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_ORG)
+
+        self._com_token = com_token
+        self._org_token = org_token
         self._logger = logging.getLogger(__name__)
 
-    def _get(self, url):
-        headers = {"Authorization": 'token {}'.format(self.token),
+    def _get(self, url, org=False):
+        if org:
+            base = self.TRAVIS_BASE_ORG
+            token = self.org_token
+        else:
+            base = self.TRAVIS_BASE_COM
+            token = self._com_token
+
+        headers = {"Authorization": 'token {}'.format(token),
                    "Travis-API-Version": "3"}
 
         if not url.startswith('/'):
             url = "/" + url
 
-        resource = self.TRAVIS_BASE + url
+        resource = base + url
 
         self._logger.debug("HTTP GET %s", resource)
         resp = requests.get(resource, headers=headers)
@@ -62,8 +93,8 @@ class TravisCI:
 
         return resp
 
-    def _get_parse(self, url):
-        resp = self._get(url)
+    def _get_parse(self, url, org=False):
+        resp = self._get(url, org=org)
 
         if resp.status_code >= 200 and resp.status_code < 300:
             return resp.json()
@@ -104,12 +135,45 @@ class TravisCI:
         self._logger.debug("Repository info on %s: %s", repo_slug, info)
         return info
 
-    def get_key(self, repo_slug):
-        """Get the encryption key for a repository by its slug."""
+    def use_travis_org(self, repo_slug):
+        """Check and see if this repo is on travis.org or com.
+
+        Returns:
+            bool: True if on travis-ci.org, False if on travis-ci.com.
+        """
 
         encoded_slug = self._encode_repo_slug(repo_slug)
 
-        resp = self._get_parse("repo/{}/key_pair/generated".format(encoded_slug))
+        try:
+            resp = self._get_parse("repo/{}".format(encoded_slug), org=False)
+            return resp.get('active_on_org', False)
+        except:
+            pass
+
+        try:
+            resp = self._get_parse("repo/{}".format(encoded_slug), org=True)
+            return resp.get('active_on_org', False)
+        except:
+            pass
+
+        raise InternalError("Could not find repository %s on either travis-ci.org or travis-ci.com" % encoded_slug)
+
+    def get_key(self, repo_slug):
+        """Get the encryption key for a repository by its slug.
+
+        This method will automatically get the correct key for the repository
+        whether it is running on travis-ci.com or travis-ci.org.
+        """
+
+        org = self.use_travis_org(repo_slug)
+        if org:
+            self._logger.info("Getting encryption key for %s on travis-ci.org", repo_slug)
+        else:
+            self._logger.info("Getting encryption key for %s on travis-ci.com", repo_slug)
+
+        encoded_slug = self._encode_repo_slug(repo_slug)
+
+        resp = self._get_parse("repo/{}/key_pair/generated".format(encoded_slug), org=org)
 
         key = resp.get('public_key')
         if resp is None:
