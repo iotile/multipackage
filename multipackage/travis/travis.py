@@ -125,6 +125,8 @@ class TravisCI:
     def encrypt_string(self, repo_slug, text):
         """Encrypt a string using the repo's public key."""
 
+        self._logger.debug("Encrypting '%s' for repo '%s'", text, repo_slug)
+
         if not isinstance(text, bytes):
             text = text.encode('utf-8')
 
