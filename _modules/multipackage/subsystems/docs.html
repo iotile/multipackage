@@ -149,6 +149,7 @@
 <span></span><span class="sd">&quot;&quot;&quot;Documentation subsystem that manages autogenerating documentation.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">InternalError</span>
 
 <div class="viewcode-block" id="DocumentationSubsystem"><a class="viewcode-back" href="../../../api/multipackage.subsystems.docs.html#multipackage.subsystems.docs.DocumentationSubsystem">[docs]</a><span class="k">class</span> <span class="nc">DocumentationSubsystem</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
@@ -174,10 +175,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="s2">&quot;doc/_template&quot;</span><span class="p">,</span> <span class="n">gitkeep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="s2">&quot;built_docs&quot;</span><span class="p">,</span> <span class="n">gitkeep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+        <span class="n">namespace_package</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">namespace_packages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Having more than one namespace package is not yet supported: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">namespace_packages</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">namespace_packages</span><span class="p">):</span>
+            <span class="n">namespace_package</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">namespace_packages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
         <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="n">options</span><span class="p">,</span>
             <span class="s1">&#39;components&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
-            <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;documentation&#39;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;documentation&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="n">namespace_package</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;doc/_template/module.rst&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;module.rst&quot;</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>

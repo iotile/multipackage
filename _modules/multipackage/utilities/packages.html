@@ -153,15 +153,35 @@
 <span class="kn">from</span> <span class="nn">setuptools</span> <span class="k">import</span> <span class="n">find_packages</span>
 
 
-<div class="viewcode-block" id="find_toplevel_packages"><a class="viewcode-back" href="../../../api/multipackage.utilities.packages.html#multipackage.utilities.packages.find_toplevel_packages">[docs]</a><span class="k">def</span> <span class="nf">find_toplevel_packages</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,)):</span>
+<div class="viewcode-block" id="find_toplevel_packages"><a class="viewcode-back" href="../../../api/multipackage.utilities.packages.html#multipackage.utilities.packages.find_toplevel_packages">[docs]</a><span class="k">def</span> <span class="nf">find_toplevel_packages</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,),</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Find all top level python packages in the given directory.</span>
 
 <span class="sd">    This will automatically exclude all subpackages and only</span>
-<span class="sd">    report the top level package.</span>
+<span class="sd">    report the top level package.  If you pass a prefix argument,</span>
+<span class="sd">    then only the top level packages under that prefix will be</span>
+<span class="sd">    reported.</span>
+
+<span class="sd">    So, if you have a package hierarchy like:</span>
+
+<span class="sd">    multipackage.core</span>
+<span class="sd">    multipackage.plugins</span>
+<span class="sd">    other_package.hello</span>
+
+<span class="sd">    and you pass prefix=&quot;multipackage&quot;, then you will get</span>
+<span class="sd">    multipackage.core</span>
+<span class="sd">    multipackage.plugins</span>
+
+<span class="sd">    Otherwise you will get:</span>
+<span class="sd">    multipackage</span>
+<span class="sd">    other_package</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path (str): The path to the directory in which to search</span>
 <span class="sd">        exclude (list of str): Exclude the given packages</span>
+<span class="sd">        prefix (str): Optional package prefix to search under.</span>
+<span class="sd">            If this is not None then it must not end with a .</span>
+<span class="sd">            and will be used to find the next level of packages</span>
+<span class="sd">            under a given prefix.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list of str: The list of top level packages.</span>
@@ -174,7 +194,16 @@
 
     <span class="n">packages</span> <span class="o">=</span> <span class="n">find_packages</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">exclude</span><span class="p">)</span>
 
-    <span class="n">toplevel</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">toplevel</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">packages</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">prefix_dots</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prefix</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+            <span class="n">prefix_dots</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span>
+
+        <span class="n">toplevel</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">packages</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">prefix_dots</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">toplevel</span><span class="p">))</span></div>
 </pre></div>
 

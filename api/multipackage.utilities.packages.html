@@ -191,10 +191,22 @@
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="multipackage.utilities.packages.find_toplevel_packages">
-<code class="descclassname">multipackage.utilities.packages.</code><code class="descname">find_toplevel_packages</code><span class="sig-paren">(</span><em>path</em>, <em>exclude=('test'</em>, <em>)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/packages.html#find_toplevel_packages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.packages.find_toplevel_packages" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">multipackage.utilities.packages.</code><code class="descname">find_toplevel_packages</code><span class="sig-paren">(</span><em>path</em>, <em>exclude=('test'</em>, <em>)</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/packages.html#find_toplevel_packages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.packages.find_toplevel_packages" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find all top level python packages in the given directory.</p>
 <p>This will automatically exclude all subpackages and only
-report the top level package.</p>
+report the top level package.  If you pass a prefix argument,
+then only the top level packages under that prefix will be
+reported.</p>
+<p>So, if you have a package hierarchy like:</p>
+<p>multipackage.core
+multipackage.plugins
+other_package.hello</p>
+<p>and you pass prefix=”multipackage”, then you will get
+multipackage.core
+multipackage.plugins</p>
+<p>Otherwise you will get:
+multipackage
+other_package</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -202,6 +214,10 @@ report the top level package.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the directory in which to search</li>
 <li><strong>exclude</strong> (<em>list of str</em>) – Exclude the given packages</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Optional package prefix to search under.
+If this is not None then it must not end with a .
+and will be used to find the next level of packages
+under a given prefix.</li>
 </ul>
 </td>
 </tr>
