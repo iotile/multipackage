@@ -301,7 +301,8 @@ exception is raised.</li>
 <code class="descname">get_key</code><span class="sig-paren">(</span><em>repo_slug</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.get_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.get_key" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the encryption key for a repository by its slug.</p>
 <p>This method will automatically get the correct key for the repository
-whether it is running on travis-ci.com or travis-ci.org.</p>
+whether it is running on travis-ci.com or travis-ci.org.  It will only
+look up each key once using a global cache of keys.</p>
 </dd></dl>
 
 <dl class="method">

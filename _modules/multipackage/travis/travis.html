@@ -310,8 +310,12 @@
         <span class="sd">&quot;&quot;&quot;Get the encryption key for a repository by its slug.</span>
 
 <span class="sd">        This method will automatically get the correct key for the repository</span>
-<span class="sd">        whether it is running on travis-ci.com or travis-ci.org.</span>
+<span class="sd">        whether it is running on travis-ci.com or travis-ci.org.  It will only</span>
+<span class="sd">        look up each key once using a global cache of keys.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">repo_slug</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_cache</span><span class="p">[</span><span class="n">repo_slug</span><span class="p">]</span>
 
         <span class="n">org</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_travis_org</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">org</span><span class="p">:</span>
