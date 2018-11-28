@@ -204,16 +204,41 @@
 <span class="sd">    having fetched the latest changes, etc.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
+
+<div class="viewcode-block" id="verify_env_var"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_env_var">[docs]</a><span class="k">def</span> <span class="nf">verify_env_var</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Check that an environment variable exists.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">%s</span><span class="s2">: ERROR, NOT PRESENT&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    Needed for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">%s</span><span class="s2">: OKAY&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">1</span></div>
+
+
 <div class="viewcode-block" id="verify_environment"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_environment">[docs]</a><span class="k">def</span> <span class="nf">verify_environment</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Verify that all required environment settings are correct.&quot;&quot;&quot;</span>
 
     <span class="n">travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
     <span class="n">travis</span><span class="o">.</span><span class="n">ensure_token</span><span class="p">()</span>
 
-    <span class="n">GITRepository</span><span class="o">.</span><span class="n">version</span><span class="p">()</span></div>
+    <span class="n">GITRepository</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
 
-    <span class="c1">#travis.get_key(&#39;iotile/typedargs&#39;)</span>
-    <span class="c1">#encoded = travis.encrypt_string(&#39;iotile/typedargs&#39;, &quot;TEST_ENV=hello&quot;)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Checking for required environment variables:&quot;</span><span class="p">)</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;encrypting environment variables on travis-ci.org&quot;</span><span class="p">)</span>
+    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_COM&quot;</span><span class="p">,</span> <span class="s2">&quot;encrypting environment variables on travis-ci.com&quot;</span><span class="p">)</span>
+    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;GITHUB_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;deploying documentation to github pages&quot;</span><span class="p">)</span>
+    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;SLACK_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;sending slack notifications&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">found</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="mi">1</span></div>
 
 
 <div class="viewcode-block" id="create_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.create_repo">[docs]</a><span class="k">def</span> <span class="nf">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
@@ -408,7 +433,7 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;doctor&#39;</span><span class="p">:</span>
-            <span class="n">verify_environment</span><span class="p">()</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">verify_environment</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;info&#39;</span><span class="p">:</span>
             <span class="n">retval</span> <span class="o">=</span> <span class="n">verify_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;init&quot;</span><span class="p">:</span>
