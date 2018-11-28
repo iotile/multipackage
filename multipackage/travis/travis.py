@@ -207,7 +207,7 @@ class TravisCI:
 
         return base64.b64encode(ciphertext).decode('utf-8')
 
-    def encrypt_env(self, repo_slug, *env_names, only_value=False):
+    def encrypt_env(self, repo_slug, *env_names, **kwargs):
         """Encrypt one or more environment variables.
 
         The resulting string is suitable for pasting directly into a
@@ -217,9 +217,12 @@ class TravisCI:
         could be necessary to include all secure environment variables in a
         single line.
 
-        If only value is passed, you must give a single environment variable
-        name and its raw value will be encrypted without a NAME= prefix.
+        If only value is passed as a keyword arg, you must give a single
+        environment variable name and its raw value will be encrypted without
+        a NAME= prefix.
         """
+
+        only_value = kwargs.get('only_value', False)
 
         if only_value and len(env_names) != 1:
             raise InternalError("TravisCI.encrypt_env called with multiple variables and only_value=True")
