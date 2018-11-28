@@ -1,7 +1,7 @@
-#BEGIN MULTIPACKAGE MANAGED SECTION, HASH=MD5:BD12D46B056929426C434874B62D4C7B
-sphinx
-jinja2
-sphinx_rtd_theme
-sphinxcontrib-programoutput
-recommonmark
+#BEGIN MULTIPACKAGE MANAGED SECTION, HASH=MD5:1EC4A56B5267A3F13BD6E757610704DC
+sphinx ~= 1.8
+jinja2 ~= 2.10
+sphinx_rtd_theme ~= 0.4
+sphinxcontrib-programoutput ~= 0.11
+recommonmark ~= 0.4
 #END MULTIPACKAGE MANAGED SECTION

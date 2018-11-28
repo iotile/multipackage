@@ -10,9 +10,14 @@ class DocumentationSubsystem:
     def update(self, options):
         """Update the documentation subsystem."""
 
+        # Make sure we pin all of our versions
         self._repo.ensure_lines("requirements_doc.txt",
                                 ["sphinx", "jinja2", "sphinx_rtd_theme", "sphinxcontrib-programoutput",
-                                 "recommonmark"])
+                                 "recommonmark"], present=False)
+
+        self._repo.ensure_lines("requirements_doc.txt",
+                                ["sphinx ~= 1.8", "jinja2 ~= 2.10", "sphinx_rtd_theme ~= 0.4", "sphinxcontrib-programoutput ~= 0.11",
+                                 "recommonmark ~= 0.4"])
 
         self._repo.ensure_lines(".gitignore", ['.tmp_docs', 'built_docs'])
 
