@@ -313,13 +313,16 @@ look up each key once using a global cache of keys.</p>
 
 <dl class="method">
 <dt id="multipackage.travis.travis.TravisCI.encrypt_env">
-<code class="descname">encrypt_env</code><span class="sig-paren">(</span><em>repo_slug</em>, <em>*env_names</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.encrypt_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.encrypt_env" title="Permalink to this definition">¶</a></dt>
+<code class="descname">encrypt_env</code><span class="sig-paren">(</span><em>repo_slug</em>, <em>*env_names</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/travis/travis.html#TravisCI.encrypt_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.travis.travis.TravisCI.encrypt_env" title="Permalink to this definition">¶</a></dt>
 <dd><p>Encrypt one or more environment variables.</p>
 <p>The resulting string is suitable for pasting directly into a
 .travis.yml file, i.e. it is of the form secure: &lt;encrypted value&gt;</p>
 <p>See <a class="reference external" href="https://github.com/travis-ci/travis-ci/issues/9548">https://github.com/travis-ci/travis-ci/issues/9548</a> for why it
-is necessary to include all secure environment variables in a
+could be necessary to include all secure environment variables in a
 single line.</p>
+<p>If only value is passed as a keyword arg, you must give a single
+environment variable name and its raw value will be encrypted without
+a NAME= prefix.</p>
 </dd></dl>
 
 </dd></dl>
