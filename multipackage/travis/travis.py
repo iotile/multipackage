@@ -162,8 +162,12 @@ class TravisCI:
         """Get the encryption key for a repository by its slug.
 
         This method will automatically get the correct key for the repository
-        whether it is running on travis-ci.com or travis-ci.org.
+        whether it is running on travis-ci.com or travis-ci.org.  It will only
+        look up each key once using a global cache of keys.
         """
+
+        if repo_slug in self._key_cache:
+            return self._key_cache[repo_slug]
 
         org = self.use_travis_org(repo_slug)
         if org:
