@@ -54,6 +54,7 @@ jobs:
 
     - stage: "Deploy"
       if: branch = master AND type != pull_request
+      script: python scripts/build_documentation.py
       os: linux
       dist: xenial
       python: "3.6"
@@ -67,7 +68,7 @@ jobs:
           keep-history: true
           local-dir: built_docs
       env:
-        secure: pDeRloiV61099HB8TS8gJvCg1Wat4WMOSdcZldPLG5NogO1WRPi/oeUF8bqj3Gr6plV+r5JNs/cIxIMT7AQGShTwxeFYnOsSfUhyH4+NEk0SoJD77dhkyY/ohDZLwQFPFiI4O9/vVew04Jzuy+ZEysbeRmhXL4+bRhG8zJd1voIS7VGg8SDz5JCJZl21UwNOHTxyRSrVm9Hc6p1HoIxCLCWFv2emcAWNQ7xvg05RvH3fSp8uN5JV89Lqbd+x0S/V9ZWw9N98h1GqDSsnxae+WbaCuuKKno6bB9chRVT0sWFis0ECOnPbkwDY3n0TsRZgF6bo+Zi/KXO9UdnLoKU5Jp+GNkzJ9VV30b35KSXPY9fDUFJu6cYKumpebT6hAQtNTrWe1ukf3OD0QfTiJW6llrvvuQcbYhS+F36qmYz0fWQ8tWXaXBrMevP1ablhAn9yEn3PmNCcBTgNyqlfTNzUv+Y1N9XtVCLqyHHBs9XS7xmUhSs5G1/r8alMHZwy/72tpWEa+ghOYmE0kVcR9lIKJmjOElErlMA5sDoCfKoYJpo1WPn/S8+dLiMsEYhGAMtXTVcDg1d6qLFns/dAE1ErE/cxy4saGyl5wtKbSsJ2+hW8W1nro+pMvGmib40x2Io7qf0w01R44z+YoqdvmSASQlT8dAHmCtXbsPeYnk2IfgY=
+        secure: KSG3hnAMLzEh3zCIYeGt+5eJwMaW6aKBeuJ7xO60R9Md4cD83zVZAsvlFRHeChnuD09F9sJzwxDCHlH85M+7tBop57eY+o/eNlRKn7RxDGgWdvApMTc0mWyukW6IrJzggGLmWz2/dAmhKwlKntnhxNBTjjVdg/EoR5KpcPuiUl5O8dSQ2i+33iVlDBxR/B8kDbPou7B4ZH5GuyqRAWMDSCu7VPu4eaRCoqH9qxvLEsk8qrl/gHgmdZ/1xIPc6H8rbz6hMbEmUlcUplDv63V8WHwTdX6MC8tPyWwXXO/VytZGtLG6aWjcsD+74KDpFn6eAUXeEUMNQMFIAy/QAKkL2c2zh7xCUXPUQBWyxDFbVkkNnbGtkHx0GC1OT+EVd2D0S75vpn4ARfUgN31ge6aNEL9NWP3/wOXEAmnY1j1w1T0dVgbsM1Yb+QbzNx4Q24YV51aTSdPE4eOj7U3kBEoZC5OtoR//yExkNHdgxfHXZBGQpqinuBDC6YsGII3A0i5h0UNa63VuW7GUkocpNJzaW27F5BYmROcScDlbrvTWlxFcpw7tBzObZmILuIy2zxwfGRI/OLE5FEp/OcNe9aL92JPhHvVdvBOqo1ShNuzcqC+5Xi8uKJwQIOG4PZr1RY217HGr7uXN9HwaejUFuQtVv1hfxjbF95KjmdqD2XnQJ50=
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt

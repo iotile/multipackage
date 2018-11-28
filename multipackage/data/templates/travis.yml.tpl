@@ -60,6 +60,7 @@ jobs:
 
     - stage: "Deploy"
       if: branch = master AND type != pull_request
+      script: python scripts/build_documentation.py
       os: linux
       dist: xenial
       python: "3.6"
