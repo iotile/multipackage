@@ -60,14 +60,14 @@ jobs:
       language: python
       name: "Documentation to Github Pages"
       deploy:
-      - provider: pages
-        skip-cleanup: true
-        github-token: $GITHUB_TOKEN
-        committer-from-gh: true
-        keep-history: true
-        local-dir: built_docs
+        - provider: pages
+          skip-cleanup: true
+          github-token: $GITHUB_TOKEN
+          committer-from-gh: true
+          keep-history: true
+          local-dir: built_docs
       env:
-      - secure: A4iTX8DVcGlCdYpwJUBz0eV+KwjR6WT96YVKIe3ozJVoevQystGvn7aAjDTturSDJZNM1FGcS2sc7YHc6PoUxR4MGcFpStITV5AFskJcAnBKcZ6a5Zzwo1WcQ0cqg/8ZrkiObsD9TK8X8g/7DzhNc+mK23DCV5fT+W75pKhyvpEE3DXId5GEkHDMPuBjTf9myQy3YTJlKOoto+QVOa1IQX8KQiQcE60iBIFFN9FZeO+FXgbOJtSWRr9r0O0kpCRhkQKfcmouj6+HrxGFKR8GvUDFZMOU/YP2GL+OtRUggvzolftdmt6Mb42gFbPyj3B5AyhbMkoIdqKDHze8iQy1iSe3ned2xdnu9I9BU2ttBf6aNuzrPjaG9sX5eTKRBy8eFOHgtHC633aGYtEj1frabTd1K5wXqhuu3khTC7f/B9VE8YOCh2y1lUjVh1gkiI2SQ3/b8lpxdu3S7wdhlpRBZnaajxG5tITWNJrWjz3AWjqdyaAxoDaaYbAD6FMzpIceKE+h6U8IW85upKuacP2rlRk8hCiDTwwv3BKmBUJhlK4eyDeH78lhKn8xT1E1Q3ub9fCctWFNs6NMms+m3e7LAAe2YHo4y+lZ/az9oLLKVD9l/q7AyJooXbttzSqIYGdakyPbRYUW/um+z88PIbe3wyncTzLRvtxYOy4274GWC/8=
+        - secure: iuvWPCWPRX9YJre5C8eddtl2qE2JhQB+nyVYyAJ7d6HqQT7ibC1aZwejEIujKQuedTkvBGZzfvRH6bZ5V9kp4EN4EHRZ+qATi3uZ/T8CxA/k5PFphz5WiXs+AtpAYmWcxoLiGifcsk1nP1FIFh0NMVe/jt1Pfb30hu5v0LKpJy4M+LewnQmPLbH12UOmceXHtfR//1SYiSLzjppnQ3ec6w4uI+Sllm4LavPg88LsJtA3AF75Bsy+RQ0ykeuzm0NzyqpiFjLBBUdzROIDsVivUmB2zefN3NzeGT8aqCTob7COsGo/Fsu9zhPbW/XPvTeJhmHJcq8q5m6ghHWtkoTCDFdWQfPakODjhc5lkzu8/ucSPKVwOniLQjgYgIeE/+O6UCwRlRWE9PVKOjxgqT78Ce8aHa6LIMs8VqRe4glqP3ql/EI2W41cWV5M3O+G1+Dhnb5yhdwHG1qGAJ6ixJZ64jrA+zLdH+qH8bgyZ4lZhFu7KtEroSzUdq3d4I8QP6ot4u9VYT+G1jvtqfPBNZy9nBmzhUb7UcoQgSjsWbsSDHc5lnDYv81oqz7P+DHoqT8eblRi8ejJr29dzZ9jXhZ/r8jgtkLFWmlCJ5tNgVDNMZVDYqO6L7rg2qFk+j1SoeYANgZSAJ4OTbAeJFeseL2AOXExTu9lM4nxOFM1nPSGQJM=
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt

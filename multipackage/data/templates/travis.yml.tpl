@@ -66,14 +66,14 @@ jobs:
       language: python
       name: "Documentation to Github Pages"
       deploy:
-      - provider: pages
-        skip-cleanup: true
-        github-token: $GITHUB_TOKEN
-        committer-from-gh: true
-        keep-history: true
-        local-dir: built_docs
+        - provider: pages
+          skip-cleanup: true
+          github-token: $GITHUB_TOKEN
+          committer-from-gh: true
+          keep-history: true
+          local-dir: built_docs
       env:
-      - {{ env.github_token }}
+        - {{ env.github_token }}
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
