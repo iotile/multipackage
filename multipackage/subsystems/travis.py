@@ -13,14 +13,16 @@ class TravisSubsystem:
         """Update the linting subsystem."""
 
         slug = self._repo.github_slug()
+        env = {
+            'github_token': self._travis.encrypt_env(slug, "GITHUB_TOKEN"),
+            'pypi_user': self._travis.encrypt_env(slug, "PYPI_USER"),
+            'pypi_pass': self._travis.encrypt_env(slug, "PYPI_PASS")
+        }
 
-        # See https://github.com/travis-ci/travis-ci/issues/9548
-        # we need to encrypt all environment variables together rather than
-        # separately with a list.
         variables = {
             'options': options,
             'components': self._repo.components,
-            'deploy_tokens': self._travis.encrypt_env(slug, "GITHUB_TOKEN", "PYPI_USER")
+            'env': env
         }
 
         self._repo.ensure_template(".travis.yml", "travis.yml.tpl", variables)

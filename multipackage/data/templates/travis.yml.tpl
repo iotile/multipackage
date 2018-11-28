@@ -71,10 +71,10 @@ jobs:
           skip-cleanup: true
           github-token: $GITHUB_TOKEN
           committer-from-gh: true
-          keep-history: true
+          keep-history: false
           local-dir: built_docs
       env:
-        {{ deploy_tokens }}
+        - {{ env.github_token }}
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
