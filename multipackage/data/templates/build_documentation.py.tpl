@@ -140,6 +140,11 @@ def main():
         subprocess.check_output(args)
     except subprocess.CalledProcessError as err:
         return err.returncode
+
+    print("\nAdding .nojekyll file")
+    with open(os.path.join(dest_folder, ".nojekyll"), "w"):
+        pass
+
     return 0
 
 
