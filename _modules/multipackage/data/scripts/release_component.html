@@ -330,6 +330,8 @@
     <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;setup.py&#39;</span><span class="p">,</span> <span class="s1">&#39;--name&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;clean&#39;</span><span class="p">,</span> <span class="s1">&#39;sdist&#39;</span><span class="p">,</span> <span class="s1">&#39;bdist_wheel&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">universal</span><span class="p">:</span>

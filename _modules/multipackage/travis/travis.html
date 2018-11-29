@@ -215,6 +215,12 @@
         <span class="k">if</span> <span class="n">com_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_ORG</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_ORG_URL&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TRAVIS_BASE_ORG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_ORG_URL&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_COM_URL&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">TRAVIS_BASE_COM</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_COM_URL&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_com_token</span> <span class="o">=</span> <span class="n">com_token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_org_token</span> <span class="o">=</span> <span class="n">org_token</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -249,16 +255,6 @@
 
         <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Could not access URL </span><span class="si">{}</span><span class="s2">, error code </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="p">),</span>
                             <span class="s2">&quot;Make sure the API endpoint exists&quot;</span><span class="p">)</span>
-
-<div class="viewcode-block" id="TravisCI.ensure_token"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.ensure_token">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Ensure that the Travis CI access token is valid.&quot;&quot;&quot;</span>
-
-        <span class="n">resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">200</span> <span class="ow">and</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">:</span>
-            <span class="k">return</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Token check failed, response: </span><span class="si">%s</span><span class="s2">, content=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">resp</span><span class="p">,</span> <span class="n">resp</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">INVALID_REASON</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SUGGESTION</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_encode_repo_slug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
         <span class="c1"># Allow (org, repository) format for repo_slug</span>
