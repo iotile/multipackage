@@ -1,22 +1,23 @@
 """Release script to automatically release a component onto pypi."""
 
-
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 
+from getpass import getpass
 import sys
 import os
 import argparse
 import glob
 import subprocess
 
-if sys.version_info.major < 3:
-    from builtins import raw_input as input
-
-from getpass import getpass
 import requests
 import setuptools.sandbox
 from twine.commands.upload import upload
 from twine.settings import Settings
+
+if sys.version_info.major < 3:
+    from builtins import raw_input as input
+
+VERSION = "0.1.0"
 
 
 DESCRIPTION = \
@@ -27,6 +28,26 @@ the correct information before releasing.  You can check that everything is
 ready for a release by passing -c,--check to do everything except upload the
 finished distributions to PyPI (including sending a test message to slack if
 configured so that you can check your webhook settings).
+
+
+choosing your repo:
+  You can specify the destination pypi index in one of four ways:
+
+  - do nothing, the default behavior is to upload to PyPI
+  - pass -r (pypi|testpypi).  These strings are automatically matched to the
+    global PyPI index and the test pypi index, respectively.
+  - pass -r <url>.  You can specify the URL for an arbitrary public or private
+    PyPI index such as gemfury.
+  - pass -r <name> where <name> is anything defined in your ~/.pypirc file (if
+    it exists).
+
+  Most users will not need to specify anything with -r since they will be
+  uploading to PyPI, however, you can override this if you have a different
+  target destination.
+
+  Note that if you repo does not require a password, you still need to pass a
+  blank one on the command line with --password= otherwise you will be
+  prompted to enter one interactively.
 """
 
 class MismatchError(Exception):
@@ -55,12 +76,14 @@ def build_parser():
     parser = argparse.ArgumentParser(description=DESCRIPTION, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('path', default='.', nargs="?", help="The path to the component that we should release")
     parser.add_argument('-c', '--compat', default="universal", choices=['universal', 'py2', 'py3'], help="The python version we should release for")
-    parser.add_argument('-v', '--version', required=True, help="The expected version of the component")
+    parser.add_argument('-e', '--expected', required=True, help="The expected version of the component")
     parser.add_argument('-s', '--slack', help="Optional slack web hook URL")
     parser.add_argument('-u', '--user', help="Username for the PyPI repo you are uploading to")
     parser.add_argument('-p', '--password', help="Password for the PyPI repo you are uploading to")
     parser.add_argument('-r', '--repo', help="The pypi repo you want to upload to")
     parser.add_argument('-k', '--check', action="store_true", help="Check that the release could proceed without actually releasing")
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {version}'.format(version=VERSION))
 
     return parser
 
@@ -293,8 +316,8 @@ def main(argv=None):
 
         print("\n ---- Verifying component information is correct ----\n")
 
-        check_component(args.path, args.version)
-        release_notes = get_release_notes(args.path, args.version)
+        check_component(args.path, args.expected)
+        release_notes = get_release_notes(args.path, args.expected)
 
         print("Release Notes:")
         print(release_notes)
@@ -312,7 +335,7 @@ def main(argv=None):
         if args.slack is not None:
             print("\n ---- Notifying Slack Channel ----\n")
 
-            msg = generate_slack_message(component_name, args.version, release_notes, args.check)
+            msg = generate_slack_message(component_name, args.expected, release_notes, args.check)
             send_slack_message(args.slack, msg)
 
     except MismatchError as exc:
@@ -339,8 +362,18 @@ def main(argv=None):
         print("ERROR: An external service failed")
         print("Service: %s" % exc.service)
         print(exc.message)
+        retval = 3
+    except KeyboardInterrupt:
+        if should_raise:
+            raise
+
+        print()
+        print()
+        print("ERROR: Interrupted by Ctrl-C")
+        retval = 4
 
     return retval
+
 
 if __name__ == '__main__':
     sys.exit(main())
