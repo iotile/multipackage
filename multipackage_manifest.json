@@ -1,22 +1,18 @@
 {
-    "scripts/components.txt": {
-        "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1", 
+    "doc/index.rst": {
+        "hash": "MD5:2CF5732B4C40882E2355F3C6E53D2EF7", 
         "hash_type": "line"
     }, 
     "doc/api.rst": {
         "hash": "MD5:162C4492CD4CF91845E3A5FB03F404F5", 
         "hash_type": "line"
     }, 
-    ".travis.yml": {
-        "hash": "MD5:6C6F9150124CD5104DF9D457E2D59BB5", 
-        "hash_type": "line"
-    }, 
     "doc/conf.py": {
         "hash": "MD5:42152BC618B07BC70D61EEF8BA4E24BB", 
         "hash_type": "line"
     }, 
-    "doc/index.rst": {
-        "hash": "MD5:2CF5732B4C40882E2355F3C6E53D2EF7", 
+    "scripts/components.txt": {
+        "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1", 
         "hash_type": "line"
     }, 
     "doc/_template/module.rst": {
@@ -43,6 +39,10 @@
         "hash": "MD5:B96E44EE6507B912D1E2AC9AF0A8633F", 
         "hash_type": "section"
     }, 
+    "scripts/release_by_name.py": {
+        "hash": "MD5:1A649CEE32D2021066F5801EF3C58235", 
+        "hash_type": "line"
+    }, 
     "multipackage.json": {
         "hash": "MD5:32F9347D426B87235EF56F2CA41DAD2B", 
         "hash_type": "json"
@@ -63,8 +63,8 @@
         "hash": "MD5:9667C39B681AFED4D2806CC0CDAAA1C4", 
         "hash_type": "section"
     }, 
-    "scripts/release_by_name.py": {
-        "hash": "MD5:1A649CEE32D2021066F5801EF3C58235", 
+    ".travis.yml": {
+        "hash": "MD5:8348CA5BD2A3A5000C464136D2C7058D", 
         "hash_type": "line"
     }, 
     "scripts/better_apidocs.py": {

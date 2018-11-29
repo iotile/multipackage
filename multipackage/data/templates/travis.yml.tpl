@@ -75,7 +75,7 @@ jobs:
           local-dir: built_docs
       env:
         - {{ env.github_token }}
-    - if: branch = master AND tag IS present
+    - if: tag IS present
       script: python scripts/release_by_name.py $TRAVIS_TAG
       os: linux
       dist: xenial
