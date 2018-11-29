@@ -74,10 +74,11 @@ class MockPyPI:
     def post_package(self, request):
         """/repo/{slug} endpoint."""
 
+        # It's important to actually read the file otherwise twine fails
         infile = request.files['content']
         self.logger.info("Received uploaded report, filename: %s", infile.filename)
 
-        indata = infile.read()
+        infile.read()
 
     def _add_api(self, regex, callback):
         """Add an API matching a regex."""
