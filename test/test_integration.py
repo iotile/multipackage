@@ -85,7 +85,7 @@ def bare_repo(tmpdir, travis, monkeypatch):
     try:
         os.chdir(folder)
         monkeypatch.syspath_prepend(os.path.abspath(folder))
-
+        monkeypatch.setenv('GITHUB_TOKEN', "github_token")
         yield folder
     finally:
         os.chdir(curr_dir)
