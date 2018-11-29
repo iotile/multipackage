@@ -18,13 +18,14 @@ class BasicSubsystem:
             "dist/*",
             "__pycache__",
             "*.pyc",
-            ".pytest_cache/"
+            ".pytest_cache/",
+            "build/*"
         ])
 
         self._repo.ensure_template(".editorconfig", template="editorconfig")
         self._repo.ensure_lines("requirements_build.txt", [
             "requests",
-            "twine",
+            "twine ~= 1.12",
             "pycryptodome",
             "pytest"
         ])

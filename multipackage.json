@@ -12,6 +12,6 @@
                 "3.6"
             ]
         }
-    }, 
+    },
     "template": "pypi_package"
 }

@@ -160,8 +160,10 @@ class Repository:
 
         self.namespace_packages = sorted(namespace_packages)
 
-        if len(namespace_packages) > 0:
-            self._logger.info("Found namespace packages: %s, pruning them", ", ".join(self.namespace_packages))
+        if len(namespace_packages) == 0:
+            return
+
+        self._logger.info("Found namespace packages: %s, pruning them", ", ".join(self.namespace_packages))
 
         for key, old_comp in self.components.items():
             old_comp = self.components[key]

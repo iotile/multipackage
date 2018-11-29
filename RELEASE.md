@@ -1,5 +1,5 @@
 # `multipackage` Release Notes
 
-## HEAD
+## 0.0.1
 
 - Initial commit

@@ -30,4 +30,4 @@ def test_stable_generation(tmpdir):
     print("If this test fails, the multipackage api may have just changed")
     print("and you need to update the encoded hash in this test")
     print("Actual Hash: %s" % hash_value)
-    assert hash_value == 'MD5:4D33651ED986501E606F28FF015B7141'
+    assert hash_value == 'MD5:25D94B22191A4456E0CE04ADC72242CC'
