@@ -75,6 +75,17 @@ jobs:
           local-dir: built_docs
       env:
         - {{ env.github_token }}
+    - if: branch = master AND tag IS present
+      script: python scripts/release_by_name.py $TRAVIS_TAG
+      os: linux
+      dist: xenial
+      python: "3.6"
+      language: python
+      name: "Release to PyPI Index"
+      env:
+        - {{ env.slack_token }}
+        - {{ env.pypi_user }}
+        - {{ env.pypi_pass }}
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
@@ -97,3 +108,4 @@ notifications:
     - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch} in PR <%{pull_request_url}|#%{pull_request_number}> by %{author} %{result} in %{elapsed_time}"
     on_success: always
     on_failure: always
+

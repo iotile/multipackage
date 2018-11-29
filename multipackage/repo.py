@@ -401,12 +401,12 @@ class Repository:
             from pkg_resources import resource_filename, Requirement
             source_path = os.path.join(resource_filename(Requirement.parse("multipackage"), "multipackage/data/templates"), template)
             shutil.copyfile(source_path, path)
-            return
+        else:
+            if variables is None:
+                variables = {}
 
-        if variables is None:
-            variables = {}
+            render_template(template, variables, out_path=path)
 
-        render_template(template, variables, out_path=path)
         self.manifest.update_file(path)
 
     def update(self):

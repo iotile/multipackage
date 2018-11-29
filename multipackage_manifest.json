@@ -1,4 +1,8 @@
 {
+    "doc/release.rst": {
+        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB", 
+        "hash_type": "line"
+    }, 
     "scripts/components.txt": {
         "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1", 
         "hash_type": "line"
@@ -16,11 +20,11 @@
         "hash_type": "line"
     }, 
     "doc/_template/module.rst": {
-        "hash": "MD5:755FAD8AC90F86A047D6A2BCB1DA16F1", 
+        "hash": "MD5:9F8E3F379547D5AA7EBE21181D4AC37B", 
         "hash_type": "line"
     }, 
     "scripts/generate_api.py": {
-        "hash": "MD5:446C8C27897E549B7E4FF8403932C5E2", 
+        "hash": "MD5:40303ACB3E7E4C76D9C3C02792290B4A", 
         "hash_type": "line"
     }, 
     ".editorconfig": {
@@ -31,8 +35,12 @@
         "hash": "MD5:0CF706EB23656ED50ACD0A7BE2127F3F", 
         "hash_type": "line"
     }, 
+    "scripts/release_component.py": {
+        "hash": "MD5:59D0416C9D359DE03C85A43067B03EBC", 
+        "hash_type": "line"
+    }, 
     "requirements_build.txt": {
-        "hash": "MD5:EF4F76A18BEDA2B13976B0655F20E637", 
+        "hash": "MD5:FC6236EB2EF916FE167F71A9EB3A3CBF", 
         "hash_type": "section"
     }, 
     "multipackage.json": {
@@ -40,23 +48,23 @@
         "hash_type": "json"
     }, 
     "doc/_template/package.rst": {
-        "hash": "MD5:5929DFF8A6F8DEB44A2038E3F76EE7F1", 
+        "hash": "MD5:D7114A8BF7CAB963CCCE5D0830359B7D", 
         "hash_type": "line"
     }, 
     ".pylintrc": {
         "hash": "MD5:C73A3B561CEF58737117F47C66364AFE", 
         "hash_type": "line"
     }, 
-    "doc/release.rst": {
-        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB", 
+    ".travis.yml": {
+        "hash": "MD5:689A176189AE4DA9E73387C86FAC744D", 
         "hash_type": "line"
     }, 
     ".gitignore": {
         "hash": "MD5:9667C39B681AFED4D2806CC0CDAAA1C4", 
         "hash_type": "section"
     }, 
-    ".travis.yml": {
-        "hash": "MD5:B38B0A2FB479A750273FCC2B60F9DC37", 
+    "scripts/release_by_name.py": {
+        "hash": "MD5:DAB3F0B1204F50509AE2C2B64AD4F2C4", 
         "hash_type": "line"
     }, 
     "scripts/better_apidocs.py": {

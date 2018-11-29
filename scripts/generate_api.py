@@ -1,8 +1,13 @@
 """Generate API docs for all subpackages."""
 
+from __future__ import print_function
 import sys
 import os
+import shutil
+import time
 import argparse
+
+VERSION = "0.1.0"
 
 
 class Error(Exception):
@@ -29,7 +34,7 @@ def delete_with_retry(folder):
                 shutil.rmtree(folder)
 
             return
-        except:
+        except:  #pylint:disable=bare-except;We do really want to catch everything
             time.sleep(0.1)
 
     raise Error("Could not delete directory after 5 attempts, failing")
@@ -44,6 +49,8 @@ def build_parser():
     parser.add_argument("input", default=[], nargs="+", help="The input directories to generate docs for")
     parser.add_argument("-t", "--template", required=True, help="The template directory")
     parser.add_argument("-r", "--remove", action="append", default=[], help="Remove these generated files")
+    parser.add_argument('--version', action='version',
+                        version='%(prog)s {version}'.format(version=VERSION))
     return parser
 
 
@@ -66,12 +73,12 @@ def verify_packages():
     """Verify that we have all required packages."""
 
     try:
-        import sphinx
+        import sphinx as _sphinx
     except ImportError:
         raise Error("This command requires sphinx: pip install sphinx")
 
     try:
-        import jinja2
+        import jinja2 as _jinja2
     except ImportError:
         raise Error("This command requires jinja2: pip install jinja2")
 
@@ -81,7 +88,7 @@ def generate_api(input_path, template_dir, output_path, remove):
 
     # Do this import here so we can check for import errors before failing
     try:
-        from better_apidocs import main as apidoc_main
+        from better_apidocs import main as apidoc_main  #pylint:disable=relative-import;We need this logic so that we work when installed
     except ImportError:
         from .better_apidocs import main as apidoc_main
 
@@ -97,6 +104,8 @@ def generate_api(input_path, template_dir, output_path, remove):
 
 
 def main(argv=None):
+    """Main entry point for generate_api.py."""
+
     should_raise = argv is None
 
     if argv is None:
@@ -111,7 +120,7 @@ def main(argv=None):
 
         if args.clean:
             print("Cleaning output directory")
-            delete_with_retry()
+            delete_with_retry(args.output)
             verify_output(args.output)
 
         for input_folder in args.input:

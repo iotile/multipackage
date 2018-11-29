@@ -30,5 +30,14 @@ class BasicSubsystem:
             "pytest"
         ])
 
+        variables = {
+            'options': options,
+            'components': self._repo.components,
+            'doc': options.get('documentation', {}),
+        }
+
         self._repo.ensure_directory("scripts")
         self._repo.ensure_template("scripts/components.txt", template="components.txt", overwrite=False)
+        self._repo.ensure_template("scripts/release_by_name.py", "release_by_name.py.tpl", variables)
+
+        self._repo.ensure_script("scripts/release_component.py", "release_component.py")
