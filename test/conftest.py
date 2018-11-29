@@ -3,6 +3,8 @@
 import pytest
 from multipackage import Repository
 
+pytest_plugins = ['mock_travis', 'mock_pypi', 'mock_slack']
+
 
 @pytest.fixture(scope="function")
 def bare_repo(tmpdir):

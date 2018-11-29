@@ -67,6 +67,12 @@ class TravisCI:
         if com_token is None:
             raise InvalidEnvironmentError("TRAVIS_TOKEN_ORG", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_ORG)
 
+        if os.environ.get("TRAVIS_ORG_URL") is not None:
+            self.TRAVIS_BASE_ORG = os.environ.get("TRAVIS_ORG_URL")
+
+        if os.environ.get("TRAVIS_COM_URL") is not None:
+            self.TRAVIS_BASE_COM = os.environ.get("TRAVIS_COM_URL")
+
         self._com_token = com_token
         self._org_token = org_token
         self._logger = logging.getLogger(__name__)
@@ -101,16 +107,6 @@ class TravisCI:
 
         raise InternalError("Could not access URL {}, error code {}".format(url, resp.status_code),
                             "Make sure the API endpoint exists")
-
-    def ensure_token(self):
-        """Ensure that the Travis CI access token is valid."""
-
-        resp = self._get('user')
-        if resp.status_code >= 200 and resp.status_code < 300:
-            return
-
-        self._logger.error("Token check failed, response: %s, content=%s", resp, resp.text)
-        raise InvalidEnvironmentError("TRAVIS_TOKEN", self.INVALID_REASON, self.SUGGESTION)
 
     def _encode_repo_slug(self, repo_slug):
         # Allow (org, repository) format for repo_slug

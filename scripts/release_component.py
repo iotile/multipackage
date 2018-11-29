@@ -182,6 +182,8 @@ def build_component(component, universal):
     os.chdir(component)
     try:
         name = subprocess.check_output(['python', 'setup.py', '--name'])
+        if not isinstance(name, str):
+            name = name.decode('utf-8')
 
         args = ['clean', 'sdist', 'bdist_wheel']
         if universal:

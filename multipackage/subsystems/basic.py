@@ -27,7 +27,8 @@ class BasicSubsystem:
             "requests",
             "twine ~= 1.12",
             "pycryptodome",
-            "pytest"
+            "pytest ~= 4.0",
+            "wheel"
         ])
 
         variables = {
