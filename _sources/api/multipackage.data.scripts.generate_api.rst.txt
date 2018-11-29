@@ -7,7 +7,7 @@ multipackage.data.scripts.generate_api module
 .. currentmodule:: multipackage.data.scripts.generate_api
 
 .. automodule:: multipackage.data.scripts.generate_api
-    :members: Error, build_parser, delete_with_retry, generate_api, main, verify_output, verify_packages
+    :members: Error, VERSION, build_parser, delete_with_retry, generate_api, main, verify_output, verify_packages
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -33,6 +33,13 @@ multipackage.data.scripts.generate_api module
         main
         verify_output
         verify_packages
+
+    Data:
+
+    .. autosummary::
+        :nosignatures:
+
+        VERSION
 
 
 

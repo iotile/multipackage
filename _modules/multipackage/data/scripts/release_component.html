@@ -1,0 +1,578 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.data.scripts.release_component &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.data.scripts.release_component</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.data.scripts.release_component</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Release script to automatically release a component onto pypi.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">getpass</span> <span class="k">import</span> <span class="n">getpass</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">setuptools.sandbox</span>
+<span class="kn">from</span> <span class="nn">twine.commands.upload</span> <span class="k">import</span> <span class="n">upload</span>
+<span class="kn">from</span> <span class="nn">twine.settings</span> <span class="k">import</span> <span class="n">Settings</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="n">raw_input</span> <span class="k">as</span> <span class="nb">input</span>
+
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+
+
+<span class="n">DESCRIPTION</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;Release script to automatically release a component onto PyPI.</span>
+
+<span class="sd">This script will inspect the python package at &lt;path&gt; and verify that it has</span>
+<span class="sd">the correct information before releasing.  You can check that everything is</span>
+<span class="sd">ready for a release by passing -c,--check to do everything except upload the</span>
+<span class="sd">finished distributions to PyPI (including sending a test message to slack if</span>
+<span class="sd">configured so that you can check your webhook settings).</span>
+
+
+<span class="sd">choosing your repo:</span>
+<span class="sd">  You can specify the destination pypi index in one of four ways:</span>
+
+<span class="sd">  - do nothing, the default behavior is to upload to PyPI</span>
+<span class="sd">  - pass -r (pypi|testpypi).  These strings are automatically matched to the</span>
+<span class="sd">    global PyPI index and the test pypi index, respectively.</span>
+<span class="sd">  - pass -r &lt;url&gt;.  You can specify the URL for an arbitrary public or private</span>
+<span class="sd">    PyPI index such as gemfury.</span>
+<span class="sd">  - pass -r &lt;name&gt; where &lt;name&gt; is anything defined in your ~/.pypirc file (if</span>
+<span class="sd">    it exists).</span>
+
+<span class="sd">  Most users will not need to specify anything with -r since they will be</span>
+<span class="sd">  uploading to PyPI, however, you can override this if you have a different</span>
+<span class="sd">  target destination.</span>
+
+<span class="sd">  Note that if you repo does not require a password, you still need to pass a</span>
+<span class="sd">  blank one on the command line with --password= otherwise you will be</span>
+<span class="sd">  prompted to enter one interactively.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MismatchError"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.MismatchError">[docs]</a><span class="k">class</span> <span class="nc">MismatchError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">found</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MismatchError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Information mismatch in &#39;</span><span class="si">%s</span><span class="s2">&#39;, expected: &#39;</span><span class="si">%s</span><span class="s2">&#39;, found: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">subsystem</span><span class="p">,</span> <span class="n">expected</span><span class="p">,</span> <span class="n">found</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExternalError"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.ExternalError">[docs]</a><span class="k">class</span> <span class="nc">ExternalError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExternalError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service</span></div>
+
+
+<div class="viewcode-block" id="InternalError"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.InternalError">[docs]</a><span class="k">class</span> <span class="nc">InternalError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InternalError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
+
+
+<div class="viewcode-block" id="build_parser"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.build_parser">[docs]</a><span class="k">def</span> <span class="nf">build_parser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Create an argument parser.&quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">DESCRIPTION</span><span class="p">,</span> <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The path to the component that we should release&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--compat&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;universal&quot;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;universal&#39;</span><span class="p">,</span> <span class="s1">&#39;python2&#39;</span><span class="p">,</span> <span class="s1">&#39;python3&#39;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The python version we should release for&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--expected&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The expected version of the component&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--slack&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional slack web hook URL&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="s1">&#39;--user&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Username for the PyPI repo you are uploading to&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;--password&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Password for the PyPI repo you are uploading to&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--repo&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The pypi repo you want to upload to&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-k&#39;</span><span class="p">,</span> <span class="s1">&#39;--check&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Check that the release could proceed without actually releasing&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
+                        <span class="n">version</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(prog)s</span><span class="s1"> </span><span class="si">{version}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="n">VERSION</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="verify_python_version"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.verify_python_version">[docs]</a><span class="k">def</span> <span class="nf">verify_python_version</span><span class="p">(</span><span class="n">expected</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Verify that we are on an appropriate python version to do the release.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">expected</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;universal&#39;</span><span class="p">,</span> <span class="s1">&#39;python2&#39;</span><span class="p">,</span> <span class="s1">&#39;python3&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Unknown expected python version string: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">expected</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;python interpreter version&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;=2.7&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">expected</span> <span class="o">==</span> <span class="s2">&quot;universal&quot;</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">expected</span> <span class="o">==</span> <span class="s2">&quot;python2&quot;</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;python interpreter version&quot;</span><span class="p">,</span> <span class="s2">&quot;2.X&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">expected</span> <span class="o">==</span> <span class="s2">&quot;python3&quot;</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;python interpreter version&quot;</span><span class="p">,</span> <span class="s2">&quot;3.X&quot;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="generate_slack_message"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.generate_slack_message">[docs]</a><span class="k">def</span> <span class="nf">generate_slack_message</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">notes</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Format a nice slack message about the release.&quot;&quot;&quot;</span>
+
+    <span class="n">notes</span> <span class="o">=</span> <span class="s2">&quot;```</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">notes</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;```&quot;</span>
+
+    <span class="k">if</span> <span class="n">check</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#2eb886&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;#808080&quot;</span>
+
+    <span class="n">attachment</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Released </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2"> to PyPI&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">version</span><span class="p">),</span>
+        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Distribution&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">distribution</span><span class="p">,</span>
+                <span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Version&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">version</span><span class="p">,</span>
+                <span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="kc">True</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="n">notes_attachment</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+        <span class="s2">&quot;mrkdn_in&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Release Notes for </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">version</span><span class="p">),</span>
+        <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">notes</span>
+    <span class="p">}</span>
+
+    <span class="n">fallback</span> <span class="o">=</span> <span class="s2">&quot;Released </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2"> to PyPI&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">check</span><span class="p">:</span>
+        <span class="n">fallback</span> <span class="o">=</span> <span class="s2">&quot;Test message from release bot for </span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">distribution</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+        <span class="n">attachment</span><span class="p">[</span><span class="s1">&#39;text&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;*This is just a test message, nothing was actually released.*&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;fallback&quot;</span><span class="p">:</span> <span class="n">fallback</span><span class="p">,</span>
+        <span class="s2">&quot;attachments&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="n">attachment</span><span class="p">,</span>
+            <span class="n">notes_attachment</span>
+        <span class="p">],</span>
+        <span class="s1">&#39;username&#39;</span><span class="p">:</span> <span class="s1">&#39;Release Bot&#39;</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="send_slack_message"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.send_slack_message">[docs]</a><span class="k">def</span> <span class="nf">send_slack_message</span><span class="p">(</span><span class="n">webhook</span><span class="p">,</span> <span class="n">message_json</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Send a message to a slack channel.&quot;&quot;&quot;</span>
+
+    <span class="n">resp</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">webhook</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">message_json</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="s2">&quot;slack webhook&quot;</span><span class="p">,</span> <span class="s2">&quot;Could not post message to slack channel: response=</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_component"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.check_component">[docs]</a><span class="k">def</span> <span class="nf">check_component</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">expected_version</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Make sure the package version in setuptools matches what we expect it to be.&quot;&quot;&quot;</span>
+
+    <span class="n">compath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">compath</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">version</span>
+
+    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">version</span> <span class="o">!=</span> <span class="n">expected_version</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;component version in version.py&quot;</span><span class="p">,</span> <span class="n">expected_version</span><span class="p">,</span> <span class="n">version</span><span class="o">.</span><span class="n">version</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_component"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.build_component">[docs]</a><span class="k">def</span> <span class="nf">build_component</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">universal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create an sdist and a wheel for the desired component.&quot;&quot;&quot;</span>
+
+    <span class="n">curr</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;setup.py&#39;</span><span class="p">,</span> <span class="s1">&#39;--name&#39;</span><span class="p">])</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;clean&#39;</span><span class="p">,</span> <span class="s1">&#39;sdist&#39;</span><span class="p">,</span> <span class="s1">&#39;bdist_wheel&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">universal</span><span class="p">:</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;--universal&#39;</span><span class="p">)</span>
+
+        <span class="n">setuptools</span><span class="o">.</span><span class="n">sandbox</span><span class="o">.</span><span class="n">run_setup</span><span class="p">(</span><span class="s1">&#39;setup.py&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">curr</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="upload_component"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.upload_component">[docs]</a><span class="k">def</span> <span class="nf">upload_component</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="s2">&quot;pypi&quot;</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Upload a given component to pypi</span>
+
+<span class="sd">    The pypi username and password must either be specified in a ~/.pypirc</span>
+<span class="sd">    file or in environment variables PYPI_USER and PYPI_PASS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter your username [</span><span class="si">%s</span><span class="s2">]: &quot;</span> <span class="o">%</span> <span class="n">repo</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">password</span> <span class="o">=</span> <span class="n">getpass</span><span class="p">((</span><span class="s2">&quot;Enter your password [</span><span class="si">%s</span><span class="s2">]: &quot;</span> <span class="o">%</span> <span class="n">repo</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+
+    <span class="n">distpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span> <span class="s1">&#39;dist&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+    <span class="n">distpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">distpath</span><span class="p">))</span>
+    <span class="n">dists</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">distpath</span><span class="p">)</span>
+
+    <span class="n">repo_name</span> <span class="o">=</span> <span class="n">repo</span>
+    <span class="n">repo_url</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s2">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">repo_name</span><span class="p">:</span>
+        <span class="n">repo_url</span> <span class="o">=</span> <span class="n">repo</span>
+        <span class="n">repo_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#Invoke upload this way since subprocess call of twine cli has cross platform issues</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">Settings</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">,</span> <span class="n">repository_name</span><span class="o">=</span><span class="n">repo_name</span><span class="p">,</span>
+                            <span class="n">repository_url</span><span class="o">=</span><span class="n">repo_url</span><span class="p">)</span>
+        <span class="n">upload</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="n">dists</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span>
+
+        <span class="k">if</span> <span class="n">repo_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">repo_name</span> <span class="o">=</span> <span class="n">repo_url</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unknown response from server&quot;</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">409</span> <span class="ow">or</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Package already exists&quot;</span>
+
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="s2">&quot;PyPI repository &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">repo_name</span><span class="p">,</span> <span class="s2">&quot;HTTP status </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">msg</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="parse_version"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.parse_version">[docs]</a><span class="k">def</span> <span class="nf">parse_version</span><span class="p">(</span><span class="n">version_line</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;##&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a version from a markdown header.</span>
+
+<span class="sd">    The line must be formatted as:</span>
+<span class="sd">    ## X.Y.Z [whatever else you want]</span>
+
+<span class="sd">    So you could have, for example:</span>
+<span class="sd">    ## 1.5.0 (11/28/2018)</span>
+<span class="sd">    ##1.5.0</span>
+
+<span class="sd">    ## 1.5.0 hello this is a test</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The parsed version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">version_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">version_line</span> <span class="o">=</span> <span class="n">version_line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">version_line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">words</span> <span class="o">=</span> <span class="n">version_line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_release_notes"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.get_release_notes">[docs]</a><span class="k">def</span> <span class="nf">get_release_notes</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a release notes section from a markdown file.&quot;&quot;&quot;</span>
+
+    <span class="n">notes_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;RELEASE.md&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">notes_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="s2">&quot;Release notes file &#39;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">notes_path</span><span class="p">,</span> <span class="s2">&quot;Could not open file to read release notes&quot;</span><span class="p">)</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">release_lines</span> <span class="o">=</span> <span class="p">{</span><span class="n">parse_version</span><span class="p">(</span><span class="n">line</span><span class="p">):</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;##&#39;</span><span class="p">)}</span>
+
+    <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">release_lines</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;release notes entry for release&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> non-matching release headers&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">release_lines</span><span class="p">))</span>
+
+    <span class="n">start_line</span> <span class="o">=</span> <span class="n">release_lines</span><span class="p">[</span><span class="n">version</span><span class="p">]</span>
+    <span class="n">past_releases</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">release_lines</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">start_line</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">release_string</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;release notes contents for release&quot;</span><span class="p">,</span> <span class="s2">&quot;a list of release notes&quot;</span><span class="p">,</span> <span class="s2">&quot;nothing&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">release_string</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main entrypoint for release_component.py script.&quot;&quot;&quot;</span>
+
+    <span class="n">should_raise</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">should_raise</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">build_parser</span><span class="p">()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> ---- Verifying python version is compatible ----</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">verify_python_version</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">compat</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> ---- Verifying component information is correct ----</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">check_component</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">expected</span><span class="p">)</span>
+        <span class="n">release_notes</span> <span class="o">=</span> <span class="n">get_release_notes</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">expected</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Release Notes:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">release_notes</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> ---- Building component ----</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">component_name</span> <span class="o">=</span> <span class="n">build_component</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">universal</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">compat</span> <span class="o">==</span> <span class="s2">&quot;universal&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">**** Successfully built distribution named &#39;</span><span class="si">%s</span><span class="s2">&#39; ****&quot;</span> <span class="o">%</span> <span class="n">component_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">check</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> ---- Uploading distributions ----</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">upload_component</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">slack</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> ---- Notifying Slack Channel ----</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">generate_slack_message</span><span class="p">(</span><span class="n">component_name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">expected</span><span class="p">,</span> <span class="n">release_notes</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
+            <span class="n">send_slack_message</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">slack</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">MismatchError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: There is a mismatch in required component information of the environment&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">except</span> <span class="n">InternalError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An internal error has occurred.  This indicates a bug in this script.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">except</span> <span class="n">ExternalError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An external service failed&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Service: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Interrupted by Ctrl-C&quot;</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">4</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

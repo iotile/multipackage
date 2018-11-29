@@ -1,0 +1,411 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.data.scripts.release_component module &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.scripts package" href="multipackage.scripts.html" />
+    <link rel="prev" title="multipackage.data.scripts.generate_api module" href="multipackage.data.scripts.generate_api.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.data.html">multipackage.data package</a> &raquo;</li>
+        
+          <li><a href="multipackage.data.scripts.html">multipackage.data.scripts package</a> &raquo;</li>
+        
+      <li>multipackage.data.scripts.release_component module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.data.scripts.release_component.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.data.scripts.release_component">
+<span id="multipackage-data-scripts-release-component-module"></span><h1>multipackage.data.scripts.release_component module<a class="headerlink" href="#module-multipackage.data.scripts.release_component" title="Permalink to this headline">¶</a></h1>
+<p>Release script to automatically release a component onto pypi.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Exceptions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.ExternalError" title="multipackage.data.scripts.release_component.ExternalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExternalError</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.InternalError" title="multipackage.data.scripts.release_component.InternalError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InternalError</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.MismatchError" title="multipackage.data.scripts.release_component.MismatchError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MismatchError</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Functions:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.build_component" title="multipackage.data.scripts.release_component.build_component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_component</span></code></a></td>
+<td>Create an sdist and a wheel for the desired component.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.build_parser" title="multipackage.data.scripts.release_component.build_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_parser</span></code></a></td>
+<td>Create an argument parser.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.check_component" title="multipackage.data.scripts.release_component.check_component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_component</span></code></a></td>
+<td>Make sure the package version in setuptools matches what we expect it to be.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.generate_slack_message" title="multipackage.data.scripts.release_component.generate_slack_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_slack_message</span></code></a></td>
+<td>Format a nice slack message about the release.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.get_release_notes" title="multipackage.data.scripts.release_component.get_release_notes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_release_notes</span></code></a></td>
+<td>Get a release notes section from a markdown file.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.main" title="multipackage.data.scripts.release_component.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></td>
+<td>Main entrypoint for release_component.py script.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.parse_version" title="multipackage.data.scripts.release_component.parse_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_version</span></code></a></td>
+<td>Parse a version from a markdown header.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.send_slack_message" title="multipackage.data.scripts.release_component.send_slack_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_slack_message</span></code></a></td>
+<td>Send a message to a slack channel.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.upload_component" title="multipackage.data.scripts.release_component.upload_component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upload_component</span></code></a></td>
+<td>Upload a given component to pypi</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.verify_python_version" title="multipackage.data.scripts.release_component.verify_python_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_python_version</span></code></a></td>
+<td>Verify that we are on an appropriate python version to do the release.</td>
+</tr>
+</tbody>
+</table>
+<p>Data:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">DESCRIPTION</span></code></td>
+<td>str(object=’‘) -&gt; str str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">VERSION</span></code></td>
+<td>str(object=’‘) -&gt; str str(bytes_or_buffer[, encoding[, errors]]) -&gt; str</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="multipackage.data.scripts.release_component.MismatchError">
+<em class="property">exception </em><code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">MismatchError</code><span class="sig-paren">(</span><em>subsystem</em>, <em>expected</em>, <em>found</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#MismatchError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.MismatchError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="multipackage.data.scripts.release_component.ExternalError">
+<em class="property">exception </em><code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">ExternalError</code><span class="sig-paren">(</span><em>service</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#ExternalError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.ExternalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="multipackage.data.scripts.release_component.InternalError">
+<em class="property">exception </em><code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">InternalError</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#InternalError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.InternalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.build_parser">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">build_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#build_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.build_parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an argument parser.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.verify_python_version">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">verify_python_version</code><span class="sig-paren">(</span><em>expected</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#verify_python_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.verify_python_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verify that we are on an appropriate python version to do the release.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.generate_slack_message">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">generate_slack_message</code><span class="sig-paren">(</span><em>distribution</em>, <em>version</em>, <em>notes</em>, <em>check=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#generate_slack_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.generate_slack_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a nice slack message about the release.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.send_slack_message">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">send_slack_message</code><span class="sig-paren">(</span><em>webhook</em>, <em>message_json</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#send_slack_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.send_slack_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a message to a slack channel.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.check_component">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">check_component</code><span class="sig-paren">(</span><em>path</em>, <em>expected_version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#check_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.check_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make sure the package version in setuptools matches what we expect it to be.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.build_component">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">build_component</code><span class="sig-paren">(</span><em>component</em>, <em>universal</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#build_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.build_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an sdist and a wheel for the desired component.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.upload_component">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">upload_component</code><span class="sig-paren">(</span><em>component_path</em>, <em>repo='pypi'</em>, <em>username=None</em>, <em>password=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#upload_component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.upload_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a given component to pypi</p>
+<p>The pypi username and password must either be specified in a ~/.pypirc
+file or in environment variables PYPI_USER and PYPI_PASS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.parse_version">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">parse_version</code><span class="sig-paren">(</span><em>version_line</em>, <em>prefix='##'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#parse_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.parse_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a version from a markdown header.</p>
+<p>The line must be formatted as:
+## X.Y.Z [whatever else you want]</p>
+<p>So you could have, for example:
+## 1.5.0 (11/28/2018)
+##1.5.0</p>
+<p>## 1.5.0 hello this is a test</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The parsed version.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.get_release_notes">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">get_release_notes</code><span class="sig-paren">(</span><em>path</em>, <em>version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#get_release_notes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.get_release_notes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a release notes section from a markdown file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.main">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">main</code><span class="sig-paren">(</span><em>argv=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entrypoint for release_component.py script.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.scripts.html" class="btn btn-neutral float-right" title="multipackage.scripts package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.data.scripts.generate_api.html" class="btn btn-neutral" title="multipackage.data.scripts.generate_api module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

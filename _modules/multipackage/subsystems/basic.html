@@ -166,19 +166,29 @@
             <span class="s2">&quot;dist/*&quot;</span><span class="p">,</span>
             <span class="s2">&quot;__pycache__&quot;</span><span class="p">,</span>
             <span class="s2">&quot;*.pyc&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;.pytest_cache/&quot;</span>
+            <span class="s2">&quot;.pytest_cache/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;build/*&quot;</span>
         <span class="p">])</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;.editorconfig&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;editorconfig&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_lines</span><span class="p">(</span><span class="s2">&quot;requirements_build.txt&quot;</span><span class="p">,</span> <span class="p">[</span>
             <span class="s2">&quot;requests&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;twine&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;twine ~= 1.12&quot;</span><span class="p">,</span>
             <span class="s2">&quot;pycryptodome&quot;</span><span class="p">,</span>
             <span class="s2">&quot;pytest&quot;</span>
         <span class="p">])</span>
 
+        <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="n">options</span><span class="p">,</span>
+            <span class="s1">&#39;components&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
+            <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;documentation&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="p">}</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="s2">&quot;scripts&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;scripts/components.txt&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;components.txt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;scripts/components.txt&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;components.txt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;scripts/release_by_name.py&quot;</span><span class="p">,</span> <span class="s2">&quot;release_by_name.py.tpl&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_script</span><span class="p">(</span><span class="s2">&quot;scripts/release_component.py&quot;</span><span class="p">,</span> <span class="s2">&quot;release_component.py&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -19,6 +19,7 @@ Submodules
 
     ~multipackage.data.scripts.better_apidocs
     ~multipackage.data.scripts.generate_api
+    ~multipackage.data.scripts.release_component
 
 
 
