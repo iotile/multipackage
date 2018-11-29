@@ -84,7 +84,7 @@ jobs:
       language: python
       name: "Release to PyPI Index"
       env:
-        - {{ env.slack_token }}
+        - {{ env.slack_web_hook }}
         - {{ env.pypi_user }}
         - {{ env.pypi_pass }}
 

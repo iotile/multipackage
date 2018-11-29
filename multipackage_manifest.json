@@ -1,14 +1,14 @@
 {
-    "doc/release.rst": {
-        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB", 
-        "hash_type": "line"
-    }, 
     "scripts/components.txt": {
         "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1", 
         "hash_type": "line"
     }, 
     "doc/api.rst": {
         "hash": "MD5:162C4492CD4CF91845E3A5FB03F404F5", 
+        "hash_type": "line"
+    }, 
+    ".travis.yml": {
+        "hash": "MD5:75B9841A8C366883C1828AB54FCF543A", 
         "hash_type": "line"
     }, 
     "doc/conf.py": {
@@ -55,8 +55,8 @@
         "hash": "MD5:C73A3B561CEF58737117F47C66364AFE", 
         "hash_type": "line"
     }, 
-    ".travis.yml": {
-        "hash": "MD5:70885D63074F14CECD59C0C6B9A25548", 
+    "doc/release.rst": {
+        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB", 
         "hash_type": "line"
     }, 
     ".gitignore": {
