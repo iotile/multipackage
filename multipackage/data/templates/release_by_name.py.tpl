@@ -24,7 +24,7 @@ def main():
     name, _, version = tag.partition('-')
 
     check = False
-    if name.startswith('test:'):
+    if name.startswith('test@'):
         name = name[5:]
         check = True
 
