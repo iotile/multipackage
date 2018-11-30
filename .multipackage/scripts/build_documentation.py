@@ -6,11 +6,10 @@ import os
 import time
 import subprocess
 import platform
-from generate_api import main as api_main
 
-COMPONENTS = {
-    "multipackage": {"name": "multipackage", "path": "./", "packages": ["multipackage"]}
-}
+from generate_api import main as api_main
+from components.py import COMPONENTS
+
 
 NAMESPACE = None
 

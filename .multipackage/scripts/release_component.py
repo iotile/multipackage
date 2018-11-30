@@ -17,6 +17,17 @@ from twine.settings import Settings
 if sys.version_info.major < 3:
     from builtins import raw_input as input
 
+try:
+    from shared_errors import MismatchError, ExternalError, InternalError, handle_exception  #pylint:disable=relative-import;We need this logic so that we work when installed
+except ImportError:
+    from .shared_errors import MismatchError, ExternalError, InternalError, handle_exception
+
+try:
+    from release_notes import get_release_notes, get_version  #pylint:disable=relative-import;We need this logic so that we work when installed
+except ImportError:
+    from .release_notes import get_release_notes, get_version
+
+
 VERSION = "0.1.0"
 
 
@@ -49,26 +60,6 @@ choosing your repo:
   blank one on the command line with --password= otherwise you will be
   prompted to enter one interactively.
 """
-
-class MismatchError(Exception):
-    def __init__(self, subsystem, expected, found):
-        super(MismatchError, self).__init__()
-        self.message = "Information mismatch in '%s', expected: '%s', found: '%s'" % (subsystem, expected, found)
-
-
-class ExternalError(Exception):
-    def __init__(self, service, message):
-        super(ExternalError, self).__init__()
-
-        self.message = message
-        self.service = service
-
-
-class InternalError(Exception):
-    def __init__(self, message):
-        super(InternalError, self).__init__()
-
-        self.message = message
 
 
 def build_parser():
@@ -166,13 +157,10 @@ def send_slack_message(webhook, message_json):
 def check_component(path, expected_version):
     """Make sure the package version in setuptools matches what we expect it to be."""
 
-    compath = os.path.realpath(os.path.abspath(path))
-    sys.path.insert(0, compath)
+    actual_version = get_version(path)
 
-    import version
-
-    if version.version != expected_version:
-        raise MismatchError("component version in version.py", expected_version, version.version)
+    if actual_version != expected_version:
+        raise MismatchError("component version in version.py", expected_version, actual_version)
 
 
 def build_component(component, universal):
@@ -236,101 +224,6 @@ def upload_component(component_path, repo="pypi", username=None, password=None):
             msg = "Package already exists"
 
         raise ExternalError("PyPI repository '%s'" % repo_name, "HTTP status %d: %s" % (code, msg))
-
-
-def parse_version(version_line, prefix="##"):
-    """Parse a version from a markdown header.
-
-    The line must be formatted as:
-    ## [v]X.Y.Z [whatever else you want]
-
-    So you could have, for example:
-    ## 1.5.0 (11/28/2018)
-    ##1.5.0
-    ## v1.5.0 - 11/28/2018
-    ## 1.5.0 hello this is a test
-
-    Returns:
-        str: The parsed version.
-    """
-
-    if not version_line.startswith(prefix):
-        return None
-
-    version_line = version_line[len(prefix):].lstrip()
-
-    if len(version_line) == 0:
-        return None
-
-    words = version_line.split()
-    if len(words) == 0:
-        return None
-
-    version_word = words[0]
-    if version_word.startswith('v'):
-        version_word = version_word[1:]
-
-    return version_word
-
-
-def get_release_notes(path, version):
-    """Get a release notes section from a markdown file."""
-
-    notes_path = os.path.join(path, 'RELEASE.md')
-
-    try:
-        with open(notes_path, "r") as infile:
-            lines = infile.readlines()
-    except IOError:
-        raise ExternalError("Release notes file '%s" % notes_path, "Could not open file to read release notes")
-
-    lines = [x.rstrip() for x in lines]
-    release_lines = {parse_version(line): i for i, line in enumerate(lines) if line.startswith('##')}
-
-    if version not in release_lines:
-        raise MismatchError("release notes entry for release", version, "%d non-matching release headers" % len(release_lines))
-
-    start_line = release_lines[version]
-    past_releases = [x for x in release_lines.values() if x > start_line]
-
-    if len(past_releases) == 0:
-        release_string = "\n".join(lines[start_line + 1:])
-    else:
-        release_string = "\n".join(lines[start_line + 1:min(past_releases)])
-
-    if len(release_string) == 0:
-        raise MismatchError("release notes contents for release", "a list of release notes", "nothing")
-
-    return release_string
-
-
-def handle_exception(exception):
-    """Helper function for handling exceptions raised in main."""
-
-    print()
-
-    if isinstance(exception, MismatchError):
-        print("ERROR: There is a mismatch in required component information of the environment")
-        print(exception.message)
-        retval = 1
-    elif isinstance(exception, InternalError):
-        print("ERROR: An internal error has occurred.  This indicates a bug in this script.")
-        print(exception.message)
-        retval = 2
-    elif isinstance(exception, ExternalError):
-        print("ERROR: An external service failed")
-        print("Service: %s" % exception.service)
-        print(exception.message)
-        retval = 3
-    elif isinstance(exception, KeyboardInterrupt):
-        print()
-        print("ERROR: Interrupted by Ctrl-C")
-        retval = 4
-    else:
-        print("ERROR: An unknown exception occurred")
-        print(str(exception))
-
-    return retval
 
 
 def main(argv=None):

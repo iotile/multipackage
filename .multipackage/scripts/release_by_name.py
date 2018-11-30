@@ -5,9 +5,7 @@ import sys
 import os
 import subprocess
 
-COMPONENTS = {
-    "multipackage": {"name": "multipackage", "path": "./", "compat": "universal", "packages": ["multipackage"]}
-}
+from components import COMPONENTS
 
 
 def main():

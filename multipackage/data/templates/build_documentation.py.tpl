@@ -6,14 +6,10 @@ import os
 import time
 import subprocess
 import platform
+
 from generate_api import main as api_main
+from components.py import COMPONENTS
 
-COMPONENTS = {
-{% for key, component in components|dictsort %}
-    "{{ key }}": {"name": "{{ key }}", "path": "{{ component.relative_path }}", "packages": [{% for package in component.toplevel_packages|sort %}"{{ package }}"{% if not loop.last %},{% endif %}{% endfor %}]}{% if not loop.last %},{% endif %}
-{% endfor %}
-
-}
 
 {% if namespace %}
 NAMESPACE = "{{ namespace }}"

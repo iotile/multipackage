@@ -1,10 +1,13 @@
 """Tests to make sure api doc generation works cross platform."""
 
+from __future__ import print_function
 import os
 from multipackage.data.scripts.generate_api import main as generate_main
 from multipackage.utilities import directory_hash
 
 def get_args(tmpdir, extra_args=None):
+    """Get the args needed to invoke apigen."""
+
     base_folder = os.path.join(os.path.dirname(__file__), '..', 'multipackage')
     template_folder = os.path.join(base_folder, "data", "templates")
 
@@ -30,4 +33,4 @@ def test_stable_generation(tmpdir):
     print("If this test fails, the multipackage api may have just changed")
     print("and you need to update the encoded hash in this test")
     print("Actual Hash: %s" % hash_value)
-    assert hash_value == 'MD5:25D94B22191A4456E0CE04ADC72242CC'
+    assert hash_value == 'MD5:01226115D6CF1A1D79053BBED222BDBB'

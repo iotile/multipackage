@@ -42,5 +42,9 @@ class BasicSubsystem:
         self._repo.ensure_directory(self._repo.SCRIPT_DIR)
         self._repo.ensure_template(os.path.join(self._repo.MULTIPACKAGE_DIR, "components.txt"), template="components.txt", overwrite=False)
         self._repo.ensure_template(os.path.join(self._repo.SCRIPT_DIR, "release_by_name.py"), "release_by_name.py.tpl", variables)
+        self._repo.ensure_template(os.path.join(self._repo.SCRIPT_DIR, "components.py"), "components.py.tpl", variables)
+        self._repo.ensure_template(os.path.join(self._repo.SCRIPT_DIR, "tag_release.py"), "tag_release.py.tpl", variables)
 
+        self._repo.ensure_script(os.path.join(self._repo.SCRIPT_DIR, "shared_errors.py"), "shared_errors.py")
+        self._repo.ensure_script(os.path.join(self._repo.SCRIPT_DIR, "release_notes.py"), "release_notes.py")
         self._repo.ensure_script(os.path.join(self._repo.SCRIPT_DIR, "release_component.py"), "release_component.py")
