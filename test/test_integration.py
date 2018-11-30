@@ -41,6 +41,7 @@ def run_in_sandbox(args, pypi_url=None, slack=None):
     env = os.environ.copy()
 
     env['PYTHONPATH'] = os.path.abspath(os.getcwd())
+    print("Running in %s" % os.getcwd())
 
     if slack is not None:
         env['SLACK_WEB_HOOK'] = slack
