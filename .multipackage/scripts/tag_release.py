@@ -54,15 +54,46 @@ def run_in_component(path, args):
 def verify_git_clean(path):
     """Verify that there is a nothing pending on git."""
 
+    sys.stdout.write(" - Checking for uncommitted changes:")
     result = run_in_component(path, ['git', 'status', '--porcelain=v1'])
 
     lines = [x for x in result.splitlines() if len(x) > 0]
 
     if len(lines) == 0:
+        print(" OKAY")
         return
+
+    print(" FAILED")
 
     raise GenericError("There are uncommitted changes in the component, please commit or stash them")
 
+
+def verify_branch(path, expected_branch="master"):
+    """Verify that the branch is correct."""
+
+    sys.stdout.write(" - Verifying your branch is %s" % expected_branch)
+    branch = run_in_component(path, ['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
+    branch = branch.strip()
+
+    if branch == expected_branch:
+        print(" OKAY")
+        return
+
+    print(" FAILED")
+
+    raise GenericError("You must be on branch %s to release, you are on %s" % (expected_branch, branch))
+
+
+def verify_up_to_date(path):
+    """Verify that your branch is up to date with the remote."""
+
+    sys.stdout.write(" - Verifying your branch up to date")
+    run_in_component(path, ['git', 'remote', 'update'])
+
+    run_in_component(path, ['git', 'diff', '--quiet', 'remotes/origin/HEAD'])
+    print(" OKAY")
+
+    # FIXME Test for failure
 
 def show_confirm_version(name, version, release_notes, confirm, will_push, test):
     """Print and optionally confirm the release action."""
@@ -112,7 +143,10 @@ def main():
 
         show_confirm_version(args.name, version, release_notes, args.confirm, args.push, args.test)
 
+        print("\nRunning pre-release sanity checks:")
         verify_git_clean(path)
+        verify_branch(path, "master")
+        verify_up_to_date(path, )
 
     except (MismatchError, InternalError, ExternalError, KeyboardInterrupt, GenericError) as exc:
         retval = handle_exception(exc)
