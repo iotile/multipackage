@@ -216,19 +216,22 @@
 <tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.get_release_notes" title="multipackage.data.scripts.release_component.get_release_notes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_release_notes</span></code></a></td>
 <td>Get a release notes section from a markdown file.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.main" title="multipackage.data.scripts.release_component.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.handle_exception" title="multipackage.data.scripts.release_component.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a></td>
+<td>Helper function for handling exceptions raised in main.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.main" title="multipackage.data.scripts.release_component.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a></td>
 <td>Main entrypoint for release_component.py script.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.parse_version" title="multipackage.data.scripts.release_component.parse_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_version</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.parse_version" title="multipackage.data.scripts.release_component.parse_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_version</span></code></a></td>
 <td>Parse a version from a markdown header.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.send_slack_message" title="multipackage.data.scripts.release_component.send_slack_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_slack_message</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.send_slack_message" title="multipackage.data.scripts.release_component.send_slack_message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_slack_message</span></code></a></td>
 <td>Send a message to a slack channel.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.upload_component" title="multipackage.data.scripts.release_component.upload_component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upload_component</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.upload_component" title="multipackage.data.scripts.release_component.upload_component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upload_component</span></code></a></td>
 <td>Upload a given component to pypi</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.verify_python_version" title="multipackage.data.scripts.release_component.verify_python_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_python_version</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.data.scripts.release_component.verify_python_version" title="multipackage.data.scripts.release_component.verify_python_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_python_version</span></code></a></td>
 <td>Verify that we are on an appropriate python version to do the release.</td>
 </tr>
 </tbody>
@@ -318,11 +321,12 @@ file or in environment variables PYPI_USER and PYPI_PASS</p>
 <code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">parse_version</code><span class="sig-paren">(</span><em>version_line</em>, <em>prefix='##'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#parse_version"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.parse_version" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse a version from a markdown header.</p>
 <p>The line must be formatted as:
-## X.Y.Z [whatever else you want]</p>
+## [v]X.Y.Z [whatever else you want]</p>
 <p>So you could have, for example:
 ## 1.5.0 (11/28/2018)
-##1.5.0</p>
-<p>## 1.5.0 hello this is a test</p>
+##1.5.0
+## v1.5.0 - 11/28/2018
+## 1.5.0 hello this is a test</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -339,6 +343,12 @@ file or in environment variables PYPI_USER and PYPI_PASS</p>
 <dt id="multipackage.data.scripts.release_component.get_release_notes">
 <code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">get_release_notes</code><span class="sig-paren">(</span><em>path</em>, <em>version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#get_release_notes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.get_release_notes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a release notes section from a markdown file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="multipackage.data.scripts.release_component.handle_exception">
+<code class="descclassname">multipackage.data.scripts.release_component.</code><code class="descname">handle_exception</code><span class="sig-paren">(</span><em>exception</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/data/scripts/release_component.html#handle_exception"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.data.scripts.release_component.handle_exception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for handling exceptions raised in main.</p>
 </dd></dl>
 
 <dl class="function">

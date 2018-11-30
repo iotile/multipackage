@@ -390,12 +390,12 @@
     <span class="sd">&quot;&quot;&quot;Parse a version from a markdown header.</span>
 
 <span class="sd">    The line must be formatted as:</span>
-<span class="sd">    ## X.Y.Z [whatever else you want]</span>
+<span class="sd">    ## [v]X.Y.Z [whatever else you want]</span>
 
 <span class="sd">    So you could have, for example:</span>
 <span class="sd">    ## 1.5.0 (11/28/2018)</span>
 <span class="sd">    ##1.5.0</span>
-
+<span class="sd">    ## v1.5.0 - 11/28/2018</span>
 <span class="sd">    ## 1.5.0 hello this is a test</span>
 
 <span class="sd">    Returns:</span>
@@ -414,7 +414,11 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">return</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+    <span class="n">version_word</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">version_word</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+        <span class="n">version_word</span> <span class="o">=</span> <span class="n">version_word</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">version_word</span></div>
 
 
 <div class="viewcode-block" id="get_release_notes"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.get_release_notes">[docs]</a><span class="k">def</span> <span class="nf">get_release_notes</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
@@ -438,14 +442,43 @@
     <span class="n">past_releases</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">release_lines</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">start_line</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span><span class="o">+</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)])</span>
+        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)])</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">release_string</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;release notes contents for release&quot;</span><span class="p">,</span> <span class="s2">&quot;a list of release notes&quot;</span><span class="p">,</span> <span class="s2">&quot;nothing&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">release_string</span></div>
+
+
+<div class="viewcode-block" id="handle_exception"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.handle_exception">[docs]</a><span class="k">def</span> <span class="nf">handle_exception</span><span class="p">(</span><span class="n">exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper function for handling exceptions raised in main.&quot;&quot;&quot;</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">MismatchError</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: There is a mismatch in required component information of the environment&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An internal error has occurred.  This indicates a bug in this script.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">ExternalError</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An external service failed&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Service: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exception</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exception</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Interrupted by Ctrl-C&quot;</span><span class="p">)</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An unknown exception occurred&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -488,39 +521,11 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="n">generate_slack_message</span><span class="p">(</span><span class="n">component_name</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">expected</span><span class="p">,</span> <span class="n">release_notes</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">check</span><span class="p">)</span>
             <span class="n">send_slack_message</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">slack</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
 
-    <span class="k">except</span> <span class="n">MismatchError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">MismatchError</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">,</span> <span class="n">ExternalError</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
             <span class="k">raise</span>
 
-        <span class="nb">print</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: There is a mismatch in required component information of the environment&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="mi">1</span>
-    <span class="k">except</span> <span class="n">InternalError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
-            <span class="k">raise</span>
-
-        <span class="nb">print</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An internal error has occurred.  This indicates a bug in this script.&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="k">except</span> <span class="n">ExternalError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
-            <span class="k">raise</span>
-
-        <span class="nb">print</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: An external service failed&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Service: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">exc</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="mi">3</span>
-    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
-            <span class="k">raise</span>
-
-        <span class="nb">print</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERROR: Interrupted by Ctrl-C&quot;</span><span class="p">)</span>
-        <span class="n">retval</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">handle_exception</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">retval</span></div>
 
