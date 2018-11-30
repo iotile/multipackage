@@ -119,9 +119,15 @@ def create_tag(path, name, version, notes):
 
     tag_contents = "Release %s for %s\n\n%s" % (version, name, notes)
 
-    sys.stdout.write("Creating annotated release tag '%s': " % tag_name)
+    print("Creating annotated release tag: %s" % tag_name)
     run_in_component(path, ['git', 'tag', '-a', '-F', '-', tag_name], stdin=tag_contents)
-    print( "OKAY")
+
+
+def push_tag(path):
+    """Push tags."""
+
+    print("Pushing tags to remote")
+    run_in_component(path, ['git', 'push', '--tags'])
 
 
 def show_confirm_version(name, version, release_notes, confirm, will_push, test):
@@ -183,6 +189,10 @@ def main():
             print('\nSkipping pre-release checks becaus -f/--force was passed\n')
 
         create_tag(path, comp['name'], version, release_notes)
+
+        if args.push:
+            push_tag(path)
+
     except (MismatchError, InternalError, ExternalError, KeyboardInterrupt, GenericError) as exc:
         retval = handle_exception(exc)
 
