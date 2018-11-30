@@ -1,6 +1,7 @@
 """Documentation subsystem that manages autogenerating documentation."""
 
 import logging
+import os
 from ..exceptions import InternalError
 
 class DocumentationSubsystem:
@@ -50,6 +51,6 @@ class DocumentationSubsystem:
         self._repo.ensure_template("doc/release.rst", "release.rst.tpl", variables)
 
         # Install the documentation building scripts
-        self._repo.ensure_script("scripts/generate_api.py", "generate_api.py")
-        self._repo.ensure_script("scripts/better_apidocs.py", "better_apidocs.py")
-        self._repo.ensure_template("scripts/build_documentation.py", "build_documentation.py.tpl", variables)
+        self._repo.ensure_script(os.path.join(self._repo.SCRIPT_DIR, "generate_api.py"), "generate_api.py")
+        self._repo.ensure_script(os.path.join(self._repo.SCRIPT_DIR, "better_apidocs.py"), "better_apidocs.py")
+        self._repo.ensure_template(os.path.join(self._repo.SCRIPT_DIR, "build_documentation.py"), "build_documentation.py.tpl", variables)

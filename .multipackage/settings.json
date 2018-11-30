@@ -1,0 +1,17 @@
+{
+    "options": {
+        "test_matrix": {
+            "python_versions": [
+                "2.7",
+                "3.6"
+            ],
+            "platforms": [
+                "macos",
+                "windows",
+                "linux"
+            ]
+        }
+    },
+    "template": "pypi_package",
+    "version": "0.1"
+}

@@ -1,5 +1,6 @@
 """Integration tests of the whole multipackage process."""
 
+from __future__ import print_function
 import os
 import subprocess
 import shutil
@@ -101,7 +102,7 @@ def py2_repo(bare_repo):
 
     multipackage_main(['init'])
 
-    with open(os.path.join("scripts", "components.txt"), 'a') as outfile:
+    with open(os.path.join(".multipackage", "components.txt"), 'a') as outfile:
         outfile.write('\nmy_package: ./, compatibility=python2\n')
 
     multipackage_main(['update'])
@@ -115,7 +116,7 @@ def py3_repo(bare_repo):
 
     multipackage_main(['init'])
 
-    with open(os.path.join("scripts", "components.txt"), 'a') as outfile:
+    with open(os.path.join(".multipackage", "components.txt"), 'a') as outfile:
         outfile.write('\nmy_package: ./, compatibility=python3\n')
 
     multipackage_main(['update'])
@@ -128,7 +129,7 @@ def uni_repo(bare_repo):
 
     multipackage_main(['init'])
 
-    with open(os.path.join("scripts", "components.txt"), 'a') as outfile:
+    with open(os.path.join(".multipackage", "components.txt"), 'a') as outfile:
         outfile.write('\nmy_package: ./, compatibility=universal\n')
 
     multipackage_main(['update'])
@@ -147,7 +148,7 @@ def test_update(bare_repo):
 
     multipackage_main(['init'])
 
-    with open(os.path.join("scripts", "components.txt"), 'a') as outfile:
+    with open(os.path.join(".multipackage", "components.txt"), 'a') as outfile:
         outfile.write('\nmy_package: ./, compatibility=python2\n')
 
     multipackage_main(['-vvvvv', 'update'])
@@ -156,20 +157,20 @@ def test_update(bare_repo):
 def test_build_docs(uni_repo, capsys):
     """Make sure we can build documentation."""
 
-    run_in_sandbox(['python', os.path.join('scripts', 'build_documentation.py')])
+    run_in_sandbox(['python', os.path.join('.multipackage', 'build_documentation.py')])
 
 
 def test_twine_testrelease(uni_repo, pypi_url, slack, slack_url):
     """Make sure we can test a release without actually releasing."""
 
-    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('scripts', 'release_by_name.py'), 'test@my_package-0.0.1'],
+    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'release_by_name.py'), 'test@my_package-0.0.1'],
                                               pypi_url=pypi_url)
     assert retval == 0
     assert slack.request_count == 0
     assert slack.error_count == 0
 
 
-    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('scripts', 'release_by_name.py'), 'test@my_package-0.0.1'],
+    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'release_by_name.py'), 'test@my_package-0.0.1'],
                                               pypi_url=pypi_url, slack=slack_url)
     assert retval == 0
     assert slack.request_count == 1
@@ -179,13 +180,13 @@ def test_twine_testrelease(uni_repo, pypi_url, slack, slack_url):
 def test_twin_release(uni_repo, pypi_url, pypi, slack, slack_url):
     """Make sure we can release for real."""
 
-    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('scripts', 'release_by_name.py'), 'my_package-0.0.1'],
+    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'release_by_name.py'), 'my_package-0.0.1'],
                                               pypi_url=pypi_url)
     assert retval == 0
     assert pypi.request_count == 2
     assert pypi.error_count == 0
 
-    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('scripts', 'release_by_name.py'), 'my_package-0.0.1'],
+    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'release_by_name.py'), 'my_package-0.0.1'],
                                               pypi_url=pypi_url, slack=slack_url)
     assert retval == 0
     assert pypi.request_count == 4

@@ -60,7 +60,7 @@ jobs:
 
     - stage: "Deploy"
       if: branch = master AND type != pull_request
-      script: python scripts/build_documentation.py
+      script: python .multipackage/scripts/build_documentation.py
       os: linux
       dist: xenial
       python: "3.6"
@@ -77,7 +77,7 @@ jobs:
         - {{ env.github_token }}
     - stage: "Deploy"
       if: tag IS present
-      script: python scripts/release_by_name.py $TRAVIS_TAG
+      script: python .multipackage/scripts/release_by_name.py $TRAVIS_TAG
       os: linux
       dist: xenial
       python: "3.6"
@@ -98,7 +98,7 @@ script:
 {% for _key, component in components|dictsort %}
 - cd {{ component.relative_path }} && pwd && pytest test
 {% endfor %}
-- python scripts/build_documentation.py
+- python .multipackage/scripts/build_documentation.py
 
 notifications:
   email: false

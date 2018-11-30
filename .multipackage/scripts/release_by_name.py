@@ -41,7 +41,8 @@ def main():
     if pypi_pass is None:
         pypi_pass = ""
 
-    args = ['python', 'scripts/release_component.py', "-e", version, "-u", os.environ.get("PYPI_USER"), '--password=%s' % pypi_pass,
+    release_script = os.path.join(".multipackage", "scripts", "release_component.py")
+    args = ['python', release_script, "-e", version, "-u", os.environ.get("PYPI_USER"), '--password=%s' % pypi_pass,
             '-c', comp['compat'], "-r", repo]
 
     if slack is not None:

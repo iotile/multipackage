@@ -1,6 +1,7 @@
 """Basic files like editor settings and gitignore."""
 
 import logging
+import os
 
 class BasicSubsystem:
     """Basic managed files."""
@@ -37,8 +38,9 @@ class BasicSubsystem:
             'doc': options.get('documentation', {}),
         }
 
-        self._repo.ensure_directory("scripts")
-        self._repo.ensure_template("scripts/components.txt", template="components.txt", overwrite=False)
-        self._repo.ensure_template("scripts/release_by_name.py", "release_by_name.py.tpl", variables)
 
-        self._repo.ensure_script("scripts/release_component.py", "release_component.py")
+        self._repo.ensure_directory(self._repo.SCRIPT_DIR)
+        self._repo.ensure_template(os.path.join(self._repo.MULTIPACKAGE_DIR, "components.txt"), template="components.txt", overwrite=False)
+        self._repo.ensure_template(os.path.join(self._repo.SCRIPT_DIR, "release_by_name.py"), "release_by_name.py.tpl", variables)
+
+        self._repo.ensure_script(os.path.join(self._repo.SCRIPT_DIR, "release_component.py"), "release_component.py")

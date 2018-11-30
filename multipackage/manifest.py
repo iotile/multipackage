@@ -25,14 +25,16 @@ class ManifestFile:
     Args:
         path (str): The path to the manifest file.  If it does not exist it
             will be initialized as empty.
+        base_path (str): The base path that will be used to store relative
+            paths for keys.
         reporter (object): An error reporter class that has an add_warning
             and add_error method.  This is compatible with the signatures
             of the Repository class so it can be passed directly.
     """
 
-    def __init__(self, path, reporter):
+    def __init__(self, path, base_path, reporter):
         self.path = path
-        self._relative_base = os.path.abspath(os.path.dirname(path))
+        self._relative_base = os.path.abspath(base_path)
         self._relative_path = os.path.relpath(path, start=self._relative_base)
         self._logger = logging.getLogger(__name__)
         self._reporter = reporter

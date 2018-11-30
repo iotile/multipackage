@@ -54,7 +54,7 @@ jobs:
 
     - stage: "Deploy"
       if: branch = master AND type != pull_request
-      script: python scripts/build_documentation.py
+      script: python .multipackage/scripts/build_documentation.py
       os: linux
       dist: xenial
       python: "3.6"
@@ -68,19 +68,19 @@ jobs:
           keep-history: true
           local-dir: built_docs
       env:
-        - secure: pYESJpBOVGR5MSlrq6kNEM3xTFOBgIlFw/M6R96/IM9Ulbz0sjj69OFofJLcHU4hS5POWlUhR/H4ZvUGOX/myu9chPlPR8amygdxCxm8LDOmiJm7CP27fjjT8QVM28h+UwNKHZEpLYzqR0TXEKnCjDK/Mt3VaHuwIFIqsr72Ve78qOdsqhU9E0tWJukFGY6ShMJf8fp6gDrrDPMXgkyZyya9EdtrxVpqOQ/VnRIzrG69wc1Y+COWc1B2w5OqTQj0C6TYPzrzQrmfc3Wi3d1Kqe7Ojn5If5NJa/by9SdU5+gcLIYROwLfimWUQeZDA1FfoIyZYU81MBzZyoR9Oh/vpFVGjQRJmx2Dby+8+qbK21aN4RqMkpLxiRoUUNocRJ14bQaEawC838vxewnkil4sUBP+ymK9vTkyMKcJULk5pI5KcF33PDSuVCopShl47YoCn7zhkoiYHrGxNKjmFF39l62Rzhs1VwqbGtD7z/Gvl/kXZ2sjeevu/A8FjhtlIxg+Q4xmA2S5YQ1d5kEXHzc38efJiTEjG3mUAFtSWtyPrnCc8C6iOhH63h98BijlQ+QUvCMCLO3r2W7yFxzGo94O1QkCJ8J9GKBSYScMSsmCr+TDl8Bz1DmUCP8NAqPQgmt5Ehhp2BNpmsRxx6VzXGY8uzqUubCfBhzP+ikYu5+fOBI=
+        - secure: JZy8Q6JD5ls3VTo7l5ULvDnRAEVnWcICMaMNSuxMgbSs1HdfxEvASaM8xLMzwlcqwR57K/wfM7Q1l4EySS2m7+aZaA5vSCHFgz7oqOSlpqhnKvFhPNetnfUXqL4ygh1nuk0D/KJokaUfCSKM48v2+fIbYnGmf9/rsi5TG1mxGPq26Zo2+NKT/2GuFXQdlEGPndRBNumai4Y2RfzOOLjyB4ggWnKKkQkkgwr2taekSybhVVK03XcP/nb17lAqO35mG/og5rKMjPJIQ/mBN/R5LyND8y3eg9MkqpBXiAKYv7bw38vrxgu5U66LUEp39rsNkT43JqZSg7WmrL2QLTophsPsYkKAGMzJjtV2hsajTuNUMCY7tsRXp39OMcYR/PwDZBXO4v5+L3tckeEmDUNULm4NhFDHJRQoE2omHcw6snyPKaubWAxh15O8VXeuSHmOHfrE6RuZ2mg3KpVODtd+qp+Q/7SIC2GLPCaQxDniPke+hpwMIGIqHu8LM9MOyZ7Qsi5Tn4OvYR7QjzdptQBrLSXlhAA4SCKAobSj29D49Mm8PIbGuVIAWUr4RCzLGsFZPkJhuXI2NG+QpeilNMxmigQMxe5RBL3DzqGfuCbTmYKzuxqCErhP6xbt9Q8Hm4rEyyCrEi7aa+ITDsONhV3a/+DEeqcIy7fKTH/X4YTeY5I=
     - stage: "Deploy"
       if: tag IS present
-      script: python scripts/release_by_name.py $TRAVIS_TAG
+      script: python .multipackage/scripts/release_by_name.py $TRAVIS_TAG
       os: linux
       dist: xenial
       python: "3.6"
       language: python
       name: "Release to PyPI Index"
       env:
-        - secure: ZCkf0AE5dpsRC9KQHNDMTnljx8AO9zOf5am+6Agb3lV8s+wsX56zZIqu4KZk1oB0CRYWH/4KIjR9/keWxj03SFDmYullvLgrw2hh6IRleVpgM2KEVi+t5AtwGqjJcwtlnpV4piHI5BdKUKqe/pvHYL5L/ZRbwYmr0P5ocPnUwjc0MVwvpu9yV6PeR2V6PWtFWpzt05oTUajd2G1K+0l2YEB19EG/JEeUQgjeVlCuQtRYzMeTJk5G3aLpGv3/hivi36yn5rYcOlSnuNru2iF+euhf31k+rpOZCrJQWrUa41TzYXFbfeFhUcC1Q6mZIQ1RjIIss3JsOk29F7K4Y+j6Sc/0jo0EAa7sKNR1VHyqPYHhX7UAvoh1ixVvUlMHMcT2MFJ5LrdfIv+P0b0dTVWBCEyuUfTOwpETUe3tzMh344Z5O1q774xxsoVhVv32lgN4xUVV9+yPD33jHTD6dvF+arItDWzkAgO/XmOjXXL5cY9Ugt3pL3mR0CXJEdq9zRwUT4gj85g2gi3rc3V0yU7sfk7C0YLGUv+pvAo8JOm509vo+K6LcBGsZZ+nHNys4mqp0+UjMekgxhqT+Hicjvvkd4cM7HGDkE0LX+MWMjYGBMB1jTS/PMDQhnc2TpjaebLhkpZfdUfishwNy9dFoP8R0wb/W1639HZgiGIoPTZ1I+c=
-        - secure: UlMrHe/ve+DuR7bqph+Xbvbw5FIEi7l1XEmVQ8ELVM0jV0d7B11+0o7C7joDENKBgZaxZyaqXNW8BCNem37IgkhleE3T6xoufcdigtWwa04ticZTzVgs2rZd+4LjF+aKUQ4SqXCiaYJ+GCGANMaoVsqDdXMJxQ9b4LgRQLtBWGRMckkiZDGdgIbVIE6N9uxub0slTUIVkZQTOLg31RPMRPdGaA5CXLI7tvgUEJmFI2NlGfPGiMLCi3jpRcXgJB8uL5Y6Fc6MTBHVeMcWhug/XIhGPcQhNiXpKf3TQO41D2Rw4NDKPROOejeouKBSd9j3Ogbp4wCGZ7A7TpWZZFJK/Xud2k0IsilQtj9C4NQ1WJiRv9/QXVgjJzVrgF0EXxVHhfG/BAOnZfxqgFOQ32UxEFtGsc1e9DRHimQ+u1zf1rADqerC1OBTw0YfElJj/H6yoGy8FY08Y8+SbtGcOgXMqu7onJILb4DvtlphyoYhlI+oFHN8VJwYxVLJwMGohoVJjAvoQ/lEVq9DtmkXZXpVvF6nMv3VCFDipT/p8brEgDe1ugbd6TRWXJBxk/Hkv3PvQFfK1ppZGy4nH66DMxxClFRGgTduEyFIuXhUcNRQMIJ0ZydLB5/NQeccrxoJyBhsloewIpg9yeyac7legpA+GQ9k7sRxHm8yMfwhzJ+Yqys=
-        - secure: ObRRApV08lHu6h+EBMZGd1IZ+bL4gg3w9tu2aBgQenDkMVvIb4n29acEWcjsDIcSTQnxbsG7vlT6F0QKaLyLxl5KXdDIZjfhDsvrJWBFFfM79X/rsMPh5IRSHxHskwE/JRtkbYxBe9q2BaHQ4T5XfFWUmh/d+/lUZJbfXlou8Cur2Y4BR+OeAo2s0ZKNmTwBlkuswUMjMLtDIoeIeM0rI+NPOQYvuhzSgLKzZWPHWdU5/Cq4JvazW3C0I8MMhauWVH9OtmhHFkJJX3SdXpdPi67oEsU8yqCIXkI2XjkT9ObJxeZh0kRoG9uVtV2W/pWbI6aZlnVgwDe99WidOU65EA+QbQwxVvt0ttsmV+HWpfcHja+aJLchcX8g6779Swu7ZvHy8SQEGVgmleP3bS0IHJldNns0JNMyarVyZsfjASXCUadQqjhWH48P6Me43ivKhXb3P7n418dKRDF1zb7ocTh27jp5DY+HnxfyjWNofQiJJIM/jDbCpleoc/n1wHPredYliYXhShJp6tdwqE/piGqLRnt645OxgPhczL7yClpW+czWlHqqYmFl3WNOZZsdtVJgTKz3FaFLqAOVbFb4MsQEzVGnDUCg9hTlDfhrur4/3JoyS23vsP0XjNOilDlosPynFTMBQnt8O+oPMUyBJeOzc6MYskaqao3A6Oc+ZBw=
+        - secure: Cq9rllVOHrzZDHjcRrOZ6R+QUWc073TmdP0feua7DbBHcbU1gGdTOtGc2u6/eviRpoPLsZhEAv4118cIVxhc+uyDcjvSkDiN0OCLNVmSAHnHc0JLY8kD+KePExtTmeA7fZjD4+StBMXTHVsH9U7DFTVlO9GrWTHRrknRyZhgNyqfszwNYVgu50mOvJWxR0ZJ/BXs26FqU9vPc9nFYTpRVX1T0+/bWNWINMTyHcpcUf8e/c73nCw5lqIU68uvCHld+79gmIjjBSAJpIqGUgr/Mfdgc1hD/2OM1/uWaLPmu+cXQEhcYJCHWLp2Ga1Nt8e3yBERTBteF/neAbjHt/2KvxBCgpdzIT/QKtsI+6ypsEoPUjApQ3PV+uqpJWhCxOwlQL+Qto7foQYyvTvSKDoH1aly70AI6Kx+qDTDq7fsg2wj1sAL5bKyF2DxXZjJ3yGPWBRjyjiI+Rb03aH7IMiO8+9bqU9Losnbri/Nz7uyFSIxpBTWj5L+GjVzug5Okt+F+Tp3pj+TKBSA6rnDALM0Flvmls1EZRcG7Ypqlo5EE2s4UCRax4l8+Ew0iSLM2h18KJ6XKS5FHhzVXyvd5Wi5vORevXg+Ug8WW7p5O/Bufp9kFilzUGBGBnG8vopZGaKu/FxuwfFsI/d7OUWfAaOFej5BxdWUd5bClbIDCLpnpYo=
+        - secure: Na/39zJsWf4A6g+lcdkFDufOWWBZNalNuYOy3nN2WT4tlzK5JUfIzTvT4nbdYbADiZkzT+6JB6csy1c4Qai8k9T9X9F/TUB8I+WDLXywzrdp0Ef6VPe+0xnBwDATqvaCD8kYT2aEGKN9KPKyqk4VzoneFTQ6TQ5XWg9R61HjrzuqAys0pOQ7gKKxOY4uvC2w3CY6OAD6pG2mSNyZgGU9OcCVMtKckbHjq+5REt5se9yMfvpshiEbEE5av2macAsQlUoRpLTRfy7vEqeu4jiuC0HODbLknYipJ+iH0tmStMDWq7XKmM9XO3NfR/G9y4cJ+dGu2B8kI6lS6BZljdzLSUn1Gp6Z8oxHVW7giq7FTDrTWMuLeqsSK2jmzgtbaDBcRMbuV04UZGuNq71LFjpribzSHa8CdtCBtaJJtYOULBdxm4PhKKj2HciBpqkSaXfXFpQ8rYm8fVzm9H7wswCpQq6l9w4CIYUr2pbm69iMRTT7GVosIWYKSfvyU+bbOPWPvKEqrrt322ahea38eVO4rwgBGogGNdTaePB9Urm/IuXMUQ1jHTEZLW3SP5w3/2ffyGlrI6yKc/ANvg9wbL3CTl3oP+UbVfH3BHCjrvntmQxoGyflVY9RkEaFJgU5Nr1YxbTzwucNZK42gKtDME6GcUPA2dcCqOQsPYxQnnbPLGA=
+        - secure: DqenA/ZvE5nYk2Uqn6J79ewXsOia1uSc2kmB/yaT8D2nNPy9n2neyg6clalPD4yW8g1XaACqMb/EwFd8YwosKNlqp78IVQAH938fZ6ELoa1uj4C/Zt85VHH85DneMzjcZLtIF4x/Qz8sWD0UxiOMyST2FVC61patumIoe6/ZSRReAGqJdU2b0iBNRd9JaCucxGwwgkgT0cQVVz2mBeP8UkjBwddoY84+t7tCQdWb4OC+i7iu29Z7h6wPyNIsSAOBlhoTnQrk0kg6N7vJPMNVI0SNZQ6T9ro1CFsT+PwCTPvvKmSIBiC875kjiCoMBf+GPV5zmrIXNwsV94a+NGLV8ZF9kXpKWme+xN94AB/y2zeZPpYpmKj2unb86POgh2j+PywY3krTOdJ2qWFwmVx88LtOXN/m3HkAFld9Ax1YXj0ZTsbNdPjdzPBplJ1lKcKGyuvcL6dyWgilwMh7WoyYB4UTG7uhsi9Z6YyrXIqUiQvtiCMm8S/8eVV1mkxtrfT4EozzZjAKFx7gJxByr8UFODlFfEC/5LgUuZtb60F1Bev5HXKEiAsDBbYnAxWNj1i5KtF1tyeNTW64Tsl3/yZpidtH8m/OikGUepIqf80eZmrONVTgNW5dItvl3MS4aku18MboGGDJqWEZOiPHhSMW+zW5vc+ZdDWFcCZwsVillNI=
 
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
@@ -88,13 +88,13 @@ install:
 
 script:
 - cd ./ && pwd && pytest test
-- python scripts/build_documentation.py
+- python .multipackage/scripts/build_documentation.py
 
 notifications:
   email: false
   slack:
     rooms:
-    - secure: BD1LO2TMx92XLtEDr6ExDQhO0td+blKWQi4proOS/weIFtbW+U0Gcln9QaGA6w6T8rj9MX/9l4mvJ7aDLnOoh7N1ncryqT5A3Rc+DUCto/+f/rCkqtGJGUyIsQ2z5SkyTcu3nBLXDXiaoYcUEwFZooP2tqh3SZwa6ELre0KXYNykViJT2WZbguwV7W2m74Wy+EO99sx1cdbhz80Yvc5ECDJRx/4PVBeo+8CyU21JXwGDTSsdYiTUUMfmjkGUmI9G1jOQTa78cD3ZpLv7GLKAqi8JOzKctA/zjMySyIcg7SL7Nsms5mSDmHug+eDxZagu9IER8RBIfZMPF6azouJvZcwqxHjqJgwU+zhQ2EvstETu5qS9oAPTP0U8tyL4SBgGbQhe4/gnBhlOMzeQLpVaKzpZmhdIvpk5yg7gbyzeq9rEfsFpCGHE71c+N04v7EcgE4fSvNHtyecQlCS7YgxYaBbi/kcGfmKWXML0XHl9nE82CYMNMBBBqispNboNFaShM7RcK8AgWFTJ8KQ27c/+lhatAnf/hHgoJzYuStoyReFH5Kthr9dlhtlBC2i53oSiffEmhSDva0cWhKGUzlRAA5NJyCDebjELnL+a/KXndXWMzwxJlO+B0Ah+VJKS8K0Zz83/wh64VzyLrzApptju5Aeot2J7o4ZP1+RS/XDorjE=
+    - secure: b6X5XylZ6i8/9sHcahvUP6GmjHFQZUJwTtGQnUc+dSfUpEpXc74ZKYoFxt4cwVoTy1na7sd2e+AKEqtw4HW5IuSCHQiSIMNXn+cQoqVqf283Vnf2npFWSe29deSmFiHcO1EUWKZBVKff9WL/wEOnBsJEXg8NV0KlYl9u40w6HoivHecCaNQS+f+/4JPtjItsgcqsbtMINWi+JIkRWijAa78PMoRomhM5cLedAvX5uwBvIivUUSIO7qtg79REabTWUGcnfp/D8tb/jZuS6OvXLHS5tORSbD3CgA6vz4Wo1HPLjAlH/5/Y/25mnQQQpanGgrr26IAMOWhgiZQj2sA3TUuZwhe2AdEylzlZR1b2Som0NxcowpoHan0HuwS7L5zpDUeJQqehxSSmCDIBKKewVGhvNl3263C8qwqakoAPGYe4UsZi+z35Wu8EjKfe8QqTGVffZZu8PN/DCTrFQJQUjFokaiPJS+ILGrMQ+BU9jCUGgeo0ZJUP3gEC81npWIY/tRij8a/LN7fPCdo2TttKKZAuH+nH6x32p42VPMM6vi/2xJBKIvwHXVap5fN5yUj8lh+CffJyxxNgVLQ+PDY2sdXpzFwvaJfpqodnccQWpz4XX7dJZ/GsW7lnkfh95/wT8EI/gjvIypkXigRnlDo8FLTDDATtQPU5mN3Td53zt8s=
     template:
     - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch} in PR <%{pull_request_url}|#%{pull_request_number}> by %{author} %{result} in %{elapsed_time}"
     on_success: always

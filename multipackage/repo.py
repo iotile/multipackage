@@ -35,16 +35,19 @@ class Repository:
     """
 
     DEFAULT_TEMPLATE = "pypi_package"
-    SETTINGS_FILE = "multipackage.json"
-    MANIFEST_FILE = "multipackage_manifest.json"
-    SCRIPT_FOLDER = "scripts"
-    COMPONENT_FILE = "components.txt"
-    COMPONENT_REGEX = r"^(?P<package>[a-zA-Z_0-9]+):\s*(?P<path>[\.a-zA-Z_\-0-9\\/]+)(\s*,\s*compatibility=(?P<compat>universal|python2|python3))?\s*$"
-    SETTINGS_VERSION = "1.0"
+    MULTIPACKAGE_DIR = ".multipackage"
+    SCRIPT_DIR = os.path.join(MULTIPACKAGE_DIR, "scripts")
 
+    SETTINGS_FILE = os.path.join(MULTIPACKAGE_DIR, "settings.json")
+    MANIFEST_FILE = os.path.join(MULTIPACKAGE_DIR, "manifest.json")
+    COMPONENT_FILE = os.path.join(MULTIPACKAGE_DIR, "components.txt")
+
+    COMPONENT_REGEX = r"^(?P<package>[a-zA-Z_0-9]+):\s*(?P<path>[\.a-zA-Z_\-0-9\\/]+)(\s*,\s*compatibility=(?P<compat>universal|python2|python3))?\s*$"
+    SETTINGS_VERSION = "0.1"
 
     def __init__(self, path, nogit=False):
         self.path = path
+
         self._logger = logging.getLogger(__name__)
 
         if not os.path.exists(self.path):
@@ -65,7 +68,7 @@ class Repository:
         self.namespace_packages = []
 
         self._try_load()
-        self.manifest = ManifestFile(os.path.join(path, self.MANIFEST_FILE), self)
+        self.manifest = ManifestFile(os.path.join(self.path, self.MANIFEST_FILE), self.path, self)
 
         if nogit:
             self.git = None
@@ -107,10 +110,9 @@ class Repository:
         <package_name>: <relative_path>, compatibility=[universal|python2|python3]
         """
 
-        component_path = os.path.join(self.path, self.SCRIPT_FOLDER, self.COMPONENT_FILE)
-        relative_path = os.path.join(self.SCRIPT_FOLDER, self.COMPONENT_FILE)
+        component_path = os.path.join(self.path, self.COMPONENT_FILE)
         if not os.path.exists(component_path):
-            self.add_warning(relative_path, "Missing components list", "Run `multipackage update` to reinitialize")
+            self.add_warning(self.COMPONENT_FILE, "Missing components list", "Run `multipackage update` to reinitialize")
             return
 
         with open(component_path, "r", encoding="utf-8") as infile:
@@ -125,7 +127,7 @@ class Repository:
 
             result = regex.match(line)
             if result is None:
-                self.add_error(relative_path, "Could not parse line '%s' in components file" % line,
+                self.add_error(self.COMPONENT_FILE, "Could not parse line '%s' in components file" % line,
                                "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
                 continue
 
@@ -134,7 +136,7 @@ class Repository:
                 compat = "universal"
 
             if not os.path.isdir(os.path.join(self.path, path)):
-                self.add_error(relative_path, "Component folder '%s' specified in components file is not a directory" % path,
+                self.add_error(self.COMPONENT_FILE, "Component folder '%s' specified in components file is not a directory" % path,
                                "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
                 continue
 
@@ -176,8 +178,6 @@ class Repository:
             self.components[key] = comp
 
             self._logger.debug("Replaced namespace package '%s' in '%s' with %s", old_comp.toplevel_packages[0], key, desired_packages)
-
-
 
     def _try_load(self):
         """Try to load settings for this repository."""
@@ -257,14 +257,16 @@ class Repository:
             }
         }
 
+        self.ensure_directory(os.path.join(self.path, self.MULTIPACKAGE_DIR))
+        self.ensure_directory(os.path.join(self.path, self.SCRIPT_DIR))
+
         atomic_json(os.path.join(self.path, self.SETTINGS_FILE), settings)
         atomic_json(os.path.join(self.path, self.MANIFEST_FILE), {})
 
         self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type="json")
 
         # Make sure we start off with a blank components file if it doesn't exist already
-        self.ensure_directory("scripts")
-        self.ensure_template("scripts/components.txt", template="components.txt", overwrite=False)
+        self.ensure_template(os.path.join(self.path, self.COMPONENT_FILE), template="components.txt", overwrite=False)
 
         self.manifest.save()
 
@@ -431,6 +433,6 @@ class Repository:
             subsystems.DocumentationSubsystem(self).update(self.options)
 
             self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type='json')
-            self.manifest.update_file(os.path.join(self.path, self.SCRIPT_FOLDER, self.COMPONENT_FILE))
+            self.manifest.update_file(os.path.join(self.path, self.COMPONENT_FILE))
         finally:
             self.manifest.save()

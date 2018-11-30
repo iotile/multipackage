@@ -97,7 +97,7 @@ def copy_release_notes(base_folder, out_folder):
 
 
 def generate_args(folders, extra_args=None):
-    base_folder = os.path.join(os.path.dirname(__file__), '..')
+    base_folder = os.path.join(os.path.dirname(__file__), '..', '..')
     template_folder = os.path.join(base_folder, "doc", "_template")
 
     outdir = os.path.join(base_folder, ".tmp_docs", "api")
@@ -109,7 +109,7 @@ def generate_args(folders, extra_args=None):
     return args
 
 def main():
-    base_folder = os.path.join(os.path.dirname(__file__), '..')
+    base_folder = os.path.join(os.path.dirname(__file__), '..', '..')
     output_folder = os.path.join(base_folder, ".tmp_docs")
     dest_folder = os.path.join(base_folder, "built_docs")
 
