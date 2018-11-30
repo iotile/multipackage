@@ -119,7 +119,7 @@ def create_tag(path, name, version, notes):
 
     tag_contents = "Release %s for %s\n\n%s" % (version, name, notes)
 
-    stdout.write("Creating annotated release tag '%s': " % tag_name)
+    sys.stdout.write("Creating annotated release tag '%s': " % tag_name)
     run_in_component(path, ['git', 'tag', '-a', '-F', '-', tag_name], stdin=tag_contents)
     print( "OKAY")
 
