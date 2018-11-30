@@ -102,6 +102,7 @@ def bare_repo(tmpdir, travis, monkeypatch):
         monkeypatch.setenv('PYPI_USER', 'test_user')
         monkeypatch.setenv('PYPI_PASS', 'test_pass')
         monkeypatch.setenv('SLACK_TOKEN', 'test_slack_token')
+        monkyepatch.setenv('SLACK_WEB_HOOK', 'http://127.0.0.1:8000/nothing')
 
         yield folder
     finally:
