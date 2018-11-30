@@ -37,12 +37,22 @@ def run_in_sandbox(args, pypi_url=None, slack=None):
     could be used to actually release a package make into the environment.
     Similarly, it makes sure that slack notifications are turned off unless a
     local test server is setup.
+
+    Specifically, what this function does is:
+
+    - spawns a separate process with the given args using subproces
+    - captures the stdout and stderr of that process as it runs to
+      completion.
+    - patches the environment variables sent to that process to remote
+      anything that could refer to a real third-party service.
     """
 
     env = os.environ.copy()
 
     env['PYTHONPATH'] = os.path.abspath(os.getcwd())
     print("Running in %s" % os.getcwd())
+
+    env['SLACK_TOKEN'] = "test_slack_token"
 
     if slack is not None:
         env['SLACK_WEB_HOOK'] = slack
