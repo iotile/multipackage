@@ -35,6 +35,8 @@ def build_parser():
 
 
 def run_in_component(path, args):
+    """Run a command in a given directory."""
+
     curr = os.getcwd()
 
     try:
@@ -53,7 +55,13 @@ def verify_git_clean(path):
     """Verify that there is a nothing pending on git."""
 
     result = run_in_component(path, ['git', 'status', '--porcelain=v1'])
-    print(result)    
+
+    lines = [x for x in result.splitlines() if len(x) > 0]
+
+    if len(lines) == 0:
+        return
+
+    raise GenericError("There are uncommitted changes in the component, please commit or stash them")
 
 
 def show_confirm_version(name, version, release_notes, confirm, will_push, test):
