@@ -126,7 +126,7 @@ def create_tag(path, name, version, notes):
 def push_tag(path):
     """Push tags."""
 
-    print("Pushing tags to remote")
+    print("Pushing tags to remote\n")
     run_in_component(path, ['git', 'push', '--tags'])
 
 
@@ -155,7 +155,7 @@ def show_confirm_version(name, version, release_notes, confirm, will_push, test)
     print()
 
     if confirm:
-        val = input("Are you sure [y/N]?")
+        val = input("Are you sure [y/N]? ")
         if val.lower() != 'y':
             raise GenericError("Cancelled by user", 100)
 

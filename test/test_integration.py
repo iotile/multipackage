@@ -154,10 +154,11 @@ def test_update(bare_repo):
     multipackage_main(['-vvvvv', 'update'])
 
 
-def test_build_docs(uni_repo, capsys):
+def test_build_docs(uni_repo):
     """Make sure we can build documentation."""
 
-    run_in_sandbox(['python', os.path.join('.multipackage', 'build_documentation.py')])
+    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'build_documentation.py')])
+    assert retval == 0
 
 
 def test_twine_testrelease(uni_repo, pypi_url, slack, slack_url):
@@ -177,7 +178,7 @@ def test_twine_testrelease(uni_repo, pypi_url, slack, slack_url):
     assert slack.error_count == 0
 
 
-def test_twin_release(uni_repo, pypi_url, pypi, slack, slack_url):
+def test_twine_release(uni_repo, pypi_url, pypi, slack, slack_url):
     """Make sure we can release for real."""
 
     retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'release_by_name.py'), 'my_package-0.0.1'],

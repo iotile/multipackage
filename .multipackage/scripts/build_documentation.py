@@ -8,7 +8,7 @@ import subprocess
 import platform
 
 from generate_api import main as api_main
-from components.py import COMPONENTS
+from components import COMPONENTS
 
 
 NAMESPACE = None
