@@ -1,15 +1,59 @@
 {
+    "doc/conf.py": {
+        "hash_type": "line",
+        "hash": "MD5:42152BC618B07BC70D61EEF8BA4E24BB"
+    },
+    "requirements_build.txt": {
+        "hash_type": "section",
+        "hash": "MD5:9A24FE501F3DA2E916436E4E2B8071A8"
+    },
+    "doc/_template/module.rst": {
+        "hash_type": "line",
+        "hash": "MD5:9F8E3F379547D5AA7EBE21181D4AC37B"
+    },
     ".pylintrc": {
         "hash_type": "line",
         "hash": "MD5:C73A3B561CEF58737117F47C66364AFE"
+    },
+    ".multipackage/scripts/better_apidocs.py": {
+        "hash_type": "line",
+        "hash": "MD5:619EF1C5A91A2D25CC6FD99C024750F6"
+    },
+    "doc/release.rst": {
+        "hash_type": "line",
+        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB"
+    },
+    ".multipackage/scripts/generate_api.py": {
+        "hash_type": "line",
+        "hash": "MD5:40303ACB3E7E4C76D9C3C02792290B4A"
+    },
+    ".multipackage/components.txt": {
+        "hash_type": "line",
+        "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1"
+    },
+    ".multipackage/scripts/release_by_name.py": {
+        "hash_type": "line",
+        "hash": "MD5:3D63DD5E9412424BE58E46FCC000BAD2"
     },
     "doc/api.rst": {
         "hash_type": "line",
         "hash": "MD5:162C4492CD4CF91845E3A5FB03F404F5"
     },
-    "requirements_build.txt": {
-        "hash_type": "section",
-        "hash": "MD5:9A24FE501F3DA2E916436E4E2B8071A8"
+    "doc/_template/package.rst": {
+        "hash_type": "line",
+        "hash": "MD5:D7114A8BF7CAB963CCCE5D0830359B7D"
+    },
+    ".multipackage/scripts/build_documentation.py": {
+        "hash_type": "line",
+        "hash": "MD5:D34024A5564DC5B0AF0494507B5AA4F9"
+    },
+    ".editorconfig": {
+        "hash_type": "line",
+        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943"
+    },
+    ".travis.yml": {
+        "hash_type": "line",
+        "hash": "MD5:FCC0620E4FFE249DCFFB7AED1C4429E8"
     },
     ".gitignore": {
         "hash_type": "section",
@@ -17,58 +61,14 @@
     },
     ".multipackage/scripts/release_component.py": {
         "hash_type": "line",
-        "hash": "MD5:11A72FA6112889667BA067ACBF09ED63"
-    },
-    ".multipackage/scripts/build_documentation.py": {
-        "hash_type": "line",
-        "hash": "MD5:FC091B9AC3710FA62CA7B28BB6BCB2A6"
-    },
-    ".editorconfig": {
-        "hash_type": "line",
-        "hash": "MD5:F517559C3A0EECB0C4EE685A09ED7943"
-    },
-    ".multipackage/scripts/generate_api.py": {
-        "hash_type": "line",
-        "hash": "MD5:40303ACB3E7E4C76D9C3C02792290B4A"
-    },
-    ".multipackage/scripts/better_apidocs.py": {
-        "hash_type": "line",
-        "hash": "MD5:619EF1C5A91A2D25CC6FD99C024750F6"
-    },
-    "doc/_template/module.rst": {
-        "hash_type": "line",
-        "hash": "MD5:9F8E3F379547D5AA7EBE21181D4AC37B"
-    },
-    ".multipackage/settings.json": {
-        "hash_type": "json",
-        "hash": "MD5:AF7B80EE668CC638FEB9BC4EC2D8AAFD"
-    },
-    "doc/conf.py": {
-        "hash_type": "line",
-        "hash": "MD5:42152BC618B07BC70D61EEF8BA4E24BB"
-    },
-    ".travis.yml": {
-        "hash_type": "line",
-        "hash": "MD5:DDC6743E75DD1E18353E215F20CE4C30"
-    },
-    ".multipackage/scripts/release_by_name.py": {
-        "hash_type": "line",
-        "hash": "MD5:3D63DD5E9412424BE58E46FCC000BAD2"
-    },
-    "doc/release.rst": {
-        "hash_type": "line",
-        "hash": "MD5:2AB10EB55D54E0CD6D4130DE42E1F2FB"
-    },
-    ".multipackage/components.txt": {
-        "hash_type": "line",
-        "hash": "MD5:5BB4C956008C439DF38EA44F793CD9A1"
-    },
-    "doc/_template/package.rst": {
-        "hash_type": "line",
-        "hash": "MD5:D7114A8BF7CAB963CCCE5D0830359B7D"
+        "hash": "MD5:547323E7A6F10AC21A170A2733A42428"
     },
     "requirements_doc.txt": {
         "hash_type": "section",
         "hash": "MD5:1EC4A56B5267A3F13BD6E757610704DC"
+    },
+    ".multipackage/settings.json": {
+        "hash_type": "json",
+        "hash": "MD5:AF7B80EE668CC638FEB9BC4EC2D8AAFD"
     }
 }

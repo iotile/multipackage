@@ -108,6 +108,7 @@ def generate_args(folders, extra_args=None):
 
     return args
 
+
 def main():
     base_folder = os.path.join(os.path.dirname(__file__), '..', '..')
     output_folder = os.path.join(base_folder, ".tmp_docs")
@@ -124,7 +125,7 @@ def main():
         extra_args.extend(['-r', "%s.rst" % NAMESPACE])
 
     args = generate_args(folders, extra_args=extra_args)
-    
+
     print("\n---- Generating API docs ----\n")
     api_main(args)
 

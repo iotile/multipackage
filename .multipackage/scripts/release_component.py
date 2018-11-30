@@ -242,12 +242,12 @@ def parse_version(version_line, prefix="##"):
     """Parse a version from a markdown header.
 
     The line must be formatted as:
-    ## X.Y.Z [whatever else you want]
+    ## [v]X.Y.Z [whatever else you want]
 
     So you could have, for example:
     ## 1.5.0 (11/28/2018)
     ##1.5.0
-
+    ## v1.5.0 - 11/28/2018
     ## 1.5.0 hello this is a test
 
     Returns:
@@ -266,7 +266,11 @@ def parse_version(version_line, prefix="##"):
     if len(words) == 0:
         return None
 
-    return words[0]
+    version_word = words[0]
+    if version_word.startswith('v'):
+        version_word = version_word[1:]
+
+    return version_word
 
 
 def get_release_notes(path, version):
@@ -290,14 +294,43 @@ def get_release_notes(path, version):
     past_releases = [x for x in release_lines.values() if x > start_line]
 
     if len(past_releases) == 0:
-        release_string = "\n".join(lines[start_line+1:])
+        release_string = "\n".join(lines[start_line + 1:])
     else:
-        release_string = "\n".join(lines[start_line:min(past_releases)])
+        release_string = "\n".join(lines[start_line + 1:min(past_releases)])
 
     if len(release_string) == 0:
         raise MismatchError("release notes contents for release", "a list of release notes", "nothing")
 
     return release_string
+
+
+def handle_exception(exception):
+    """Helper function for handling exceptions raised in main."""
+
+    print()
+
+    if isinstance(exception, MismatchError):
+        print("ERROR: There is a mismatch in required component information of the environment")
+        print(exception.message)
+        retval = 1
+    elif isinstance(exception, InternalError):
+        print("ERROR: An internal error has occurred.  This indicates a bug in this script.")
+        print(exception.message)
+        retval = 2
+    elif isinstance(exception, ExternalError):
+        print("ERROR: An external service failed")
+        print("Service: %s" % exception.service)
+        print(exception.message)
+        retval = 3
+    elif isinstance(exception, KeyboardInterrupt):
+        print()
+        print("ERROR: Interrupted by Ctrl-C")
+        retval = 4
+    else:
+        print("ERROR: An unknown exception occurred")
+        print(str(exception))
+
+    return retval
 
 
 def main(argv=None):
@@ -340,39 +373,11 @@ def main(argv=None):
             msg = generate_slack_message(component_name, args.expected, release_notes, args.check)
             send_slack_message(args.slack, msg)
 
-    except MismatchError as exc:
+    except (MismatchError, InternalError, ExternalError, KeyboardInterrupt) as exc:
         if should_raise:
             raise
 
-        print()
-        print("ERROR: There is a mismatch in required component information of the environment")
-        print(exc.message)
-        retval = 1
-    except InternalError as exc:
-        if should_raise:
-            raise
-
-        print()
-        print("ERROR: An internal error has occurred.  This indicates a bug in this script.")
-        print(exc.message)
-        retval = 2
-    except ExternalError as exc:
-        if should_raise:
-            raise
-
-        print()
-        print("ERROR: An external service failed")
-        print("Service: %s" % exc.service)
-        print(exc.message)
-        retval = 3
-    except KeyboardInterrupt:
-        if should_raise:
-            raise
-
-        print()
-        print()
-        print("ERROR: Interrupted by Ctrl-C")
-        retval = 4
+        retval = handle_exception(exc)
 
     return retval
 
