@@ -7,22 +7,13 @@ multipackage.data.scripts.release_component module
 .. currentmodule:: multipackage.data.scripts.release_component
 
 .. automodule:: multipackage.data.scripts.release_component
-    :members: DESCRIPTION, ExternalError, InternalError, MismatchError, VERSION, build_component, build_parser, check_component, generate_slack_message, get_release_notes, handle_exception, main, parse_version, send_slack_message, upload_component, verify_python_version
+    :members: DESCRIPTION, VERSION, build_component, build_parser, check_component, generate_slack_message, main, send_slack_message, upload_component, verify_python_version
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
 
     Summary
     -------
-
-    Exceptions:
-
-    .. autosummary::
-        :nosignatures:
-
-        ExternalError
-        InternalError
-        MismatchError
 
     Functions:
 
@@ -33,10 +24,7 @@ multipackage.data.scripts.release_component module
         build_parser
         check_component
         generate_slack_message
-        get_release_notes
-        handle_exception
         main
-        parse_version
         send_slack_message
         upload_component
         verify_python_version

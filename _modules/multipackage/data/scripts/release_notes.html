@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.data.scripts.release_notes &mdash;  latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+
+  
+  <script src="../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> 
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html"></a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>multipackage.data.scripts.release_notes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for multipackage.data.scripts.release_notes</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Helper script for parsing release notes from a markdown file.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="p">(</span><span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">shared_errors</span> <span class="k">import</span> <span class="n">MismatchError</span><span class="p">,</span> <span class="n">ExternalError</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">,</span> <span class="n">handle_exception</span>  <span class="c1">#pylint:disable=relative-import;We need this logic so that we work when installed</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">.shared_errors</span> <span class="k">import</span> <span class="n">MismatchError</span><span class="p">,</span> <span class="n">ExternalError</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">,</span> <span class="n">handle_exception</span>
+
+
+<span class="n">VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1.0&quot;</span>
+
+<span class="n">DESCRIPTION</span> <span class="o">=</span> \
+<span class="sd">&quot;&quot;&quot;Parse a markdown file containing release notes.</span>
+
+<span class="sd">This script will expect a file named RELEASE.md in &lt;path&gt; and will parse it as</span>
+<span class="sd">if it contains a series of release notes.  The file must be formatted with</span>
+<span class="sd">markdown containing the releases as second level headers: `##`.</span>
+
+<span class="sd">The formatting for each release header line is flexible but must at least</span>
+<span class="sd">match the following structure:</span>
+
+<span class="sd">## [v]X.Y.Z [whatever you want]</span>
+
+<span class="sd">Basically the line is read and the initial ## is discarded, any preceding</span>
+<span class="sd">whitespace is stripped using lstrip() and then the first white-space delimited</span>
+<span class="sd">word must be the version in X.Y.Z format.  It can optionally have a lower-case</span>
+<span class="sd">v in front of it, which is stripped away if present.  So the following are all</span>
+<span class="sd">valid ways of specifying version 1.5.0:</span>
+
+<span class="sd">## 1.5.0 (11/28/2018)</span>
+<span class="sd">##1.5.0</span>
+<span class="sd">## v1.5.0 - 11/28/2018</span>
+<span class="sd">## 1.5.0 hello this is a test</span>
+
+<span class="sd">All lines after each valid release header are assumed to be the release notes</span>
+<span class="sd">for that release (until the next header).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="build_parser"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_notes.html#multipackage.data.scripts.release_notes.build_parser">[docs]</a><span class="k">def</span> <span class="nf">build_parser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Build our argument parser.&quot;&quot;&quot;</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">DESCRIPTION</span><span class="p">,</span> <span class="n">formatter_class</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">RawDescriptionHelpFormatter</span><span class="p">)</span>
+
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The path to the component that we should release&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--release&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The release notes version we want&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--version&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;version&#39;</span><span class="p">,</span>
+                        <span class="n">version</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(prog)s</span><span class="s1"> </span><span class="si">{version}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="n">VERSION</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="get_version"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_notes.html#multipackage.data.scripts.release_notes.get_version">[docs]</a><span class="k">def</span> <span class="nf">get_version</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the version of package.&quot;&quot;&quot;</span>
+
+    <span class="n">compath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">compath</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">compath</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">version</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="s2">&quot;version.py&quot;</span><span class="p">,</span> <span class="s2">&quot;Missing version.py file containing a version = </span><span class="se">\&quot;</span><span class="s2">X.Y.Z</span><span class="se">\&quot;</span><span class="s2"> line&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="s2">&quot;version&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="s2">&quot;version.py&quot;</span><span class="p">,</span> <span class="s2">&quot;File is missing a version = </span><span class="se">\&quot;</span><span class="s2">X.Y.Z</span><span class="se">\&quot;</span><span class="s2"> line&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">version</span><span class="o">.</span><span class="n">version</span></div>
+
+
+<div class="viewcode-block" id="parse_release_header"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_notes.html#multipackage.data.scripts.release_notes.parse_release_header">[docs]</a><span class="k">def</span> <span class="nf">parse_release_header</span><span class="p">(</span><span class="n">version_line</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;##&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a version from a markdown header.</span>
+
+<span class="sd">    The line must be formatted as:</span>
+<span class="sd">    ## [v]X.Y.Z [whatever else you want]</span>
+
+<span class="sd">    So you could have, for example:</span>
+<span class="sd">    ## 1.5.0 (11/28/2018)</span>
+<span class="sd">    ##1.5.0</span>
+<span class="sd">    ## v1.5.0 - 11/28/2018</span>
+<span class="sd">    ## 1.5.0 hello this is a test</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The parsed version.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">version_line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">version_line</span> <span class="o">=</span> <span class="n">version_line</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">):]</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">version_line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">words</span> <span class="o">=</span> <span class="n">version_line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">version_word</span> <span class="o">=</span> <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">version_word</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">):</span>
+        <span class="n">version_word</span> <span class="o">=</span> <span class="n">version_word</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">version_word</span></div>
+
+
+<div class="viewcode-block" id="get_release_notes"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_notes.html#multipackage.data.scripts.release_notes.get_release_notes">[docs]</a><span class="k">def</span> <span class="nf">get_release_notes</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a release notes section from a markdown file.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;RELEASE.md&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Path is not a file or a folder containing a RELEASE.md file: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ExternalError</span><span class="p">(</span><span class="s2">&quot;Release notes file &#39;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span> <span class="s2">&quot;Could not open file to read release notes&quot;</span><span class="p">)</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+    <span class="n">release_lines</span> <span class="o">=</span> <span class="p">{</span><span class="n">parse_release_header</span><span class="p">(</span><span class="n">line</span><span class="p">):</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;##&#39;</span><span class="p">)}</span>
+
+    <span class="k">if</span> <span class="n">version</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">release_lines</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;release notes entry for release&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> non-matching release headers&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">release_lines</span><span class="p">))</span>
+
+    <span class="n">start_line</span> <span class="o">=</span> <span class="n">release_lines</span><span class="p">[</span><span class="n">version</span><span class="p">]</span>
+    <span class="n">past_releases</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">release_lines</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="n">start_line</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">release_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">start_line</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">past_releases</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">release_string</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">MismatchError</span><span class="p">(</span><span class="s2">&quot;release notes contents for release&quot;</span><span class="p">,</span> <span class="s2">&quot;a list of release notes&quot;</span><span class="p">,</span> <span class="s2">&quot;nothing&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">release_string</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/multipackage.data.scripts.release_notes.html#multipackage.data.scripts.release_notes.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">should_raise</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main entry point for release_notes.py.&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">argv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">should_raise</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">argv</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">build_parser</span><span class="p">()</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
+
+    <span class="n">retval</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="n">release</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">release</span>
+        <span class="n">source_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">release</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">release</span> <span class="o">=</span> <span class="n">get_version</span><span class="p">(</span><span class="n">base_dir</span><span class="p">)</span>
+            <span class="n">source_string</span> <span class="o">=</span> <span class="s2">&quot; (version pulled from version.py, use --release version to override)&quot;</span>
+        <span class="n">notes</span> <span class="o">=</span> <span class="n">get_release_notes</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">release</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Release Notes for Version </span><span class="si">%s%s</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">release</span><span class="p">,</span> <span class="n">source_string</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">notes</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="p">(</span><span class="n">MismatchError</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">,</span> <span class="n">ExternalError</span><span class="p">,</span> <span class="ne">KeyboardInterrupt</span><span class="p">)</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">should_raise</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+        <span class="n">retval</span> <span class="o">=</span> <span class="n">handle_exception</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">retval</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
