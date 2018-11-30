@@ -57,8 +57,8 @@ this, this template will not work well for you):
 
 ## Basic Usage
 
-> If you need to go beyond what is described here, you should consult the 
-> detailed documentation hosted on [Github Pages](https://iotile.github.io/multipackage).
+> If you need to go beyond what is described here, you should **consult the 
+detailed documentation** hosted on [Github Pages](https://iotile.github.io/multipackage).
 
 1. First make sure that you meet the following prerequisites: 
     
