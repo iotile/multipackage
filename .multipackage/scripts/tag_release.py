@@ -177,8 +177,10 @@ def main():
             verify_git_clean(path)
             verify_branch(path, "master")
             verify_up_to_date(path, "master")
+
+            print()
         else:
-            print('\nSkipping pre-release checks becaus -f/--force was passed')
+            print('\nSkipping pre-release checks becaus -f/--force was passed\n')
 
         create_tag(path, comp['name'], version, release_notes)
     except (MismatchError, InternalError, ExternalError, KeyboardInterrupt, GenericError) as exc:
