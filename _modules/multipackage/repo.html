@@ -183,16 +183,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;pypi_package&quot;</span>
-    <span class="n">SETTINGS_FILE</span> <span class="o">=</span> <span class="s2">&quot;multipackage.json&quot;</span>
-    <span class="n">MANIFEST_FILE</span> <span class="o">=</span> <span class="s2">&quot;multipackage_manifest.json&quot;</span>
-    <span class="n">SCRIPT_FOLDER</span> <span class="o">=</span> <span class="s2">&quot;scripts&quot;</span>
-    <span class="n">COMPONENT_FILE</span> <span class="o">=</span> <span class="s2">&quot;components.txt&quot;</span>
-    <span class="n">COMPONENT_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(?P&lt;package&gt;[a-zA-Z_0-9]+):\s*(?P&lt;path&gt;[\.a-zA-Z_\-0-9</span><span class="se">\\</span><span class="s2">/]+)(\s*,\s*compatibility=(?P&lt;compat&gt;universal|python2|python3))?\s*$&quot;</span>
-    <span class="n">SETTINGS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;1.0&quot;</span>
+    <span class="n">MULTIPACKAGE_DIR</span> <span class="o">=</span> <span class="s2">&quot;.multipackage&quot;</span>
+    <span class="n">SCRIPT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;scripts&quot;</span><span class="p">)</span>
 
+    <span class="n">SETTINGS_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;settings.json&quot;</span><span class="p">)</span>
+    <span class="n">MANIFEST_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;manifest.json&quot;</span><span class="p">)</span>
+    <span class="n">COMPONENT_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;components.txt&quot;</span><span class="p">)</span>
+
+    <span class="n">COMPONENT_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(?P&lt;package&gt;[a-zA-Z_0-9]+):\s*(?P&lt;path&gt;[\.a-zA-Z_\-0-9</span><span class="se">\\</span><span class="s2">/]+)(\s*,\s*compatibility=(?P&lt;compat&gt;universal|python2|python3))?\s*$&quot;</span>
+    <span class="n">SETTINGS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">nogit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
@@ -213,7 +216,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">namespace_packages</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_try_load</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">ManifestFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_FILE</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">ManifestFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_FILE</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">nogit</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="o">=</span> <span class="kc">None</span>
@@ -255,10 +258,9 @@
 <span class="sd">        &lt;package_name&gt;: &lt;relative_path&gt;, compatibility=[universal|python2|python3]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">component_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">)</span>
-        <span class="n">relative_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">)</span>
+        <span class="n">component_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">component_path</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Missing components list&quot;</span><span class="p">,</span> <span class="s2">&quot;Run `multipackage update` to reinitialize&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Missing components list&quot;</span><span class="p">,</span> <span class="s2">&quot;Run `multipackage update` to reinitialize&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
@@ -273,7 +275,7 @@
 
             <span class="n">result</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Could not parse line &#39;</span><span class="si">%s</span><span class="s2">&#39; in components file&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Could not parse line &#39;</span><span class="si">%s</span><span class="s2">&#39; in components file&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">,</span>
                                <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
@@ -282,7 +284,7 @@
                 <span class="n">compat</span> <span class="o">=</span> <span class="s2">&quot;universal&quot;</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">path</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="n">relative_path</span><span class="p">,</span> <span class="s2">&quot;Component folder &#39;</span><span class="si">%s</span><span class="s2">&#39; specified in components file is not a directory&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Component folder &#39;</span><span class="si">%s</span><span class="s2">&#39; specified in components file is not a directory&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span>
                                <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
@@ -324,8 +326,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Replaced namespace package &#39;</span><span class="si">%s</span><span class="s2">&#39; in &#39;</span><span class="si">%s</span><span class="s2">&#39; with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">old_comp</span><span class="o">.</span><span class="n">toplevel_packages</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">key</span><span class="p">,</span> <span class="n">desired_packages</span><span class="p">)</span>
-
-
 
     <span class="k">def</span> <span class="nf">_try_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Try to load settings for this repository.&quot;&quot;&quot;</span>
@@ -405,14 +405,16 @@
             <span class="p">}</span>
         <span class="p">}</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_DIR</span><span class="p">))</span>
+
         <span class="n">atomic_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">),</span> <span class="n">settings</span><span class="p">)</span>
         <span class="n">atomic_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_FILE</span><span class="p">),</span> <span class="p">{})</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">),</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
 
         <span class="c1"># Make sure we start off with a blank components file if it doesn&#39;t exist already</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="s2">&quot;scripts&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;scripts/components.txt&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;components.txt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">),</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;components.txt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
 
@@ -579,7 +581,7 @@
             <span class="n">subsystems</span><span class="o">.</span><span class="n">DocumentationSubsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">),</span> <span class="n">hash_type</span><span class="o">=</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SCRIPT_FOLDER</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">))</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div></div>
 </pre></div>

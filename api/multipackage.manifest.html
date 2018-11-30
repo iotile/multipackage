@@ -247,7 +247,7 @@
 
 <dl class="class">
 <dt id="multipackage.manifest.ManifestFile">
-<em class="property">class </em><code class="descclassname">multipackage.manifest.</code><code class="descname">ManifestFile</code><span class="sig-paren">(</span><em>path</em>, <em>reporter</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">multipackage.manifest.</code><code class="descname">ManifestFile</code><span class="sig-paren">(</span><em>path</em>, <em>base_path</em>, <em>reporter</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/manifest.html#ManifestFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.manifest.ManifestFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A hash based manifest file.</p>
 <p>This class will load a json file that contains relative file paths and
@@ -259,6 +259,8 @@ hash values.  It can detect changes in the files using the hashes.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to the manifest file.  If it does not exist it
 will be initialized as empty.</li>
+<li><strong>base_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The base path that will be used to store relative
+paths for keys.</li>
 <li><strong>reporter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – An error reporter class that has an add_warning
 and add_error method.  This is compatible with the signatures
 of the Repository class so it can be passed directly.</li>
