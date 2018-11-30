@@ -84,16 +84,23 @@ def verify_branch(path, expected_branch="master"):
     raise GenericError("You must be on branch %s to release, you are on %s" % (expected_branch, branch))
 
 
-def verify_up_to_date(path):
+def verify_up_to_date(path, branch="master"):
     """Verify that your branch is up to date with the remote."""
 
     sys.stdout.write(" - Verifying your branch up to date")
     run_in_component(path, ['git', 'remote', 'update'])
 
-    run_in_component(path, ['git', 'diff', '--quiet', 'remotes/origin/HEAD'])
-    print(" OKAY")
+    result = run_in_component(path, ['git', 'rev-list', 'HEAD...origin/%s' % branch, '--count'])
+    count = int(result.strip())
 
-    # FIXME Test for failure
+    if count == 0:
+        print(" OKAY")
+        return
+
+    print( "FAILED")
+
+    raise GenericError("You branch is not up-to-date with remote branch: %d different commits" % count)
+
 
 def show_confirm_version(name, version, release_notes, confirm, will_push, test):
     """Print and optionally confirm the release action."""
