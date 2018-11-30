@@ -27,6 +27,8 @@ def build_parser():
                         help="Do not prompt for confimation")
     parser.add_argument("-t", "--test", action="store_true",
                         help="Create a test release tag that will trigger a dry-run")
+    parser.add_argument('-f', '--force', action="store_true",
+                        help="Don't do any pre-release sanity checks")
     parser.add_argument("name", help="The name of the component that you want to release")
     parser.add_argument('--version', action='version',
                         version='%(prog)s {version}'.format(version=VERSION))
@@ -34,7 +36,7 @@ def build_parser():
     return parser
 
 
-def run_in_component(path, args):
+def run_in_component(path, args, stdin=None):
     """Run a command in a given directory."""
 
     curr = os.getcwd()
@@ -42,11 +44,19 @@ def run_in_component(path, args):
     try:
         os.chdir(path)
 
-        result = subprocess.check_output(args)
-        if not isinstance(result, str):
-            result = result.decode('utf-8')
+        if stdin is not None and not isinstance(stdin, bytes):
+            stdin = stdin.encode('utf-8')
 
-        return result
+        proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        stdout, _stderr = proc.communicate(stdin)
+
+        if proc.returncode != 0:
+            raise GenericError("Subcommand '%s' returned a nonzero status code: %d" % (" ".join(args), proc.returncode))
+
+        if not isinstance(stdout, str):
+            stdout = stdout.decode('utf-8')
+
+        return stdout
     finally:
         os.chdir(curr)
 
@@ -71,7 +81,7 @@ def verify_git_clean(path):
 def verify_branch(path, expected_branch="master"):
     """Verify that the branch is correct."""
 
-    sys.stdout.write(" - Verifying your branch is %s" % expected_branch)
+    sys.stdout.write(" - Verifying your branch is %s:" % expected_branch)
     branch = run_in_component(path, ['git', 'rev-parse', '--abbrev-ref', 'HEAD'])
     branch = branch.strip()
 
@@ -87,7 +97,7 @@ def verify_branch(path, expected_branch="master"):
 def verify_up_to_date(path, branch="master"):
     """Verify that your branch is up to date with the remote."""
 
-    sys.stdout.write(" - Verifying your branch up to date")
+    sys.stdout.write(" - Verifying your branch up to date:")
     run_in_component(path, ['git', 'remote', 'update'])
 
     result = run_in_component(path, ['git', 'rev-list', 'HEAD...origin/%s' % branch, '--count'])
@@ -97,9 +107,21 @@ def verify_up_to_date(path, branch="master"):
         print(" OKAY")
         return
 
-    print( "FAILED")
+    print(" FAILED")
 
     raise GenericError("You branch is not up-to-date with remote branch: %d different commits" % count)
+
+
+def create_tag(path, name, version, notes):
+    """Create an annotated release tag."""
+
+    tag_name = "{}-{}".format(name, version)
+
+    tag_contents = "Release %s for %s\n\n%s" % (version, name, notes)
+
+    stdout.write("Creating annotated release tag '%s': " % tag_name)
+    run_in_component(path, ['git', 'tag', '-a', '-F', '-', tag_name], stdin=tag_contents)
+    print( "OKAY")
 
 
 def show_confirm_version(name, version, release_notes, confirm, will_push, test):
@@ -150,11 +172,15 @@ def main():
 
         show_confirm_version(args.name, version, release_notes, args.confirm, args.push, args.test)
 
-        print("\nRunning pre-release sanity checks:")
-        verify_git_clean(path)
-        verify_branch(path, "master")
-        verify_up_to_date(path, )
+        if not args.force:
+            print("\nRunning pre-release sanity checks:")
+            verify_git_clean(path)
+            verify_branch(path, "master")
+            verify_up_to_date(path, "master")
+        else:
+            print('\nSkipping pre-release checks becaus -f/--force was passed')
 
+        create_tag(path, comp['name'], version, release_notes)
     except (MismatchError, InternalError, ExternalError, KeyboardInterrupt, GenericError) as exc:
         retval = handle_exception(exc)
 
