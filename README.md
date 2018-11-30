@@ -11,7 +11,6 @@
   - [Why Does `multipackage` Exist?](#why-does-multipackage-exist)
   - [Can't You Already Do This?](#cant-you-already-do-this)
   - [Why Isn't `multipackage` More Configurable?](#why-isnt-multipackage-more-configurable)
-- [Continuous Integration Notes](#continuous-integration-notes)
 
 <!-- /MarkdownTOC -->
 
@@ -249,6 +248,3 @@ There is not a shortage of great general-purpose tools available to help you
 setup modern python package repositories.  **multipackage does not replace those
 general purpose tools**.  Instead, it just wires together existing tools in a
 specific way that can be automatically installed and maintained.
-
-
-## Continuous Integration Notes
