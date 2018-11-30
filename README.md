@@ -232,18 +232,18 @@ fully-featured CI system set up or who get frustrated with the amount of time it
 takes to debug every little change.
 
 > **Think of `multipackage` as a self-updating cookiecutter that comes with
-prebaked best practices**
+prebaked best practices.**
 
 ### Why Isn't `multipackage` More Configurable?
 
 > **`multipackage` is not intended to be a general purpose library.**  
-> 
-> It is a more of a framework rather than a library. If you like the general
-> outline of what `multipackage` provides, then you can get a lot of
-> functionality without much configuration.  The trade-off, is that if you don't
-> like the general outline of what `multipackage` provides, then you're likely
-> better off starting from scratch (possibly reusing some of the code, possibly
-> not).
+ 
+It is a more of a framework rather than a library. If you like the general
+outline of what `multipackage` provides, then you can get a lot of
+functionality without much configuration.  The trade-off, is that if you don't
+like the general outline of what `multipackage` provides, then you're likely
+better off starting from scratch (possibly reusing some of the code, possibly
+not).
 
 There is not a shortage of great general-purpose tools available to help you
 setup modern python package repositories.  **multipackage does not replace those
