@@ -8,6 +8,6 @@
   it has a folder that it manages for you and a cli tool that interacts with
   that folder.
 
-## 0.0.1 (11/29/2018)
+## v0.0.1 (11/29/2018)
 
 - Initial commit
