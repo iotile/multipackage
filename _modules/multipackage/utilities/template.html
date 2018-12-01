@@ -148,13 +148,19 @@
   <h1>Source code for multipackage.utilities.template</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;jinja based template rendering.&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">PackageLoader</span>
 
 
-<div class="viewcode-block" id="render_template"><a class="viewcode-back" href="../../../api/multipackage.utilities.template.html#multipackage.utilities.template.render_template">[docs]</a><span class="k">def</span> <span class="nf">render_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="render_template"><a class="viewcode-back" href="../../../api/multipackage.utilities.template.html#multipackage.utilities.template.render_template">[docs]</a><span class="k">def</span> <span class="nf">render_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">adjust_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Render a template using the variables in info.</span>
 
-<span class="sd">    You can optionally render to a file by passing out_path.</span>
+<span class="sd">    You can optionally render to a file by passing out_path.  This assumes</span>
+<span class="sd">    that you are rendering text files that will be saved with UTF-8 encoding.</span>
+
+<span class="sd">    By default, it modifies the generated template to have platform-specific</span>
+<span class="sd">    newlines.  If you want the template&#39;s output to be unmodified, pass</span>
+<span class="sd">    adjust_newlines=False.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        template_name (str): The name of the template to load.  This must</span>
@@ -163,6 +169,8 @@
 <span class="sd">            file, otherwise it is just returned as a string.</span>
 <span class="sd">        info (dict): A dictionary of variables passed into the template to</span>
 <span class="sd">            perform substitutions.</span>
+<span class="sd">        adjust_newlines (bool): Automatically convert the output to have</span>
+<span class="sd">            platform specific newlines.  Default: True.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        string: The rendered template data.</span>
@@ -173,6 +181,10 @@
 
     <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">adjust_newlines</span><span class="p">:</span>
+        <span class="n">result_lines</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">result_lines</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">out_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>

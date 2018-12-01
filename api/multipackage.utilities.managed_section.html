@@ -246,13 +246,16 @@ such as delimiter_start=”&lt;!– “, delimiter_end=” –&gt;”.</li>
 
 <dl class="method">
 <dt id="multipackage.utilities.managed_section.ManagedFileSection.ensure_lines">
-<code class="descname">ensure_lines</code><span class="sig-paren">(</span><em>lines</em>, <em>present=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/managed_section.html#ManagedFileSection.ensure_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.ensure_lines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ensure_lines</code><span class="sig-paren">(</span><em>lines</em>, <em>match=None</em>, <em>present=True</em>, <em>multi=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/managed_section.html#ManagedFileSection.ensure_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.managed_section.ManagedFileSection.ensure_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure that the given lines are present or absent in this file.</p>
 <p>Each line is added independently and no order is assumed. This method
 is idempotent so that you can call it repeatedly and each line will
 only be added once.  The lines must match exactly.</p>
 <p>The lines must be distinct.  If there are multiple copies of the same
 line in <code class="docutils literal notranslate"><span class="pre">lines</span></code>, only one copy will be added to the file.</p>
+<p>If you need to perform fuzzy matching on a given line in order to
+properly update it, you can pass a list of regular expressions along
+with the lines</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -262,8 +265,15 @@ line in <code class="docutils literal notranslate"><span class="pre">lines</span
 file if they are not present or remove from the file if they are.
 Whether the lines are added or removed is controlled by the
 <code class="docutils literal notranslate"><span class="pre">present</span></code> parameter.</li>
+<li><strong>match</strong> (<em>list of str</em>) – A list of regular expressions to
+use to match against a line.  If passed it must have the same
+length as lines and will be paired with each line in lines in
+order to determine which line matches.</li>
 <li><strong>present</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, ensure lines are present (the default), if
 False, ensure lines are absent.</li>
+<li><strong>multi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, allow for matching and updating multiple lines
+for each line in <code class="docutils literal notranslate"><span class="pre">lines</span></code>.  If False, InternalError is raised
+if there are multiple lines matching a given line.</li>
 </ul>
 </td>
 </tr>

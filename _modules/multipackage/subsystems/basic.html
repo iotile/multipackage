@@ -173,12 +173,18 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;.editorconfig&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;editorconfig&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_lines</span><span class="p">(</span><span class="s2">&quot;requirements_build.txt&quot;</span><span class="p">,</span> <span class="p">[</span>
-            <span class="s2">&quot;requests&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;requests ~= 2.20&quot;</span><span class="p">,</span>
             <span class="s2">&quot;twine ~= 1.12&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;pycryptodome&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pycryptodome ~= 3.7&quot;</span><span class="p">,</span>
             <span class="s2">&quot;pytest ~= 4.0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;wheel&quot;</span>
-        <span class="p">])</span>
+            <span class="s2">&quot;wheel &gt;= 0.32&quot;</span>
+        <span class="p">],</span> <span class="p">[</span>
+            <span class="sa">r</span><span class="s2">&quot;^requests&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;^twine&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;^pycryptodome&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;^pytest&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;^wheel&quot;</span>
+        <span class="p">],</span> <span class="n">multi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="n">options</span><span class="p">,</span>

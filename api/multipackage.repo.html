@@ -357,7 +357,7 @@ from a non-git repository.  This is useful for testing purposes.</li>
 
 <dl class="method">
 <dt id="multipackage.repo.Repository.ensure_lines">
-<code class="descname">ensure_lines</code><span class="sig-paren">(</span><em>relative_path</em>, <em>lines</em>, <em>present=True</em>, <em>delimiter_start='#'</em>, <em>delimiter_end=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_lines" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ensure_lines</code><span class="sig-paren">(</span><em>relative_path</em>, <em>lines</em>, <em>match=None</em>, <em>present=True</em>, <em>multi=False</em>, <em>delimiter_start='#'</em>, <em>delimiter_end=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_lines" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure that the following lines are in the given file.</p>
 <p>This will create or update a ManagedSection and ensure that the
 following lines are all present in that file.  The lines are assumed
@@ -376,6 +376,13 @@ update.</li>
 they do not exist.</li>
 <li><strong>present</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, ensure lines are present (the default), if
 False, ensure lines are absent.</li>
+<li><strong>match</strong> (<em>list of str</em>) – A list of regular expressions to
+use to match against a line.  If passed it must have the same
+length as lines and will be paired with each line in lines in
+order to determine which line matches.</li>
+<li><strong>multi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, allow for matching and updating multiple lines
+for each line in <code class="docutils literal notranslate"><span class="pre">lines</span></code>.  If False, InternalError is raised
+if there are multiple lines matching a given line.</li>
 <li><strong>delimiter_start</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The character string that starts a managed file
 section block header line.  This is usually a comment character
 like ‘#’.</li>

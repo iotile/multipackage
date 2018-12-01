@@ -191,9 +191,13 @@
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="multipackage.utilities.template.render_template">
-<code class="descclassname">multipackage.utilities.template.</code><code class="descname">render_template</code><span class="sig-paren">(</span><em>template_name</em>, <em>info</em>, <em>out_path=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/template.html#render_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.template.render_template" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">multipackage.utilities.template.</code><code class="descname">render_template</code><span class="sig-paren">(</span><em>template_name</em>, <em>info</em>, <em>out_path=None</em>, <em>adjust_newlines=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/utilities/template.html#render_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.utilities.template.render_template" title="Permalink to this definition">¶</a></dt>
 <dd><p>Render a template using the variables in info.</p>
-<p>You can optionally render to a file by passing out_path.</p>
+<p>You can optionally render to a file by passing out_path.  This assumes
+that you are rendering text files that will be saved with UTF-8 encoding.</p>
+<p>By default, it modifies the generated template to have platform-specific
+newlines.  If you want the template’s output to be unmodified, pass
+adjust_newlines=False.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -205,6 +209,8 @@ be a file in config/templates inside this package</li>
 file, otherwise it is just returned as a string.</li>
 <li><strong>info</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary of variables passed into the template to
 perform substitutions.</li>
+<li><strong>adjust_newlines</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Automatically convert the output to have
+platform specific newlines.  Default: True.</li>
 </ul>
 </td>
 </tr>

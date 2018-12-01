@@ -1,5 +1,16 @@
 # `multipackage` Release Notes
 
+## HEAD
+
+- Update `ManagedFileSection.ensure_lines` to support matching multiple lines
+  with regular expressions so that you can do things like changing the pinned
+  version of a given package in a `requirements.txt` file.
+- Update `atomic_json` and `render_template` to produce files your native
+  line ending by default so that the files are more easily readable on each
+  platform (since git checks them out in native line endings anyway).
+- Remove Sphinx warnings from `pytest` since they are not fixable and we can't
+  move to Sphinx 2.0 anyway because it doesn't support Python 2.7. 
+
 ## v0.1.0 (11/29/2018)
 
 - Update location of multipackage files to all live under a `.multipackage`

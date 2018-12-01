@@ -150,11 +150,12 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">open</span>
 <span class="kn">from</span> <span class="nn">.obj_hash</span> <span class="k">import</span> <span class="n">line_hash</span>
 <span class="kn">from</span> <span class="nn">.file_ops</span> <span class="k">import</span> <span class="n">atomic_save</span>
-<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">ManualInterventionError</span>
+<span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">ManualInterventionError</span><span class="p">,</span> <span class="n">InternalError</span>
 
 
 <div class="viewcode-block" id="ManagedFileSection"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection">[docs]</a><span class="k">class</span> <span class="nc">ManagedFileSection</span><span class="p">:</span>
@@ -293,7 +294,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">modified</span> <span class="o">=</span> <span class="n">actual_hash</span> <span class="o">!=</span> <span class="n">section_hash</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_start_line</span> <span class="o">=</span> <span class="n">start_line</span>
 
-<div class="viewcode-block" id="ManagedFileSection.ensure_lines"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection.ensure_lines">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="ManagedFileSection.ensure_lines"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection.ensure_lines">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Ensure that the given lines are present or absent in this file.</span>
 
 <span class="sd">        Each line is added independently and no order is assumed. This method</span>
@@ -303,27 +304,80 @@
 <span class="sd">        The lines must be distinct.  If there are multiple copies of the same</span>
 <span class="sd">        line in ``lines``, only one copy will be added to the file.</span>
 
+<span class="sd">        If you need to perform fuzzy matching on a given line in order to</span>
+<span class="sd">        properly update it, you can pass a list of regular expressions along</span>
+<span class="sd">        with the lines</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            lines (list of str): A list of lines to add to the</span>
 <span class="sd">                file if they are not present or remove from the file if they are.</span>
 <span class="sd">                Whether the lines are added or removed is controlled by the</span>
 <span class="sd">                ``present`` parameter.</span>
+<span class="sd">            match (list of str): A list of regular expressions to</span>
+<span class="sd">                use to match against a line.  If passed it must have the same</span>
+<span class="sd">                length as lines and will be paired with each line in lines in</span>
+<span class="sd">                order to determine which line matches.</span>
 <span class="sd">            present (bool): If True, ensure lines are present (the default), if</span>
 <span class="sd">                False, ensure lines are absent.</span>
+<span class="sd">            multi (bool): If true, allow for matching and updating multiple lines</span>
+<span class="sd">                for each line in ``lines``.  If False, InternalError is raised</span>
+<span class="sd">                if there are multiple lines matching a given line.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">present</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">lines</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">line</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">match</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;length of match expressions (len=</span><span class="si">%d</span><span class="s2">) must match length of lines (len=</span><span class="si">%d</span><span class="s2">)&quot;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">match</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">present</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">lines</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">present</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                <span class="n">line_match</span> <span class="o">=</span> <span class="n">line</span>
+                <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">line_match</span> <span class="o">=</span> <span class="n">match</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_line</span><span class="p">(</span><span class="n">line_match</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">multi</span><span class="p">:</span>
+                    <span class="n">match_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Line </span><span class="si">%s</span><span class="s2"> in ManagedFileSection.ensure_lines matches multiple lines in file:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span>
+                                        <span class="o">%</span> <span class="p">(</span><span class="n">line_match</span><span class="p">,</span> <span class="n">match_string</span><span class="p">))</span>
+
+                <span class="c1"># If not in section add if present is True</span>
+                <span class="c1"># If in section and present is True, update contents</span>
+                <span class="c1"># If in section, remove if present is False</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">present</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">present</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+                        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">[</span><span class="n">matches</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">line</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_find_line</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">match</span><span class="p">,</span> <span class="n">lines</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">regex</span><span class="p">:</span>
+            <span class="n">compiled</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
+            <span class="n">matcher</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">compiled</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">matcher</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">==</span> <span class="n">match</span>
+
+        <span class="n">found</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">matcher</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
+                <span class="n">found</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">found</span>
 
 <div class="viewcode-block" id="ManagedFileSection.update"><a class="viewcode-back" href="../../../api/multipackage.utilities.managed_section.html#multipackage.utilities.managed_section.ManagedFileSection.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update or add a managed section into the file.</span>
@@ -347,6 +401,8 @@
         <span class="k">if</span> <span class="n">lines</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
 
+        <span class="n">new_contents</span> <span class="o">=</span> <span class="n">lines</span>
+
         <span class="n">hash_hex</span> <span class="o">=</span> <span class="n">line_hash</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 
         <span class="n">start_line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">SECTION_START</span> <span class="o">+</span> <span class="n">hash_hex</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_delimiter_end</span>
@@ -360,7 +416,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_ending</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">line_ending</span>
         <span class="n">atomic_save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">new_section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">section_contents</span> <span class="o">=</span> <span class="n">new_contents</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">has_section</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_exists</span> <span class="o">=</span> <span class="kc">True</span></div></div>
 </pre></div>
