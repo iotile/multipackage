@@ -270,7 +270,7 @@ class Repository:
 
         self.manifest.save()
 
-    def ensure_lines(self, relative_path, lines, present=True, delimiter_start='#', delimiter_end=''):
+    def ensure_lines(self, relative_path, lines, match=None, present=True, multi=False, delimiter_start='#', delimiter_end=''):
         """Ensure that the following lines are in the given file.
 
         This will create or update a ManagedSection and ensure that the
@@ -289,6 +289,13 @@ class Repository:
                 they do not exist.
             present (bool): If True, ensure lines are present (the default), if
                 False, ensure lines are absent.
+            match (list of str): A list of regular expressions to
+                use to match against a line.  If passed it must have the same
+                length as lines and will be paired with each line in lines in
+                order to determine which line matches.
+            multi (bool): If true, allow for matching and updating multiple lines
+                for each line in ``lines``.  If False, InternalError is raised
+                if there are multiple lines matching a given line.
             delimiter_start (str): The character string that starts a managed file
                 section block header line.  This is usually a comment character
                 like '#'.
@@ -300,7 +307,7 @@ class Repository:
 
         path = os.path.join(self.path, relative_path)
         section = ManagedFileSection(path, delimiter_start=delimiter_start, delimiter_end=delimiter_end)
-        section.ensure_lines(lines, present=present)
+        section.ensure_lines(lines, match, present=present, multi=multi)
 
         self.manifest.update_file(path, hash_type="section")
 

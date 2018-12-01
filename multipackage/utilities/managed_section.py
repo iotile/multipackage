@@ -2,11 +2,12 @@
 
 from __future__ import unicode_literals
 import os
+import re
 import platform
 from builtins import open
 from .obj_hash import line_hash
 from .file_ops import atomic_save
-from ..exceptions import ManualInterventionError
+from ..exceptions import ManualInterventionError, InternalError
 
 
 class ManagedFileSection:
@@ -145,7 +146,7 @@ class ManagedFileSection:
         self.modified = actual_hash != section_hash
         self._start_line = start_line
 
-    def ensure_lines(self, lines, present=True):
+    def ensure_lines(self, lines, match=None, present=True, multi=False):
         """Ensure that the given lines are present or absent in this file.
 
         Each line is added independently and no order is assumed. This method
@@ -155,27 +156,80 @@ class ManagedFileSection:
         The lines must be distinct.  If there are multiple copies of the same
         line in ``lines``, only one copy will be added to the file.
 
+        If you need to perform fuzzy matching on a given line in order to
+        properly update it, you can pass a list of regular expressions along
+        with the lines
+
         Args:
             lines (list of str): A list of lines to add to the
                 file if they are not present or remove from the file if they are.
                 Whether the lines are added or removed is controlled by the
                 ``present`` parameter.
+            match (list of str): A list of regular expressions to
+                use to match against a line.  If passed it must have the same
+                length as lines and will be paired with each line in lines in
+                order to determine which line matches.
             present (bool): If True, ensure lines are present (the default), if
                 False, ensure lines are absent.
+            multi (bool): If true, allow for matching and updating multiple lines
+                for each line in ``lines``.  If False, InternalError is raised
+                if there are multiple lines matching a given line.
         """
 
-        if present:
-            if self.section_contents is None:
-                self.section_contents = lines
-            else:
-                for line in lines:
-                    if line not in self.section_contents:
-                        self.section_contents.append(line)
+        if match is not None and len(match) != len(lines):
+            raise InternalError("length of match expressions (len=%d) must match length of lines (len=%d)"
+                                % (len(match), len(lines)))
+
+        if present and self.section_contents is None:
+            self.section_contents = lines
+        elif not present and self.section_contents is None:
+            pass
         else:
-            if self.section_contents is not None:
-                self.section_contents = [x for x in self.section_contents if x not in lines]
+            for i, line in enumerate(lines):
+                line_match = line
+                if match is not None:
+                    line_match = match[i]
+
+                matches = self._find_line(line_match, self.section_contents, regex=match is not None)
+                if len(matches) > 1 and not multi:
+                    match_string = "\n".join(self.section_contents[i] for i in matches)
+                    raise InternalError("Line %s in ManagedFileSection.ensure_lines matches multiple lines in file:\n%s"
+                                        % (line_match, match_string))
+
+                # If not in section add if present is True
+                # If in section and present is True, update contents
+                # If in section, remove if present is False
+                if len(matches) == 0 and present:
+                    self.section_contents.append(line)
+                elif len(matches) != 0:
+                    matches.sort(reverse=True)
+
+                    if present:
+                        for i in matches[:-1]:
+                            del self.section_contents[i]
+
+                        self.section_contents[matches[-1]] = line
+                    else:
+                        for i in matches:
+                            del self.section_contents[i]
 
         self.update()
+
+    @classmethod
+    def _find_line(cls, match, lines, regex=False):
+        if regex:
+            compiled = re.compile(match)
+            matcher = lambda x: compiled.match(x) is not None
+        else:
+            matcher = lambda x: x == match
+
+        found = []
+
+        for i, line in enumerate(lines):
+            if matcher(line):
+                found.append(i)
+
+        return found
 
     def update(self, lines=None):
         """Update or add a managed section into the file.
@@ -199,6 +253,8 @@ class ManagedFileSection:
         if lines is None:
             lines = []
 
+        new_contents = lines
+
         hash_hex = line_hash(lines)
 
         start_line = self._delimiter_start + self.SECTION_START + hash_hex + self._delimiter_end
@@ -212,6 +268,6 @@ class ManagedFileSection:
         data = self.line_ending.join(lines) + self.line_ending
         atomic_save(self.path, data)
 
-        self.section_contents = new_section
+        self.section_contents = new_contents
         self.has_section = True
         self.file_exists = True

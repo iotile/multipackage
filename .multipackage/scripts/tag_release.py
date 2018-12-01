@@ -112,12 +112,15 @@ def verify_up_to_date(path, branch="master"):
     raise GenericError("You branch is not up-to-date with remote branch: %d different commits" % count)
 
 
-def create_tag(path, name, version, notes):
+def create_tag(path, name, version, notes, test=False):
     """Create an annotated release tag."""
 
     tag_name = "{}-{}".format(name, version)
-
     tag_contents = "Release %s for %s\n\n%s" % (version, name, notes)
+
+    if test:
+        tag_name = "test@" + tag_name
+        tag_contents = "Test " + tag_contents
 
     print("Creating annotated release tag: %s" % tag_name)
     run_in_component(path, ['git', 'tag', '-a', '-F', '-', tag_name], stdin=tag_contents)

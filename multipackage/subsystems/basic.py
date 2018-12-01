@@ -25,12 +25,18 @@ class BasicSubsystem:
 
         self._repo.ensure_template(".editorconfig", template="editorconfig")
         self._repo.ensure_lines("requirements_build.txt", [
-            "requests",
+            "requests ~= 2.20",
             "twine ~= 1.12",
-            "pycryptodome",
+            "pycryptodome ~= 3.7",
             "pytest ~= 4.0",
-            "wheel"
-        ])
+            "wheel >= 0.32"
+        ], [
+            r"^requests",
+            r"^twine",
+            r"^pycryptodome",
+            r"^pytest",
+            r"^wheel"
+        ], multi=True)
 
         variables = {
             'options': options,

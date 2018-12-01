@@ -3,7 +3,9 @@
 from builtins import open
 import os
 import platform
+import pytest
 from multipackage.utilities import ManagedFileSection, dict_hash, find_toplevel_packages
+from multipackage.exceptions import InternalError
 
 
 def data_path(tmpdir, name, allow_empty=False):
@@ -111,6 +113,39 @@ def test_start_end_delimiter(tmpdir):
     assert section.file_exists is True
     assert section.has_section is True
     assert section.modified is False
+
+    assert section.section_contents == ['test 1', 'test 2', 'test 3']
+
+
+def test_fuzzy_matching(tmpdir):
+    """Make sure we can match with regular expressions."""
+
+    path = data_path(tmpdir, "file_start_end.txt")
+
+    section = ManagedFileSection(path, delimiter_start="<!-- ", delimiter_end=" -->")
+
+    section.ensure_lines(['test 1'], present=False)
+    assert section.section_contents == ['test 2', 'test 3']
+
+    # Multiple matches should fail
+    with pytest.raises(InternalError):
+        section.ensure_lines(['test 4'], match=[r'test [0-9]'], present=True)
+
+    section.ensure_lines(['test 4'], match=[r'test [24]'], present=True)
+    assert section.section_contents == ['test 4', 'test 3']
+
+    section.ensure_lines(['test 5'], match=[r'test [2]'], present=True)
+    assert section.section_contents == ['test 4', 'test 3', 'test 5']
+
+
+def test_multi_matching(tmpdir):
+    """Make sure we can match and update/remove multiple lines."""
+
+    path = data_path(tmpdir, "file_start_end.txt")
+
+    section = ManagedFileSection(path, delimiter_start="<!-- ", delimiter_end=" -->")
+    section.ensure_lines(['test 4'], [r"test [23]"], multi=True)
+    assert section.section_contents == ['test 1', 'test 4']
 
 
 def test_dict_hash():

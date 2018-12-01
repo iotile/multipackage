@@ -13,5 +13,6 @@ class LintingSubsystem:
         linting = options.get('linting', {})
         enabled = linting.get('enabled', True)
 
-        self._repo.ensure_lines("requirements_build.txt", ["pylint"], present=enabled)
+        self._repo.ensure_lines("requirements_build.txt", ['pylint ~= 1.9'],
+                                [r"^pylint"], present=enabled)
         self._repo.ensure_template(".pylintrc", template="pylintrc", present=enabled)

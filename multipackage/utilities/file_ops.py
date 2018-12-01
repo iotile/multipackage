@@ -50,4 +50,7 @@ def atomic_json(target_path, obj):
     if isinstance(data, bytes):
         data = data.decode('utf-8')
 
+    lines = data.splitlines()
+    data = os.linesep.join(lines)
+
     atomic_save(target_path, data)

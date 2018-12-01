@@ -14,12 +14,9 @@ class DocumentationSubsystem:
 
         # Make sure we pin all of our versions
         self._repo.ensure_lines("requirements_doc.txt",
-                                ["sphinx", "jinja2", "sphinx_rtd_theme", "sphinxcontrib-programoutput",
-                                 "recommonmark"], present=False)
-
-        self._repo.ensure_lines("requirements_doc.txt",
-                                ["sphinx ~= 1.8", "jinja2 ~= 2.10", "sphinx_rtd_theme ~= 0.4", "sphinxcontrib-programoutput ~= 0.11",
-                                 "recommonmark ~= 0.4"])
+                                ["sphinx ~= 1.8", "jinja2 ~= 2.10", "sphinx_rtd_theme ~= 0.4", "sphinxcontrib-programoutput ~= 0.11", "recommonmark ~= 0.4"],
+                                [r"^sphinx", r"^jinja2", r"^sphinx_rtd_theme", r"^sphinxcontrib-programoutput", r"^recommonmark"],
+                                multi=True)
 
         self._repo.ensure_lines(".gitignore", ['.tmp_docs', 'built_docs'])
 
