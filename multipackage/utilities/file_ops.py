@@ -45,7 +45,7 @@ def atomic_json(target_path, obj):
         obj (dict): The dictionary that should be dumped.
     """
 
-    data = json.dumps(obj, indent=4)
+    data = json.dumps(obj, indent=4, sort_keys=True)
 
     if isinstance(data, bytes):
         data = data.decode('utf-8')
