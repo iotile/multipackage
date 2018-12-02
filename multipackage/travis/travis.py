@@ -61,12 +61,6 @@ class TravisCI:
         if org_token is None:
             org_token = os.environ.get("TRAVIS_TOKEN_ORG")
 
-        if com_token is None:
-            raise InvalidEnvironmentError("TRAVIS_TOKEN_COM", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_COM)
-
-        if com_token is None:
-            raise InvalidEnvironmentError("TRAVIS_TOKEN_ORG", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_ORG)
-
         if os.environ.get("TRAVIS_ORG_URL") is not None:
             self.TRAVIS_BASE_ORG = os.environ.get("TRAVIS_ORG_URL")
 
@@ -84,6 +78,11 @@ class TravisCI:
         else:
             base = self.TRAVIS_BASE_COM
             token = self._com_token
+
+        if token is None and org is False:
+            raise InvalidEnvironmentError("TRAVIS_TOKEN_COM", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_COM)
+        elif token is None and org is True:
+            raise InvalidEnvironmentError("TRAVIS_TOKEN_ORG", TravisCI.NO_ENV_REASON, TravisCI.SUGGESTION_ORG)
 
         headers = {"Authorization": 'token {}'.format(token),
                    "Travis-API-Version": "3"}

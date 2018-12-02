@@ -1,4 +1,4 @@
-# CLI Tool for Managing Multi-Package Python Repositories
+# Template-based Management of CI and CD scripts for Code Repositories
 
 <!-- MarkdownTOC autolink="true" bracket="round" -->
 
@@ -16,10 +16,19 @@
 
 ## Introduction
 
+`multipackage` is a tool that works like a self-updating `cookiecutter`.  It 
+configures a code repository (such as one hosted on github) according to a
+template.  `multipackage` is very good at setting up repositories for Continuous
+Integration and Continuous Deployment.
+
+>Currently, `multipackage` is restricted with working with Python based
+>repositories, but that is not inherent in the design and it will support other
+>repositories in the future.
+
 This tool is designed to automatically setup or update a github repository that
-contains one or more python packages that should be published to a Python Package
-Index such as PyPI.  It defaults to a configuration that is suitable for an open
-source package published to PyPI.
+contains one or more python packages that should be published to a Python
+Package Index such as PyPI.  It defaults to a configuration that is suitable for
+an open source package published to PyPI.
 
 `multipackage` is packaged as a python package distributed on `PyPI` that
 installs a series of script files into your repository to manage
@@ -246,13 +255,13 @@ prebaked best practices.**
 > **`multipackage` is not intended to be a general purpose library.**  
  
 It is a more of a framework rather than a library. If you like the general
-outline of what `multipackage` provides, then you can get a lot of
+outline of what a `multipackage` template provides, then you can get a lot of
 functionality without much configuration.  The trade-off, is that if you don't
 like the general outline of what `multipackage` provides, then you're likely
-better off starting from scratch (possibly reusing some of the code, possibly
-not).
+better off starting from scratch or building your own template.
 
 There is not a shortage of great general-purpose tools available to help you
-setup modern python package repositories.  **multipackage does not replace those
-general purpose tools**.  Instead, it just wires together existing tools in a
-specific way that can be automatically installed and maintained.
+setup modern code repositories with automated builds and testing.
+**multipackage does not replace those general purpose tools**.  Instead, it just
+wires together existing tools in a specific way that can be automatically
+installed and maintained.
