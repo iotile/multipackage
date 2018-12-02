@@ -135,6 +135,9 @@ def main():
     args = generate_args(folders, extra_args=extra_args)
 
     print("\n---- Generating API docs ----\n")
+
+    print("generate_api.py " + " ".join(args) + '\n')
+
     api_main(args)
 
     # sphinx-build on windows powershell leaves the terminal in a weird state
