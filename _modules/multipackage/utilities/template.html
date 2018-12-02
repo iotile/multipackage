@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.utilities.template &mdash;  latest documentation</title>
+  <title>multipackage.utilities.template &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> 
+            <a href="../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html"></a>
+          <a href="../../../index.html">multipackage</a>
         
       </nav>
 
@@ -151,6 +151,9 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">jinja2</span> <span class="k">import</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">PackageLoader</span>
 
+<span class="k">def</span> <span class="nf">_quote</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">obj</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span>
+
 
 <div class="viewcode-block" id="render_template"><a class="viewcode-back" href="../../../api/multipackage.utilities.template.html#multipackage.utilities.template.render_template">[docs]</a><span class="k">def</span> <span class="nf">render_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">adjust_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Render a template using the variables in info.</span>
@@ -179,6 +182,8 @@
     <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="n">loader</span><span class="o">=</span><span class="n">PackageLoader</span><span class="p">(</span><span class="s1">&#39;multipackage&#39;</span><span class="p">,</span> <span class="s1">&#39;data/templates&#39;</span><span class="p">),</span>
                       <span class="n">trim_blocks</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lstrip_blocks</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+    <span class="n">env</span><span class="o">.</span><span class="n">filters</span><span class="p">[</span><span class="s1">&#39;quote&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_quote</span>
+
     <span class="n">template</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
@@ -203,7 +208,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

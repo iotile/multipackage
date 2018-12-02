@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage Release Notes &mdash;  latest documentation</title>
+  <title>multipackage Release Notes &mdash; multipackage latest documentation</title>
   
 
   
@@ -47,7 +47,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> 
+            <a href="../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -106,7 +106,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html"></a>
+          <a href="../index.html">multipackage</a>
         
       </nav>
 
@@ -171,6 +171,10 @@ line ending by default so that the files are more easily readable on each
 platform (since git checks them out in native line endings anyway).</li>
 <li>Remove Sphinx warnings from <code class="docutils literal notranslate"><span class="pre">pytest</span></code> since they are not fixable and we can’t
 move to Sphinx 2.0 anyway because it doesn’t support Python 2.7.</li>
+<li>Move to a template based approach for repository management where each repo
+has a template that installs and configures subsystems.  These subsystems are
+then in charge of managing the repository.  There is one default template
+named <code class="docutils literal notranslate"><span class="pre">pypi_package</span></code> that sets up a repository for releasing pypi packages.</li>
 </ul>
 </div>
 <div class="section" id="v0-1-0-11-29-2018">
@@ -209,7 +213,7 @@ that folder.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.linting &mdash;  latest documentation</title>
+  <title>multipackage.templates.repo_template &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> 
+            <a href="../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html"></a>
+          <a href="../../../index.html">multipackage</a>
         
       </nav>
 
@@ -130,7 +130,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>multipackage.subsystems.linting</li>
+      <li>multipackage.templates.repo_template</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -145,25 +145,43 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for multipackage.subsystems.linting</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Linting subsystem that ensures we have pylint support.&quot;&quot;&quot;</span>
+  <h1>Source code for multipackage.templates.repo_template</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Base class for all Repository Templates.&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
+<div class="viewcode-block" id="RepositoryTemplate"><a class="viewcode-back" href="../../../api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate">[docs]</a><span class="k">class</span> <span class="nc">RepositoryTemplate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for all Repository Templates.</span>
 
-<div class="viewcode-block" id="LintingSubsystem"><a class="viewcode-back" href="../../../api/multipackage.subsystems.linting.html#multipackage.subsystems.linting.LintingSubsystem">[docs]</a><span class="k">class</span> <span class="nc">LintingSubsystem</span><span class="p">:</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span> <span class="o">=</span> <span class="n">repo</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="sd">    This class is the base class that all repository templates must either</span>
+<span class="sd">    inherit from or implement the same functionality as.  The main purpose of</span>
+<span class="sd">    this class is the ``install`` method that adds its subsystems to a</span>
+<span class="sd">    Repository object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="LintingSubsystem.update"><a class="viewcode-back" href="../../../api/multipackage.subsystems.linting.html#multipackage.subsystems.linting.LintingSubsystem.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Update the linting subsystem.&quot;&quot;&quot;</span>
+    <span class="n">SHORT_NAME</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;A unique name for this repository that can be used in a multipackage settings.json file.&quot;&quot;&quot;</span>
 
-        <span class="n">linting</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;linting&#39;</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">enabled</span> <span class="o">=</span> <span class="n">linting</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;enabled&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">SHORT_DESCRIPTION</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;A required one-line description that describes what the template does.&quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_lines</span><span class="p">(</span><span class="s2">&quot;requirements_build.txt&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pylint ~= 1.9&#39;</span><span class="p">],</span>
-                                <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;^pylint&quot;</span><span class="p">],</span> <span class="n">present</span><span class="o">=</span><span class="n">enabled</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;.pylintrc&quot;</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;pylintrc&quot;</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="n">enabled</span><span class="p">)</span></div></div>
+    <span class="n">INFO_TEMPLATE</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The name of a jinja2 template that will be used to render the multipackge info results.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="RepositoryTemplate.install"><a class="viewcode-back" href="../../../api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Install this template into a Repository object.</span>
+
+<span class="sd">        This method should instantiate all of its subsystems and call</span>
+<span class="sd">        ``repo.add_subsystem()`` for all of the subsystems that are part of this</span>
+<span class="sd">        repository.  All RepositoryTemplate subclasses must override this</span>
+<span class="sd">        method.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            repo (Repository): The repository where we should install this template.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
 </pre></div>
 
            </div>
@@ -176,7 +194,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

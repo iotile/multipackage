@@ -10,6 +10,10 @@
   platform (since git checks them out in native line endings anyway).
 - Remove Sphinx warnings from `pytest` since they are not fixable and we can't
   move to Sphinx 2.0 anyway because it doesn't support Python 2.7. 
+- Move to a template based approach for repository management where each repo
+  has a template that installs and configures subsystems.  These subsystems are
+  then in charge of managing the repository.  There is one default template
+  named `pypi_package` that sets up a repository for releasing pypi packages.
 
 ## v0.1.0 (11/29/2018)
 

@@ -18,8 +18,8 @@ Submodules
     :toctree:
 
     ~multipackage.subsystems.basic
-    ~multipackage.subsystems.docs
-    ~multipackage.subsystems.linting
+    ~multipackage.subsystems.pylint
+    ~multipackage.subsystems.sphinx
     ~multipackage.subsystems.travis
 
 

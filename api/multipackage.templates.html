@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.docs module &mdash;  latest documentation</title>
+  <title>multipackage.templates package &mdash; multipackage latest documentation</title>
   
 
   
@@ -28,8 +28,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="multipackage.subsystems.linting module" href="multipackage.subsystems.linting.html" />
-    <link rel="prev" title="multipackage.subsystems.basic module" href="multipackage.subsystems.basic.html" /> 
+    <link rel="next" title="multipackage.templates.pypi_package module" href="multipackage.templates.pypi_package.html" />
+    <link rel="prev" title="multipackage.subsystems.travis module" href="multipackage.subsystems.travis.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -48,7 +48,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> 
+            <a href="../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -89,7 +89,8 @@
 <li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">multipackage.templates package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
 </ul>
@@ -113,7 +114,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html"></a>
+          <a href="../index.html">multipackage</a>
         
       </nav>
 
@@ -148,15 +149,13 @@
         
           <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
         
-          <li><a href="multipackage.subsystems.html">multipackage.subsystems package</a> &raquo;</li>
-        
-      <li>multipackage.subsystems.docs module</li>
+      <li>multipackage.templates package</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/api/multipackage.subsystems.docs.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/multipackage.templates.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -169,38 +168,44 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-multipackage.subsystems.docs">
-<span id="multipackage-subsystems-docs-module"></span><h1>multipackage.subsystems.docs module<a class="headerlink" href="#module-multipackage.subsystems.docs" title="Permalink to this headline">¶</a></h1>
-<p>Documentation subsystem that manages autogenerating documentation.</p>
-<div class="section" id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Classes:</p>
+  <div class="section" id="module-multipackage.templates">
+<span id="multipackage-templates-package"></span><h1>multipackage.templates package<a class="headerlink" href="#module-multipackage.templates" title="Permalink to this headline">¶</a></h1>
+<p>Templates for different types of repository.</p>
+<p>Templates are the primary way that you can configure how multipackage manages
+a repository.  Every repository has a template (possibly configured explicitly
+and possibly using the default template for PyPI distributed open-source
+packages).</p>
+<p>A template determines which Subsystems are added to the Repository class.
+A subsystem actually manages some aspect of a given repository.  For example,
+the default <code class="docutils literal notranslate"><span class="pre">pypi_package</span></code> template has the following subsystems:</p>
+<ul class="simple">
+<li>BasicSubsystem</li>
+<li>DocumentationSubsystem</li>
+<li>LintingSubsystem</li>
+<li>TravisSubsystem</li>
+</ul>
+<p>Each subsystem determines what environment variables it supports for
+configuring secure credentials when <code class="docutils literal notranslate"><span class="pre">multipackage</span> <span class="pre">update</span></code> is called.</p>
+<p>So the overall structure is:</p>
+<p>A Repository has a Template that selects Subsystems.  The selected Subsystems
+determine what actions are taken on the repository and what environment
+variables are required and optional.</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.subsystems.docs.DocumentationSubsystem" title="multipackage.subsystems.docs.DocumentationSubsystem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DocumentationSubsystem</span></code></a></td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="multipackage.templates.pypi_package.html#module-multipackage.templates.pypi_package" title="multipackage.templates.pypi_package"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pypi_package</span></code></a></td>
+<td>A best-practices template for distributing python packages on PyPI.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="multipackage.templates.repo_template.html#module-multipackage.templates.repo_template" title="multipackage.templates.repo_template"><code class="xref py py-obj docutils literal notranslate"><span class="pre">repo_template</span></code></a></td>
+<td>Base class for all Repository Templates.</td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="reference">
-<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="multipackage.subsystems.docs.DocumentationSubsystem">
-<em class="property">class </em><code class="descclassname">multipackage.subsystems.docs.</code><code class="descname">DocumentationSubsystem</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/docs.html#DocumentationSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.docs.DocumentationSubsystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<dl class="method">
-<dt id="multipackage.subsystems.docs.DocumentationSubsystem.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/docs.html#DocumentationSubsystem.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.docs.DocumentationSubsystem.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the documentation subsystem.</p>
-</dd></dl>
-
-</dd></dl>
-
 </div>
 </div>
 
@@ -212,10 +217,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="multipackage.subsystems.linting.html" class="btn btn-neutral float-right" title="multipackage.subsystems.linting module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="multipackage.templates.pypi_package.html" class="btn btn-neutral float-right" title="multipackage.templates.pypi_package module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="multipackage.subsystems.basic.html" class="btn btn-neutral" title="multipackage.subsystems.basic module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="multipackage.subsystems.travis.html" class="btn btn-neutral" title="multipackage.subsystems.travis module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -224,7 +229,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

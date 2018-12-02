@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>multipackage.templates.pypi_package module &mdash; multipackage latest documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multipackage.templates.repo_template module" href="multipackage.templates.repo_template.html" />
+    <link rel="prev" title="multipackage.templates package" href="multipackage.templates.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> multipackage
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="multipackage.html">multipackage package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.templates.html">multipackage.templates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release.html">Release Notes</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">multipackage</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+          <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
+        
+          <li><a href="multipackage.templates.html">multipackage.templates package</a> &raquo;</li>
+        
+      <li>multipackage.templates.pypi_package module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/multipackage.templates.pypi_package.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-multipackage.templates.pypi_package">
+<span id="multipackage-templates-pypi-package-module"></span><h1>multipackage.templates.pypi_package module<a class="headerlink" href="#module-multipackage.templates.pypi_package" title="Permalink to this headline">¶</a></h1>
+<p>A best-practices template for distributing python packages on PyPI.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Classes:</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.templates.pypi_package.PyPIPackageTemplate" title="multipackage.templates.pypi_package.PyPIPackageTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PyPIPackageTemplate</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate">
+<em class="property">class </em><code class="descclassname">multipackage.templates.pypi_package.</code><code class="descname">PyPIPackageTemplate</code><a class="reference internal" href="../_modules/multipackage/templates/pypi_package.html#PyPIPackageTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate" title="multipackage.templates.repo_template.RepositoryTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">multipackage.templates.repo_template.RepositoryTemplate</span></code></a></p>
+<dl class="attribute">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate.SHORT_NAME">
+<code class="descname">SHORT_NAME</code><em class="property"> = 'pypi_package'</em><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate.SHORT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate.SHORT_DESCRIPTION">
+<code class="descname">SHORT_DESCRIPTION</code><em class="property"> = 'Builds, tests and releases PyPI packages from Travis-CI'</em><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate.SHORT_DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate.INFO_TEMPLATE">
+<code class="descname">INFO_TEMPLATE</code><em class="property"> = 'pypi_info_template.tpl'</em><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate.INFO_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate.install">
+<code class="descname">install</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/templates/pypi_package.html#PyPIPackageTemplate.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install this template into a Repository.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>repo</strong> (<a class="reference internal" href="multipackage.repo.html#multipackage.repo.Repository" title="multipackage.repo.Repository"><em>Repository</em></a>) – The repository that this template should add
+its subsystems to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate.find_toplevel_packages">
+<em class="property">classmethod </em><code class="descname">find_toplevel_packages</code><span class="sig-paren">(</span><em>base_path</em>, <em>components</em>, <em>prefixes=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/templates/pypi_package.html#PyPIPackageTemplate.find_toplevel_packages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate.find_toplevel_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find all top level python packages in each component.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="multipackage.templates.pypi_package.PyPIPackageTemplate.find_namespace_packages">
+<em class="property">classmethod </em><code class="descname">find_namespace_packages</code><span class="sig-paren">(</span><em>packages</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/templates/pypi_package.html#PyPIPackageTemplate.find_namespace_packages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.pypi_package.PyPIPackageTemplate.find_namespace_packages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find packages that are created by multiple components.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="multipackage.templates.repo_template.html" class="btn btn-neutral float-right" title="multipackage.templates.repo_template module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="multipackage.templates.html" class="btn btn-neutral" title="multipackage.templates package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018 Arch Systems Inc.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

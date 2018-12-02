@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.scripts.multipackage &mdash;  latest documentation</title>
+  <title>multipackage.scripts.multipackage &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> 
+            <a href="../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html"></a>
+          <a href="../../../index.html">multipackage</a>
         
       </nav>
 
@@ -156,7 +156,8 @@
 <span class="kn">from</span> <span class="nn">multipackage</span> <span class="k">import</span> <span class="n">Repository</span>
 <span class="kn">from</span> <span class="nn">multipackage.travis</span> <span class="k">import</span> <span class="n">TravisCI</span>
 <span class="kn">from</span> <span class="nn">multipackage.exceptions</span> <span class="k">import</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">UsageError</span>
-<span class="kn">from</span> <span class="nn">multipackage.utilities</span> <span class="k">import</span> <span class="n">GITRepository</span>
+<span class="kn">from</span> <span class="nn">multipackage.utilities</span> <span class="k">import</span> <span class="n">GITRepository</span><span class="p">,</span> <span class="n">render_template</span>
+
 
 <span class="n">DESCRIPTION</span> <span class="o">=</span> \
 <span class="sd">&quot;&quot;&quot;Manage the build, test and release scripts of a multipackage python repo.</span>
@@ -220,9 +221,7 @@
 <div class="viewcode-block" id="verify_environment"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_environment">[docs]</a><span class="k">def</span> <span class="nf">verify_environment</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Verify that all required environment settings are correct.&quot;&quot;&quot;</span>
 
-    <span class="n">travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
-    <span class="n">travis</span><span class="o">.</span><span class="n">ensure_token</span><span class="p">()</span>
-
+    <span class="n">_travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
     <span class="n">GITRepository</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Checking for required environment variables:&quot;</span><span class="p">)</span>
@@ -305,34 +304,13 @@
 
     <span class="n">repo</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">verify_all</span><span class="p">(</span><span class="n">report</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="c1">#FIXME: There are missing branches on this logic tree</span>
-    <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">settings_changed</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository is up-to-date with no problems.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span> <span class="ow">and</span> <span class="n">repo</span><span class="o">.</span><span class="n">settings_changed</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository needs to be updated.</span><span class="se">\n</span><span class="s2">RUN TO UPDATE:</span><span class="se">\n\n</span><span class="s2">    multipackage update </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_path</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository has </span><span class="si">%d</span><span class="s2"> warning(s)</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository has </span><span class="si">%d</span><span class="s2"> error(s) that need to be addressed</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">errors</span><span class="p">))</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="n">repo</span><span class="p">,</span>
+        <span class="s2">&quot;repo_path&quot;</span><span class="p">:</span> <span class="n">repo_path</span>
+    <span class="p">}</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;COMPONENTS:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">    python-version=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">component</span><span class="o">.</span><span class="n">relative_path</span><span class="p">,</span> <span class="n">component</span><span class="o">.</span><span class="n">compatibility</span><span class="p">))</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    packages: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">component</span><span class="o">.</span><span class="n">desired_packages</span><span class="p">)))</span>
-
-    <span class="nb">print</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ERRORS:&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">    Fix: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">error</span><span class="p">))</span>
-
-        <span class="nb">print</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNINGS:&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">warnings</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">    Fix: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">warning</span><span class="p">))</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">render_template</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">INFO_TEMPLATE</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">repo</span><span class="o">.</span><span class="n">clean</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">1</span>
@@ -467,7 +445,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

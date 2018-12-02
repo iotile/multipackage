@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.linting module &mdash;  latest documentation</title>
+  <title>multipackage.templates.repo_template module &mdash; multipackage latest documentation</title>
   
 
   
@@ -28,8 +28,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="multipackage.subsystems.travis module" href="multipackage.subsystems.travis.html" />
-    <link rel="prev" title="multipackage.subsystems.docs module" href="multipackage.subsystems.docs.html" /> 
+    <link rel="next" title="multipackage.travis package" href="multipackage.travis.html" />
+    <link rel="prev" title="multipackage.templates.pypi_package module" href="multipackage.templates.pypi_package.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -48,7 +48,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> 
+            <a href="../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -89,7 +89,8 @@
 <li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.templates.html">multipackage.templates package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
 </ul>
@@ -113,7 +114,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html"></a>
+          <a href="../index.html">multipackage</a>
         
       </nav>
 
@@ -148,15 +149,15 @@
         
           <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
         
-          <li><a href="multipackage.subsystems.html">multipackage.subsystems package</a> &raquo;</li>
+          <li><a href="multipackage.templates.html">multipackage.templates package</a> &raquo;</li>
         
-      <li>multipackage.subsystems.linting module</li>
+      <li>multipackage.templates.repo_template module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/api/multipackage.subsystems.linting.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/multipackage.templates.repo_template.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -169,9 +170,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-multipackage.subsystems.linting">
-<span id="multipackage-subsystems-linting-module"></span><h1>multipackage.subsystems.linting module<a class="headerlink" href="#module-multipackage.subsystems.linting" title="Permalink to this headline">¶</a></h1>
-<p>Linting subsystem that ensures we have pylint support.</p>
+  <div class="section" id="module-multipackage.templates.repo_template">
+<span id="multipackage-templates-repo-template-module"></span><h1>multipackage.templates.repo_template module<a class="headerlink" href="#module-multipackage.templates.repo_template" title="Permalink to this headline">¶</a></h1>
+<p>Base class for all Repository Templates.</p>
 <div class="section" id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
 <p>Classes:</p>
@@ -181,8 +182,8 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.subsystems.linting.LintingSubsystem" title="multipackage.subsystems.linting.LintingSubsystem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LintingSubsystem</span></code></a></td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.templates.repo_template.RepositoryTemplate" title="multipackage.templates.repo_template.RepositoryTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RepositoryTemplate</span></code></a></td>
+<td>Base class for all Repository Templates.</td>
 </tr>
 </tbody>
 </table>
@@ -190,13 +191,48 @@
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="multipackage.subsystems.linting.LintingSubsystem">
-<em class="property">class </em><code class="descclassname">multipackage.subsystems.linting.</code><code class="descname">LintingSubsystem</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/linting.html#LintingSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.linting.LintingSubsystem" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.templates.repo_template.RepositoryTemplate">
+<em class="property">class </em><code class="descclassname">multipackage.templates.repo_template.</code><code class="descname">RepositoryTemplate</code><a class="reference internal" href="../_modules/multipackage/templates/repo_template.html#RepositoryTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.repo_template.RepositoryTemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for all Repository Templates.</p>
+<p>This class is the base class that all repository templates must either
+inherit from or implement the same functionality as.  The main purpose of
+this class is the <code class="docutils literal notranslate"><span class="pre">install</span></code> method that adds its subsystems to a
+Repository object.</p>
+<dl class="attribute">
+<dt id="multipackage.templates.repo_template.RepositoryTemplate.SHORT_NAME">
+<code class="descname">SHORT_NAME</code><em class="property"> = None</em><a class="headerlink" href="#multipackage.templates.repo_template.RepositoryTemplate.SHORT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>A unique name for this repository that can be used in a multipackage settings.json file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.templates.repo_template.RepositoryTemplate.SHORT_DESCRIPTION">
+<code class="descname">SHORT_DESCRIPTION</code><em class="property"> = None</em><a class="headerlink" href="#multipackage.templates.repo_template.RepositoryTemplate.SHORT_DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>A required one-line description that describes what the template does.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.templates.repo_template.RepositoryTemplate.INFO_TEMPLATE">
+<code class="descname">INFO_TEMPLATE</code><em class="property"> = None</em><a class="headerlink" href="#multipackage.templates.repo_template.RepositoryTemplate.INFO_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of a jinja2 template that will be used to render the multipackge info results.</p>
+</dd></dl>
+
 <dl class="method">
-<dt id="multipackage.subsystems.linting.LintingSubsystem.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/linting.html#LintingSubsystem.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.linting.LintingSubsystem.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the linting subsystem.</p>
+<dt id="multipackage.templates.repo_template.RepositoryTemplate.install">
+<code class="descname">install</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/templates/repo_template.html#RepositoryTemplate.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.repo_template.RepositoryTemplate.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install this template into a Repository object.</p>
+<p>This method should instantiate all of its subsystems and call
+<code class="docutils literal notranslate"><span class="pre">repo.add_subsystem()</span></code> for all of the subsystems that are part of this
+repository.  All RepositoryTemplate subclasses must override this
+method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>repo</strong> (<a class="reference internal" href="multipackage.repo.html#multipackage.repo.Repository" title="multipackage.repo.Repository"><em>Repository</em></a>) – The repository where we should install this template.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -212,10 +248,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="multipackage.subsystems.travis.html" class="btn btn-neutral float-right" title="multipackage.subsystems.travis module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="multipackage.travis.html" class="btn btn-neutral float-right" title="multipackage.travis package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="multipackage.subsystems.docs.html" class="btn btn-neutral" title="multipackage.subsystems.docs module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="multipackage.templates.pypi_package.html" class="btn btn-neutral" title="multipackage.templates.pypi_package module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -224,7 +260,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

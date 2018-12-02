@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash;  latest documentation</title>
+  <title>Index &mdash; multipackage latest documentation</title>
   
 
   
@@ -47,7 +47,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> 
+            <a href="index.html" class="icon icon-home"> multipackage
           
 
           
@@ -98,7 +98,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html"></a>
+          <a href="index.html">multipackage</a>
         
       </nav>
 
@@ -162,6 +162,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -182,6 +183,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.add_subsystem">add_subsystem() (multipackage.repo.Repository method)</a>
+</li>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.add_warning">add_warning() (multipackage.repo.Repository method)</a>
 </li>
       <li><a href="api/multipackage.utilities.file_ops.html#multipackage.utilities.file_ops.atomic_json">atomic_json() (in module multipackage.utilities.file_ops)</a>
@@ -194,7 +197,7 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicSubsystem">BasicSubsystem (class in multipackage.subsystems.basic)</a>
+      <li><a href="api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport">BasicPythonSupport (class in multipackage.subsystems.basic)</a>
 </li>
       <li><a href="api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.build_component">build_component() (in module multipackage.data.scripts.release_component)</a>
 </li>
@@ -217,8 +220,6 @@
       <li><a href="api/multipackage.data.scripts.release_component.html#multipackage.data.scripts.release_component.check_component">check_component() (in module multipackage.data.scripts.release_component)</a>
 </li>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.clean">clean (multipackage.repo.Repository attribute)</a>
-</li>
-      <li><a href="api/multipackage.repo.html#multipackage.repo.Component.compatibility">compatibility (multipackage.repo.Component attribute)</a>
 </li>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Component">Component (class in multipackage.repo)</a>
 </li>
@@ -246,15 +247,11 @@
 </li>
       <li><a href="api/multipackage.data.scripts.generate_api.html#multipackage.data.scripts.generate_api.delete_with_retry">delete_with_retry() (in module multipackage.data.scripts.generate_api)</a>
 </li>
-      <li><a href="api/multipackage.repo.html#multipackage.repo.Component.desired_packages">desired_packages (multipackage.repo.Component attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.utilities.obj_hash.html#multipackage.utilities.obj_hash.dict_hash">dict_hash() (in module multipackage.utilities.obj_hash)</a>
 </li>
       <li><a href="api/multipackage.utilities.obj_hash.html#multipackage.utilities.obj_hash.directory_hash">directory_hash() (in module multipackage.utilities.obj_hash)</a>
-</li>
-      <li><a href="api/multipackage.subsystems.docs.html#multipackage.subsystems.docs.DocumentationSubsystem">DocumentationSubsystem (class in multipackage.subsystems.docs)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -300,8 +297,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.repo.html#multipackage.repo.ErrorMessage.file">file (multipackage.repo.ErrorMessage attribute)</a>
 </li>
-      <li><a href="api/multipackage.utilities.packages.html#multipackage.utilities.packages.find_toplevel_packages">find_toplevel_packages() (in module multipackage.utilities.packages)</a>
+      <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate.find_namespace_packages">find_namespace_packages() (multipackage.templates.pypi_package.PyPIPackageTemplate class method)</a>
 </li>
+      <li><a href="api/multipackage.utilities.packages.html#multipackage.utilities.packages.find_toplevel_packages">find_toplevel_packages() (in module multipackage.utilities.packages)</a>
+
+      <ul>
+        <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate.find_toplevel_packages">(multipackage.templates.pypi_package.PyPIPackageTemplate class method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.format_directive">format_directive() (in module multipackage.data.scripts.better_apidocs)</a>
@@ -356,14 +359,26 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate.INFO_TEMPLATE">INFO_TEMPLATE (multipackage.templates.pypi_package.PyPIPackageTemplate attribute)</a>
+
+      <ul>
+        <li><a href="api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate.INFO_TEMPLATE">(multipackage.templates.repo_template.RepositoryTemplate attribute)</a>
+</li>
+      </ul></li>
       <li><a href="api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.init_repo">init_repo() (in module multipackage.scripts.multipackage)</a>
 </li>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.initialize">initialize() (multipackage.repo.Repository method)</a>
 </li>
-      <li><a href="api/multipackage.data.scripts.shared_errors.html#multipackage.data.scripts.shared_errors.InternalError">InternalError</a>, <a href="api/multipackage.exceptions.html#multipackage.exceptions.InternalError">[1]</a>
+      <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate.install">install() (multipackage.templates.pypi_package.PyPIPackageTemplate method)</a>
+
+      <ul>
+        <li><a href="api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate.install">(multipackage.templates.repo_template.RepositoryTemplate method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/multipackage.data.scripts.shared_errors.html#multipackage.data.scripts.shared_errors.InternalError">InternalError</a>, <a href="api/multipackage.exceptions.html#multipackage.exceptions.InternalError">[1]</a>
+</li>
       <li><a href="api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.INVALID_REASON">INVALID_REASON (multipackage.travis.travis.TravisCI attribute)</a>
 </li>
       <li><a href="api/multipackage.exceptions.html#multipackage.exceptions.InvalidEnvironmentError">InvalidEnvironmentError</a>
@@ -379,10 +394,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.utilities.obj_hash.html#multipackage.utilities.obj_hash.line_hash">line_hash() (in module multipackage.utilities.obj_hash)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/multipackage.subsystems.linting.html#multipackage.subsystems.linting.LintingSubsystem">LintingSubsystem (class in multipackage.subsystems.linting)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -436,10 +447,10 @@
 </li>
       <li><a href="api/multipackage.data.scripts.release_notes.html#module-multipackage.data.scripts.release_notes">multipackage.data.scripts.release_notes (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.data.scripts.shared_errors.html#module-multipackage.data.scripts.shared_errors">multipackage.data.scripts.shared_errors (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.exceptions.html#module-multipackage.exceptions">multipackage.exceptions (module)</a>
 </li>
       <li><a href="api/multipackage.manifest.html#module-multipackage.manifest">multipackage.manifest (module)</a>
@@ -454,11 +465,17 @@
 </li>
       <li><a href="api/multipackage.subsystems.basic.html#module-multipackage.subsystems.basic">multipackage.subsystems.basic (module)</a>
 </li>
-      <li><a href="api/multipackage.subsystems.docs.html#module-multipackage.subsystems.docs">multipackage.subsystems.docs (module)</a>
+      <li><a href="api/multipackage.subsystems.pylint.html#module-multipackage.subsystems.pylint">multipackage.subsystems.pylint (module)</a>
 </li>
-      <li><a href="api/multipackage.subsystems.linting.html#module-multipackage.subsystems.linting">multipackage.subsystems.linting (module)</a>
+      <li><a href="api/multipackage.subsystems.sphinx.html#module-multipackage.subsystems.sphinx">multipackage.subsystems.sphinx (module)</a>
 </li>
       <li><a href="api/multipackage.subsystems.travis.html#module-multipackage.subsystems.travis">multipackage.subsystems.travis (module)</a>
+</li>
+      <li><a href="api/multipackage.templates.html#module-multipackage.templates">multipackage.templates (module)</a>
+</li>
+      <li><a href="api/multipackage.templates.pypi_package.html#module-multipackage.templates.pypi_package">multipackage.templates.pypi_package (module)</a>
+</li>
+      <li><a href="api/multipackage.templates.repo_template.html#module-multipackage.templates.repo_template">multipackage.templates.repo_template (module)</a>
 </li>
       <li><a href="api/multipackage.travis.html#module-multipackage.travis">multipackage.travis (module)</a>
 </li>
@@ -499,16 +516,28 @@
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/multipackage.repo.html#multipackage.repo.Component.options">options (multipackage.repo.Component attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.data.scripts.release_notes.html#multipackage.data.scripts.release_notes.parse_release_header">parse_release_header() (in module multipackage.data.scripts.release_notes)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.print_environment_error">print_environment_error() (in module multipackage.scripts.multipackage)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.print_usage_error">print_usage_error() (in module multipackage.scripts.multipackage)</a>
+</li>
+      <li><a href="api/multipackage.subsystems.pylint.html#multipackage.subsystems.pylint.PylintLinter">PylintLinter (class in multipackage.subsystems.pylint)</a>
+</li>
+      <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate">PyPIPackageTemplate (class in multipackage.templates.pypi_package)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -524,15 +553,17 @@
         <li><a href="api/multipackage.repo.html#multipackage.repo.Component.relative_path">(multipackage.repo.Component attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.utilities.git.html#multipackage.utilities.git.GITRepository.remote">remote() (multipackage.utilities.git.GITRepository method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.manifest.html#multipackage.manifest.ManifestFile.remove_file">remove_file() (multipackage.manifest.ManifestFile method)</a>
 </li>
       <li><a href="api/multipackage.utilities.template.html#multipackage.utilities.template.render_template">render_template() (in module multipackage.utilities.template)</a>
 </li>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository">Repository (class in multipackage.repo)</a>
+</li>
+      <li><a href="api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate">RepositoryTemplate (class in multipackage.templates.repo_template)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -554,13 +585,43 @@
 </li>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.SETTINGS_FILE">SETTINGS_FILE (multipackage.repo.Repository attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.SETTINGS_VERSION">SETTINGS_VERSION (multipackage.repo.Repository attribute)</a>
 </li>
       <li><a href="api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.setup_logging">setup_logging() (in module multipackage.scripts.multipackage)</a>
 </li>
       <li><a href="api/multipackage.data.scripts.better_apidocs.html#multipackage.data.scripts.better_apidocs.shall_skip">shall_skip() (in module multipackage.data.scripts.better_apidocs)</a>
+</li>
+      <li><a href="api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport.SHORT_DESCRIPTION">SHORT_DESCRIPTION (multipackage.subsystems.basic.BasicPythonSupport attribute)</a>
+
+      <ul>
+        <li><a href="api/multipackage.subsystems.pylint.html#multipackage.subsystems.pylint.PylintLinter.SHORT_DESCRIPTION">(multipackage.subsystems.pylint.PylintLinter attribute)</a>
+</li>
+        <li><a href="api/multipackage.subsystems.sphinx.html#multipackage.subsystems.sphinx.SphinxDocumentation.SHORT_DESCRIPTION">(multipackage.subsystems.sphinx.SphinxDocumentation attribute)</a>
+</li>
+        <li><a href="api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem.SHORT_DESCRIPTION">(multipackage.subsystems.travis.TravisSubsystem attribute)</a>
+</li>
+        <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate.SHORT_DESCRIPTION">(multipackage.templates.pypi_package.PyPIPackageTemplate attribute)</a>
+</li>
+        <li><a href="api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate.SHORT_DESCRIPTION">(multipackage.templates.repo_template.RepositoryTemplate attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport.SHORT_NAME">SHORT_NAME (multipackage.subsystems.basic.BasicPythonSupport attribute)</a>
+
+      <ul>
+        <li><a href="api/multipackage.subsystems.pylint.html#multipackage.subsystems.pylint.PylintLinter.SHORT_NAME">(multipackage.subsystems.pylint.PylintLinter attribute)</a>
+</li>
+        <li><a href="api/multipackage.subsystems.sphinx.html#multipackage.subsystems.sphinx.SphinxDocumentation.SHORT_NAME">(multipackage.subsystems.sphinx.SphinxDocumentation attribute)</a>
+</li>
+        <li><a href="api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem.SHORT_NAME">(multipackage.subsystems.travis.TravisSubsystem attribute)</a>
+</li>
+        <li><a href="api/multipackage.templates.pypi_package.html#multipackage.templates.pypi_package.PyPIPackageTemplate.SHORT_NAME">(multipackage.templates.pypi_package.PyPIPackageTemplate attribute)</a>
+</li>
+        <li><a href="api/multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate.SHORT_NAME">(multipackage.templates.repo_template.RepositoryTemplate attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/multipackage.subsystems.sphinx.html#multipackage.subsystems.sphinx.SphinxDocumentation">SphinxDocumentation (class in multipackage.subsystems.sphinx)</a>
 </li>
       <li><a href="api/multipackage.manifest.html#multipackage.manifest.ManagedFile.status">status (multipackage.manifest.ManagedFile attribute)</a>
 </li>
@@ -578,14 +639,12 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/multipackage.repo.html#multipackage.repo.Component.toplevel_packages">toplevel_packages (multipackage.repo.Component attribute)</a>
-</li>
       <li><a href="api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.TRAVIS_BASE_COM">TRAVIS_BASE_COM (multipackage.travis.travis.TravisCI attribute)</a>
+</li>
+      <li><a href="api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.TRAVIS_BASE_ORG">TRAVIS_BASE_ORG (multipackage.travis.travis.TravisCI attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.TRAVIS_BASE_ORG">TRAVIS_BASE_ORG (multipackage.travis.travis.TravisCI attribute)</a>
-</li>
       <li><a href="api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI">TravisCI (class in multipackage.travis.travis)</a>
 </li>
       <li><a href="api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem">TravisSubsystem (class in multipackage.subsystems.travis)</a>
@@ -599,11 +658,11 @@
       <li><a href="api/multipackage.repo.html#multipackage.repo.Repository.update">update() (multipackage.repo.Repository method)</a>
 
       <ul>
-        <li><a href="api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicSubsystem.update">(multipackage.subsystems.basic.BasicSubsystem method)</a>
+        <li><a href="api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport.update">(multipackage.subsystems.basic.BasicPythonSupport method)</a>
 </li>
-        <li><a href="api/multipackage.subsystems.docs.html#multipackage.subsystems.docs.DocumentationSubsystem.update">(multipackage.subsystems.docs.DocumentationSubsystem method)</a>
+        <li><a href="api/multipackage.subsystems.pylint.html#multipackage.subsystems.pylint.PylintLinter.update">(multipackage.subsystems.pylint.PylintLinter method)</a>
 </li>
-        <li><a href="api/multipackage.subsystems.linting.html#multipackage.subsystems.linting.LintingSubsystem.update">(multipackage.subsystems.linting.LintingSubsystem method)</a>
+        <li><a href="api/multipackage.subsystems.sphinx.html#multipackage.subsystems.sphinx.SphinxDocumentation.update">(multipackage.subsystems.sphinx.SphinxDocumentation method)</a>
 </li>
         <li><a href="api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem.update">(multipackage.subsystems.travis.TravisSubsystem method)</a>
 </li>
@@ -671,7 +730,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

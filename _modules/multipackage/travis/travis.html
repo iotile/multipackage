@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.travis.travis &mdash;  latest documentation</title>
+  <title>multipackage.travis.travis &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> 
+            <a href="../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html"></a>
+          <a href="../../../index.html">multipackage</a>
         
       </nav>
 
@@ -209,12 +209,6 @@
         <span class="k">if</span> <span class="n">org_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">org_token</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">com_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_COM&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_COM</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">com_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_ORG</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_ORG_URL&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">TRAVIS_BASE_ORG</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TRAVIS_ORG_URL&quot;</span><span class="p">)</span>
 
@@ -232,6 +226,11 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">base</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TRAVIS_BASE_COM</span>
             <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_com_token</span>
+
+        <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">org</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_COM&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_COM</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">org</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">NO_ENV_REASON</span><span class="p">,</span> <span class="n">TravisCI</span><span class="o">.</span><span class="n">SUGGESTION_ORG</span><span class="p">)</span>
 
         <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s1">&#39;token </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">token</span><span class="p">),</span>
                    <span class="s2">&quot;Travis-API-Version&quot;</span><span class="p">:</span> <span class="s2">&quot;3&quot;</span><span class="p">}</span>
@@ -402,7 +401,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

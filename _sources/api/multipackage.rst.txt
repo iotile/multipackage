@@ -32,6 +32,7 @@ Subpackages
     ~multipackage.data
     ~multipackage.scripts
     ~multipackage.subsystems
+    ~multipackage.templates
     ~multipackage.travis
     ~multipackage.utilities
 

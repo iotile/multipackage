@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.travis &mdash;  latest documentation</title>
+  <title>multipackage.subsystems.travis &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> 
+            <a href="../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html"></a>
+          <a href="../../../index.html">multipackage</a>
         
       </nav>
 
@@ -151,7 +151,10 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">..travis</span> <span class="k">import</span> <span class="n">TravisCI</span>
 
-<div class="viewcode-block" id="TravisSubsystem"><a class="viewcode-back" href="../../../api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem">[docs]</a><span class="k">class</span> <span class="nc">TravisSubsystem</span><span class="p">:</span>
+<div class="viewcode-block" id="TravisSubsystem"><a class="viewcode-back" href="../../../api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem">[docs]</a><span class="k">class</span> <span class="nc">TravisSubsystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">SHORT_NAME</span> <span class="o">=</span> <span class="s2">&quot;CI/CD using Travis CI&quot;</span>
+    <span class="n">SHORT_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;manages .travis.yml file for building and deploying on Travis CI&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span> <span class="o">=</span> <span class="n">repo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -188,7 +191,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.basic module &mdash;  latest documentation</title>
+  <title>multipackage.subsystems.basic module &mdash; multipackage latest documentation</title>
   
 
   
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="multipackage.subsystems.docs module" href="multipackage.subsystems.docs.html" />
+    <link rel="next" title="multipackage.subsystems.pylint module" href="multipackage.subsystems.pylint.html" />
     <link rel="prev" title="multipackage.subsystems package" href="multipackage.subsystems.html" /> 
 
   
@@ -48,7 +48,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> 
+            <a href="../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -90,6 +90,7 @@
 <li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.templates.html">multipackage.templates package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
 </ul>
@@ -113,7 +114,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html"></a>
+          <a href="../index.html">multipackage</a>
         
       </nav>
 
@@ -181,8 +182,8 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.subsystems.basic.BasicSubsystem" title="multipackage.subsystems.basic.BasicSubsystem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BasicSubsystem</span></code></a></td>
-<td>Basic managed files.</td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.subsystems.basic.BasicPythonSupport" title="multipackage.subsystems.basic.BasicPythonSupport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BasicPythonSupport</span></code></a></td>
+<td>Basic managed files for python based repositories.</td>
 </tr>
 </tbody>
 </table>
@@ -190,13 +191,23 @@
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="multipackage.subsystems.basic.BasicSubsystem">
-<em class="property">class </em><code class="descclassname">multipackage.subsystems.basic.</code><code class="descname">BasicSubsystem</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/basic.html#BasicSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.basic.BasicSubsystem" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.subsystems.basic.BasicPythonSupport">
+<em class="property">class </em><code class="descclassname">multipackage.subsystems.basic.</code><code class="descname">BasicPythonSupport</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/basic.html#BasicPythonSupport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.basic.BasicPythonSupport" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Basic managed files.</p>
+<p>Basic managed files for python based repositories.</p>
+<dl class="attribute">
+<dt id="multipackage.subsystems.basic.BasicPythonSupport.SHORT_NAME">
+<code class="descname">SHORT_NAME</code><em class="property"> = 'Basic python support'</em><a class="headerlink" href="#multipackage.subsystems.basic.BasicPythonSupport.SHORT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.subsystems.basic.BasicPythonSupport.SHORT_DESCRIPTION">
+<code class="descname">SHORT_DESCRIPTION</code><em class="property"> = 'pypi release scripts, editorconfig and build requirements'</em><a class="headerlink" href="#multipackage.subsystems.basic.BasicPythonSupport.SHORT_DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
-<dt id="multipackage.subsystems.basic.BasicSubsystem.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/basic.html#BasicSubsystem.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.basic.BasicSubsystem.update" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.subsystems.basic.BasicPythonSupport.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/basic.html#BasicPythonSupport.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.basic.BasicPythonSupport.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the basic subsystem.</p>
 </dd></dl>
 
@@ -213,7 +224,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="multipackage.subsystems.docs.html" class="btn btn-neutral float-right" title="multipackage.subsystems.docs module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="multipackage.subsystems.pylint.html" class="btn btn-neutral float-right" title="multipackage.subsystems.pylint module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="multipackage.subsystems.html" class="btn btn-neutral" title="multipackage.subsystems package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -225,7 +236,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

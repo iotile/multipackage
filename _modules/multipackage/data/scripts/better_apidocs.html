@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.data.scripts.better_apidocs &mdash;  latest documentation</title>
+  <title>multipackage.data.scripts.better_apidocs &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> 
+            <a href="../../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../../index.html"></a>
+          <a href="../../../../index.html">multipackage</a>
         
       </nav>
 
@@ -173,6 +173,7 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">os</span> <span class="k">import</span> <span class="n">path</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">binary_type</span>
@@ -192,6 +193,9 @@
     <span class="kn">from</span> <span class="nn">sphinx.quickstart</span> <span class="k">import</span> <span class="n">EXTENSIONS</span>
 <span class="kn">from</span> <span class="nn">sphinx.ext.autosummary</span> <span class="k">import</span> <span class="n">get_documenter</span>
 <span class="kn">from</span> <span class="nn">sphinx.util.inspect</span> <span class="k">import</span> <span class="n">safe_getattr</span>
+
+<span class="c1"># Remove PendingDeprecationWarning for features removed in sphinx-2.0.0</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
 
 <span class="n">periods_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.(?:\s+)&#39;</span><span class="p">)</span>
 
@@ -975,7 +979,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

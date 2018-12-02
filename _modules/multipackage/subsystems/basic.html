@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.basic &mdash;  latest documentation</title>
+  <title>multipackage.subsystems.basic &mdash; multipackage latest documentation</title>
   
 
   
@@ -46,7 +46,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> 
+            <a href="../../../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -97,7 +97,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html"></a>
+          <a href="../../../index.html">multipackage</a>
         
       </nav>
 
@@ -151,14 +151,17 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<div class="viewcode-block" id="BasicSubsystem"><a class="viewcode-back" href="../../../api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicSubsystem">[docs]</a><span class="k">class</span> <span class="nc">BasicSubsystem</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Basic managed files.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="BasicPythonSupport"><a class="viewcode-back" href="../../../api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport">[docs]</a><span class="k">class</span> <span class="nc">BasicPythonSupport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Basic managed files for python based repositories.&quot;&quot;&quot;</span>
+
+    <span class="n">SHORT_NAME</span> <span class="o">=</span> <span class="s2">&quot;Basic python support&quot;</span>
+    <span class="n">SHORT_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;pypi release scripts, editorconfig and build requirements&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span> <span class="o">=</span> <span class="n">repo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BasicSubsystem.update"><a class="viewcode-back" href="../../../api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicSubsystem.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+<div class="viewcode-block" id="BasicPythonSupport.update"><a class="viewcode-back" href="../../../api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the basic subsystem.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_lines</span><span class="p">(</span><span class="s2">&quot;.gitignore&quot;</span><span class="p">,</span> <span class="p">[</span>
@@ -188,10 +191,8 @@
 
         <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="n">options</span><span class="p">,</span>
-            <span class="s1">&#39;components&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
-            <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;documentation&#39;</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="s1">&#39;components&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">components</span>
         <span class="p">}</span>
-
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_directory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">SCRIPT_DIR</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;components.txt&quot;</span><span class="p">),</span> <span class="n">template</span><span class="o">=</span><span class="s2">&quot;components.txt&quot;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -214,7 +215,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>

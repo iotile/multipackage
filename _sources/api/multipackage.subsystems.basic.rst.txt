@@ -7,7 +7,7 @@ multipackage.subsystems.basic module
 .. currentmodule:: multipackage.subsystems.basic
 
 .. automodule:: multipackage.subsystems.basic
-    :members: BasicSubsystem
+    :members: BasicPythonSupport
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -20,7 +20,7 @@ multipackage.subsystems.basic module
     .. autosummary::
         :nosignatures:
 
-        BasicSubsystem
+        BasicPythonSupport
 
 
 

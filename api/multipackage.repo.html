@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.repo module &mdash;  latest documentation</title>
+  <title>multipackage.repo module &mdash; multipackage latest documentation</title>
   
 
   
@@ -48,7 +48,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> 
+            <a href="../index.html" class="icon icon-home"> multipackage
           
 
           
@@ -111,7 +111,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html"></a>
+          <a href="../index.html">multipackage</a>
         
       </nav>
 
@@ -217,20 +217,8 @@
 
 <dl class="class">
 <dt id="multipackage.repo.Component">
-<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>name</em>, <em>relative_path</em>, <em>compatibility</em>, <em>desired_packages</em>, <em>toplevel_packages</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.Component" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Component</code><span class="sig-paren">(</span><em>name</em>, <em>relative_path</em>, <em>options</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.Component" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
-<dl class="attribute">
-<dt id="multipackage.repo.Component.compatibility">
-<code class="descname">compatibility</code><a class="headerlink" href="#multipackage.repo.Component.compatibility" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 2</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="multipackage.repo.Component.desired_packages">
-<code class="descname">desired_packages</code><a class="headerlink" href="#multipackage.repo.Component.desired_packages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 3</p>
-</dd></dl>
-
 <dl class="attribute">
 <dt id="multipackage.repo.Component.name">
 <code class="descname">name</code><a class="headerlink" href="#multipackage.repo.Component.name" title="Permalink to this definition">¶</a></dt>
@@ -238,15 +226,15 @@
 </dd></dl>
 
 <dl class="attribute">
-<dt id="multipackage.repo.Component.relative_path">
-<code class="descname">relative_path</code><a class="headerlink" href="#multipackage.repo.Component.relative_path" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 1</p>
+<dt id="multipackage.repo.Component.options">
+<code class="descname">options</code><a class="headerlink" href="#multipackage.repo.Component.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="multipackage.repo.Component.toplevel_packages">
-<code class="descname">toplevel_packages</code><a class="headerlink" href="#multipackage.repo.Component.toplevel_packages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias for field number 4</p>
+<dt id="multipackage.repo.Component.relative_path">
+<code class="descname">relative_path</code><a class="headerlink" href="#multipackage.repo.Component.relative_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
 </dd></dl>
 
 </dd></dl>
@@ -310,7 +298,7 @@ from a non-git repository.  This is useful for testing purposes.</li>
 
 <dl class="attribute">
 <dt id="multipackage.repo.Repository.COMPONENT_REGEX">
-<code class="descname">COMPONENT_REGEX</code><em class="property"> = '^(?P&lt;package&gt;[a-zA-Z_0-9]+):\\s*(?P&lt;path&gt;[\\.a-zA-Z_\\-0-9\\\\/]+)(\\s*,\\s*compatibility=(?P&lt;compat&gt;universal|python2|python3))?\\s*$'</em><a class="headerlink" href="#multipackage.repo.Repository.COMPONENT_REGEX" title="Permalink to this definition">¶</a></dt>
+<code class="descname">COMPONENT_REGEX</code><em class="property"> = '^(?P&lt;package&gt;[a-zA-Z_0-9]+):\\s*(?P&lt;path&gt;[\\.a-zA-Z_\\-0-9\\\\/]+)(?P&lt;options&gt;(\\s*,\\s*[a-zA-Z_0-9_]+\\s*=\\s*[a-zA-Z_0-9_]+)+)?$'</em><a class="headerlink" href="#multipackage.repo.Repository.COMPONENT_REGEX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -341,6 +329,12 @@ from a non-git repository.  This is useful for testing purposes.</li>
 <dt id="multipackage.repo.Repository.add_error">
 <code class="descname">add_error</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_error" title="Permalink to this definition">¶</a></dt>
 <dd><p>Record an error.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.add_subsystem">
+<code class="descname">add_subsystem</code><span class="sig-paren">(</span><em>subsystem</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_subsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a subsystem to this repository.</p>
 </dd></dl>
 
 <dl class="method">
@@ -509,7 +503,7 @@ actually update each subcomponent.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018 
+        &copy; Copyright 2018 Arch Systems Inc.
 
     </p>
   </div>
