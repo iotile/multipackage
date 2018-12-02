@@ -295,16 +295,16 @@ such as:
    write these as static documents  but they slowly become out of date as the
    underlying code matures.  The result is that the tutorials are 90% right but
    don't work out of the box making it hard for beginners to learn how to use
-   your package.  For a new user to your package that has no idea how it's 
-   implemented, a HOWTO can either work as-written or no.  Ideally these HOWTOs
+   your package.  For a new user to your package that has no idea how it's
+   implemented, a HOWTO either works as-written or not.  Ideally these HOWTOs
    would be continually tested so they always work (and also serve as a nice set
-   of integration tests of your package). 
+   of integration tests of your package).
 
  - Proper unit and integration testing of the build and release scripts. Usually
    these are somewhat hacky one-off scripts that never receive the same kind of
    attention to testing and craft as the rest of the codebase.  Consequently
-   they can often be fragile sources of failure at the worst possible moment that
-   are difficult and time-consuming to debug.
+   they can often be fragile sources of failure at the worst possible moment
+   that are difficult and time-consuming to debug.
 
 ### Can't You Already Do This?
 
@@ -319,35 +319,37 @@ yourself by wiring together:
 - Cookiecutter
 
 Normally, you would do this once and then never touch it again because it's very
-fiddly to get working and once it's up and running you don't want to break it
-and you're focused on building new features in your package or fixing bugs.
+fiddly to get working and once it's up and running you want to focus on building
+new features in your package or fixing bugs.
 
 If you like setting up your own CI/CD scripts and you have the time to invest in
 getting it just right (and keeping it there), then `multipackage` is probably
-not for you.  It was designed for people who are too busy to get a
-fully-featured CI system set up or who get frustrated with the amount of time it
-takes to debug every little change.
+not for you.  It is designed for people who are too busy to get a fully-featured
+CI system set up or who get frustrated with the amount of time it takes to debug
+every little change.
 
 > **Think of `multipackage` as a self-updating cookiecutter that comes with
-prebaked best practices.**
+pre-baked best practices.**
 
 ### Why Isn't `multipackage` More Configurable?
 
 > **`multipackage` is not intended to be a general purpose library.**  
 
-It is a more of a framework rather than a library. If you like the general
-outline of what a `multipackage` template provides, then you can get a lot of
-functionality without much configuration.  The trade-off, is that if you don't
-like the general outline of what `multipackage` provides, then you're likely
-better off starting from scratch or building your own template.
+It is a more of a framework than a library. If you like the general outline of
+what a `multipackage` template provides, then you can get a lot of functionality
+without much configuration.  The trade-off is that if you don't like the general
+outline of what a `multipackage` template provides, then you're likely better
+off starting from scratch and building your own template (or just rolling your
+own solution without `multipackage`).
 
 The goal of `multipackage` is to encourage the sharing of best-practices so it
 is designed around the concept of a complete template for a given type of
 repository that has a small set of configurable options rather than an a la
-carte set of features to pick and choose from.
+carte set of features that users can pick and choose from.
 
 There is not a shortage of great general-purpose tools available to help you
-setup modern code repositories with automated builds and testing. **multipackage
-does not replace those general purpose tools**.  Instead, it just helps wire
-those existing tools together in specific ways that can be automatically
-installed and maintained.
+setup modern code repositories with automated builds and testing. 
+
+**multipackage does not replace those general purpose tools**.  Instead, it just
+helps wire those existing tools together in specific ways that can be
+automatically installed and maintained.
