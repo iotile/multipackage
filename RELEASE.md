@@ -1,6 +1,6 @@
 # `multipackage` Release Notes
 
-## HEAD
+## v0.2.0 (12/1/2018)
 
 - Update `ManagedFileSection.ensure_lines` to support matching multiple lines
   with regular expressions so that you can do things like changing the pinned
