@@ -96,7 +96,7 @@ install:
 
 script:
 {% for key, component in components|dictsort %}
-- python .multipackage/scripts/test_by_name {{ key }}
+- python .multipackage/scripts/test_by_name.py {{ key }}
 {% endfor %}
 - python .multipackage/scripts/build_documentation.py
 
