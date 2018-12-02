@@ -3,8 +3,11 @@
 import logging
 import os
 
-class BasicSubsystem:
-    """Basic managed files."""
+class BasicPythonSupport(object):
+    """Basic managed files for python based repositories."""
+
+    SHORT_NAME = "Basic python support"
+    SHORT_DESCRIPTION = "pypi release scripts, editorconfig and build requirements"
 
     def __init__(self, repo):
         self._repo = repo
@@ -40,10 +43,8 @@ class BasicSubsystem:
 
         variables = {
             'options': options,
-            'components': self._repo.components,
-            'doc': options.get('documentation', {}),
+            'components': self._repo.components
         }
-
 
         self._repo.ensure_directory(self._repo.SCRIPT_DIR)
         self._repo.ensure_template(os.path.join(self._repo.MULTIPACKAGE_DIR, "components.txt"), template="components.txt", overwrite=False)

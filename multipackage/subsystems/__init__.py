@@ -1,8 +1,8 @@
 """Supported subsystems that manage different aspects of the repository."""
 
-from .linting import LintingSubsystem
-from .basic import BasicSubsystem
+from .pylint import PylintLinter
+from .basic import BasicPythonSupport
 from .travis import TravisSubsystem
-from .docs import DocumentationSubsystem
+from .sphinx import SphinxDocumentation
 
-__all__ = ['LintingSubsystem', 'BasicSubsystem', 'TravisSubsystem', 'DocumentationSubsystem']
+__all__ = ['PylintLinter', 'BasicPythonSupport', 'TravisSubsystem', 'SphinxDocumentation']

@@ -9,16 +9,16 @@ import logging
 from builtins import open
 from collections import namedtuple
 from .exceptions import UsageError, InternalError
-from .utilities import atomic_json, ManagedFileSection, render_template, GITRepository, find_toplevel_packages
+from .utilities import atomic_json, ManagedFileSection, render_template, GITRepository
 from .manifest import ManifestFile
-from . import subsystems
+from .templates import PyPIPackageTemplate
 
 
 ErrorMessage = namedtuple("ErrorMessage", ['file', 'message', 'suggestion'])
-Component = namedtuple("Component", ['name', 'relative_path', 'compatibility', 'desired_packages', 'toplevel_packages'])
+Component = namedtuple("Component", ['name', 'relative_path', 'options'])
 
 
-class Repository:
+class Repository(object):
     """High-level representation of an entire repository.
 
     This is the main class inside ``multipackage`` that processes a complete
@@ -42,7 +42,7 @@ class Repository:
     MANIFEST_FILE = os.path.join(MULTIPACKAGE_DIR, "manifest.json")
     COMPONENT_FILE = os.path.join(MULTIPACKAGE_DIR, "components.txt")
 
-    COMPONENT_REGEX = r"^(?P<package>[a-zA-Z_0-9]+):\s*(?P<path>[\.a-zA-Z_\-0-9\\/]+)(\s*,\s*compatibility=(?P<compat>universal|python2|python3))?\s*$"
+    COMPONENT_REGEX = r"^(?P<package>[a-zA-Z_0-9]+):\s*(?P<path>[\.a-zA-Z_\-0-9\\/]+)(?P<options>(\s*,\s*[a-zA-Z_0-9_]+\s*=\s*[a-zA-Z_0-9_]+)+)?$"
     SETTINGS_VERSION = "0.1"
 
     def __init__(self, path, nogit=False):
@@ -61,13 +61,15 @@ class Repository:
         self.initialized = False
         self.template = None
         self.version = None
+        self.author = None
+        self.name = None
         self.options = {}
         self.errors = []
         self.warnings = []
         self.components = {}
-        self.namespace_packages = []
+        self.subsystems = []
 
-        self._try_load()
+        template_name = self._try_load()
         self.manifest = ManifestFile(os.path.join(self.path, self.MANIFEST_FILE), self.path, self)
 
         if nogit:
@@ -77,6 +79,12 @@ class Repository:
 
         if self.initialized:
             self._try_load_components()
+
+            if template_name != "pypi_package":
+                raise UsageError("Templates other than 'pypi_package' are not yet supported.")
+
+            self.template = PyPIPackageTemplate()
+            self.template.install(self)
 
     @property
     def clean(self):
@@ -107,7 +115,10 @@ class Repository:
         """Try to load the list of components from this repository.
 
         The format of the components text file is a list of lines:
-        <package_name>: <relative_path>, compatibility=[universal|python2|python3]
+        <package_name>: <relative_path>[,name1=value1]*
+
+        Whitespace is ignored around options, which begin after the first
+        comma.
         """
 
         component_path = os.path.join(self.path, self.COMPONENT_FILE)
@@ -131,53 +142,44 @@ class Repository:
                                "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
                 continue
 
-            package, path, compat = result.group("package", "path", "compat")
-            if compat is None:
-                compat = "universal"
+            package, path, option_string = result.group("package", "path", "options")
+            options = self._parse_options_string(option_string)
 
             if not os.path.isdir(os.path.join(self.path, path)):
                 self.add_error(self.COMPONENT_FILE, "Component folder '%s' specified in components file is not a directory" % path,
                                "Manually fix the file, verify with `multipackage info` and then run `multipackage update`")
                 continue
 
-            comp_path = os.path.join(self.path, path)
-            toplevel_packages = find_toplevel_packages(comp_path)
-
-            component = Component(package, path, compat, toplevel_packages, toplevel_packages)
+            component = Component(package, path, options)
             self._logger.debug("Adding component %s", component)
             self.components[package] = component
 
-        self._prune_namespace_packages()
+    def _parse_options_string(self, option_string):
+        if option_string is None:
+            return {}
 
-    def _prune_namespace_packages(self):
-        namespace_packages = set()
-        packages = set()
+        option_assignments = option_string.split(',')
 
-        for key, comp in self.components.items():
-            for package in comp.toplevel_packages:
-                if package in packages:
-                    namespace_packages.add(package)
-                else:
-                    packages.add(package)
+        options = {}
 
-        self.namespace_packages = sorted(namespace_packages)
+        for assignment in option_assignments:
+            assignment = assignment.strip()
+            if len(assignment) == 0:
+                continue
 
-        if len(namespace_packages) == 0:
-            return
+            name, _, value = assignment.partition('=')
+            name = name.strip()
+            value = value.strip()
 
-        self._logger.info("Found namespace packages: %s, pruning them", ", ".join(self.namespace_packages))
+            if len(name) == 0 or len(value) == 0:
+                self._logger.debug("Skipping empty option assignment: %s", assignment)
 
-        for key, old_comp in self.components.items():
-            old_comp = self.components[key]
+            if name in options:
+                self._logger.debug("Overwriting option that appeared twice: %s", name)
 
-            if len(old_comp.toplevel_packages) != 1:
-                raise InternalError("Cannot support multiple packages per component in '%s' if there is a namespace package" % key)
+            options[name] = value
 
-            desired_packages = find_toplevel_packages(os.path.join(self.path, old_comp.relative_path), prefix=old_comp.toplevel_packages[0])
-            comp = Component(key, old_comp.relative_path, old_comp.compatibility, desired_packages, old_comp.toplevel_packages)
-            self.components[key] = comp
-
-            self._logger.debug("Replaced namespace package '%s' in '%s' with %s", old_comp.toplevel_packages[0], key, desired_packages)
+        return options
 
     def _try_load(self):
         """Try to load settings for this repository."""
@@ -192,7 +194,7 @@ class Repository:
             with open(settings_path, "r") as infile:
                 settings = json.load(infile)
 
-            self._load_settings(settings)
+            return self._load_settings(settings)
         except IOError:
             self._logger.exception("Error opening file %s", settings_path)
             self.add_error(self.SETTINGS_FILE, "Could not load file due to IO error", "Check the file")
@@ -205,6 +207,10 @@ class Repository:
 
         error = ErrorMessage(file, message, suggestion)
         self.errors.append(error)
+
+    def add_subsystem(self, subsystem):
+        """Add a subsystem to this repository."""
+        self.subsystems.append(subsystem)
 
     def add_warning(self, file, message, suggestion):
         """Record a warning."""
@@ -219,12 +225,17 @@ class Repository:
         if version is None:
             self.add_error(self.SETTINGS_FILE, "Missing required version key",
                            "Run `multipackage init --force` or manually fix.")
+
+        # FIXME: The template class should handle checking for outdated versions
         if version != self.SETTINGS_VERSION:
             self.add_warning(self.SETTINGS_FILE, "Old file version ({})".format(version),
                              "Run `multipackage update`")
 
-        self.template = settings.get('template', self.DEFAULT_TEMPLATE)
+        self.author = settings.get('author', "Unknown Author")
+        self.name = settings.get('name', "Unknown Project")
+
         self.options = settings.get('options', {})
+        return settings.get('template', self.DEFAULT_TEMPLATE)
 
     def initialize(self, clean=False, platforms=('macos', 'windows', 'linux'), python_versions=('2.7', '3.6')):
         """Initialize or reinitialize this repository."""
@@ -331,7 +342,7 @@ class Repository:
         if gitkeep:
             gitkeep_path = os.path.join(path, ".gitkeep")
             if not os.path.exists(gitkeep_path):
-                with open(gitkeep_path, "wb") as outfile:
+                with open(gitkeep_path, "wb"):
                     pass
 
     def ensure_script(self, relative_path, source, present=True, overwrite=True):
@@ -434,10 +445,8 @@ class Repository:
                              "multipackage info")
 
         try:
-            subsystems.BasicSubsystem(self).update(self.options)
-            subsystems.LintingSubsystem(self).update(self.options)
-            subsystems.TravisSubsystem(self).update(self.options)
-            subsystems.DocumentationSubsystem(self).update(self.options)
+            for subsystem in self.subsystems:
+                subsystem.update(self.options)
 
             self.manifest.update_file(os.path.join(self.path, self.SETTINGS_FILE), hash_type='json')
             self.manifest.update_file(os.path.join(self.path, self.COMPONENT_FILE))

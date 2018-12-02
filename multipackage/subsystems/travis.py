@@ -3,7 +3,10 @@
 import logging
 from ..travis import TravisCI
 
-class TravisSubsystem:
+class TravisSubsystem(object):
+    SHORT_NAME = "CI/CD using Travis CI"
+    SHORT_DESCRIPTION = "manages .travis.yml file for building and deploying on Travis CI"
+
     def __init__(self, repo):
         self._repo = repo
         self._logger = logging.getLogger(__name__)

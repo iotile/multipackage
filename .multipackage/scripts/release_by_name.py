@@ -12,7 +12,7 @@ def main():
     """Main entry point to release_by_name.py."""
 
     if len(sys.argv) != 2:
-        print("Usage: release_from_tag.py <tag>")
+        print("Usage: release_by_name.py <tag>")
         return 1
 
     tag = sys.argv[1]
@@ -28,6 +28,7 @@ def main():
         return 0
 
     comp = COMPONENTS[name]
+    compat = comp['options']['compatibility']
 
     repo = os.environ.get("PYPI_URL")
     if repo is None:
@@ -41,7 +42,7 @@ def main():
 
     release_script = os.path.join(".multipackage", "scripts", "release_component.py")
     args = ['python', release_script, "-e", version, "-u", os.environ.get("PYPI_USER"), '--password=%s' % pypi_pass,
-            '-c', comp['compat'], "-r", repo]
+            '-c', compat, "-r", repo]
 
     if slack is not None:
         args.extend(['-s', slack])
@@ -54,7 +55,7 @@ def main():
     print("  - Slack Notification: %s" % (slack is not None))
     print("  - PyPI Index: %s" % repo)
     print("  - Component: %s" % name)
-    print("  - Compatibility: %s" % comp['compat'])
+    print("  - Compatibility: %s" % compat)
     print("  - Expected Version: %s" % version)
     print("  - Dry-run: %s" % check)
 

@@ -4,10 +4,22 @@ import logging
 import os
 from ..exceptions import InternalError
 
-class DocumentationSubsystem:
-    def __init__(self, repo):
+class SphinxDocumentation(object):
+    SHORT_NAME = "Sphinx documentation"
+    SHORT_DESCRIPTION = "generates and deploys api reference and prose documentation using sphinx"
+    def __init__(self, repo, desired_packages, toplevel_packages=None, namespace_packages=None):
         self._repo = repo
         self._logger = logging.getLogger(__name__)
+
+        if namespace_packages is None:
+            namespace_packages = []
+
+        if toplevel_packages is None:
+            toplevel_packages = desired_packages
+
+        self._namespace_packages = namespace_packages
+        self._desired_packages = desired_packages
+        self._toplevel_packages = toplevel_packages
 
     def update(self, options):
         """Update the documentation subsystem."""
@@ -26,16 +38,19 @@ class DocumentationSubsystem:
         self._repo.ensure_directory("built_docs", gitkeep=True)
 
         namespace_package = None
-        if len(self._repo.namespace_packages) > 1:
+        if len(self._namespace_packages) > 1:
             raise InternalError("Having more than one namespace package is not yet supported: %s" % self._repo.namespace_packages)
-        elif len(self._repo.namespace_packages):
-            namespace_package = self._repo.namespace_packages[0]
+        elif len(self._namespace_packages) == 1:
+            namespace_package = self._namespace_packages[0]
 
         variables = {
             'options': options,
             'components': self._repo.components,
             'doc': options.get('documentation', {}),
-            'namespace': namespace_package
+            'repo': self._repo,
+            'namespace': namespace_package,
+            'desired_packages': self._desired_packages,
+            'toplevel_packages': self._toplevel_packages
         }
 
         self._repo.ensure_template("doc/_template/module.rst", template="module.rst", raw=True)

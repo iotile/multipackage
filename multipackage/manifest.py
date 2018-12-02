@@ -16,7 +16,7 @@ PRESENT_UNKNOWN = 3
 
 ManagedFile = namedtuple("ManagedFile", ["relative_path", "absolute_path", "status", "expected_hash", "hash_type"])
 
-class ManifestFile:
+class ManifestFile(object):
     """A hash based manifest file.
 
     This class will load a json file that contains relative file paths and

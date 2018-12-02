@@ -12,6 +12,8 @@
             ]
         }
     },
+    "name": "multipackage",
+    "author": "Arch Systems Inc.",
     "template": "pypi_package",
     "version": "0.1"
 }

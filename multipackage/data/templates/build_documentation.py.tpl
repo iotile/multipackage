@@ -10,6 +10,19 @@ import platform
 from generate_api import main as api_main
 from components import COMPONENTS
 
+TOPLEVEL_PACKAGES = {
+{% for key, packages in toplevel_packages |dictsort %}
+    "{{ key }}": [{{ packages | map('quote') | join(", ") }}]{% if not loop.last %},{% endif %}
+{% endfor %}
+
+}
+
+DESIRED_PACKAGES = {
+{% for key, packages in desired_packages |dictsort %}
+    "{{ key }}": [{{ packages | map('quote') | join(", ") }}]{% if not loop.last %},{% endif %}
+{% endfor %}
+
+}
 
 {% if namespace %}
 NAMESPACE = "{{ namespace }}"
@@ -72,8 +85,10 @@ def get_package_folders():
     """Get all package folders that we should generate api docs for."""
 
     folders = []
-    for component in COMPONENTS.values():
-        for package in component['packages']:
+    for key, component in COMPONENTS.items():
+        packages = TOPLEVEL_PACKAGES[key]
+
+        for package in packages:
             path = os.path.join(component['path'], package)
             folders.append(path)
 

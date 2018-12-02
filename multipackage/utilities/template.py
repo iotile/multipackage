@@ -3,6 +3,9 @@
 import os
 from jinja2 import Environment, PackageLoader
 
+def _quote(obj):
+    return '"' + obj + '"'
+
 
 def render_template(template_name, info, out_path=None, adjust_newlines=True):
     """Render a template using the variables in info.
@@ -30,6 +33,8 @@ def render_template(template_name, info, out_path=None, adjust_newlines=True):
 
     env = Environment(loader=PackageLoader('multipackage', 'data/templates'),
                       trim_blocks=True, lstrip_blocks=True)
+
+    env.filters['quote'] = _quote
 
     template = env.get_template(template_name)
     result = template.render(info)

@@ -1,3 +1,3 @@
 COMPONENTS = {
-    "multipackage": {"name": "multipackage", "path": "./", "compat": "universal", "packages": ["multipackage"]}
+    "multipackage": {"name": "multipackage", "path": "./", "options": {"compatibility": "universal"}}
 }

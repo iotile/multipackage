@@ -7,7 +7,7 @@ API Reference
   :hidden:
 
 {% for key, component in components|dictsort %}
-{% for package in component.desired_packages %}
+{% for package in desired_packages[key] %}
   api/{{ package }} 
 {% endfor %}
 {% endfor %}

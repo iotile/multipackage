@@ -10,7 +10,7 @@ from .file_ops import atomic_save
 from ..exceptions import ManualInterventionError, InternalError
 
 
-class ManagedFileSection:
+class ManagedFileSection(object):
     """A section of a text file that is managed by multipackage.
 
     This class helps define a block of lines inside a file with

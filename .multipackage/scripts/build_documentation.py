@@ -10,6 +10,13 @@ import platform
 from generate_api import main as api_main
 from components import COMPONENTS
 
+TOPLEVEL_PACKAGES = {
+    "multipackage": ["multipackage"]
+}
+
+DESIRED_PACKAGES = {
+    "multipackage": ["multipackage"]
+}
 
 NAMESPACE = None
 
@@ -68,8 +75,10 @@ def get_package_folders():
     """Get all package folders that we should generate api docs for."""
 
     folders = []
-    for component in COMPONENTS.values():
-        for package in component['packages']:
+    for key, component in COMPONENTS.items():
+        packages = TOPLEVEL_PACKAGES[key]
+
+        for package in packages:
             path = os.path.join(component['path'], package)
             folders.append(path)
 

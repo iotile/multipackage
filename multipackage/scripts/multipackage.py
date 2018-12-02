@@ -8,7 +8,8 @@ import logging
 from multipackage import Repository
 from multipackage.travis import TravisCI
 from multipackage.exceptions import InvalidEnvironmentError, UsageError
-from multipackage.utilities import GITRepository
+from multipackage.utilities import GITRepository, render_template
+
 
 DESCRIPTION = \
 """Manage the build, test and release scripts of a multipackage python repo.
@@ -72,9 +73,7 @@ def verify_env_var(name, message):
 def verify_environment():
     """Verify that all required environment settings are correct."""
 
-    travis = TravisCI()
-    travis.ensure_token()
-
+    _travis = TravisCI()
     GITRepository.version()
 
     print("\nChecking for required environment variables:")
@@ -157,34 +156,13 @@ def verify_repo(repo_path):
 
     repo.manifest.verify_all(report=True)
 
-    #FIXME: There are missing branches on this logic tree
-    if repo.clean and not repo.settings_changed and len(repo.warnings) == 0:
-        print("STATUS: Repository is up-to-date with no problems.\n")
-    elif repo.clean and repo.settings_changed:
-        print("STATUS: Repository needs to be updated.\nRUN TO UPDATE:\n\n    multipackage update {}\n".format(repo_path))
-    elif repo.clean:
-        print("STATUS: Repository has %d warning(s)\n" % len(repo.warnings))
-    else:
-        print("STATUS: Repository has %d error(s) that need to be addressed\n" % len(repo.errors))
+    variables = {
+        "repo": repo,
+        "repo_path": repo_path
+    }
 
-    print("COMPONENTS:\n")
-    for component in sorted(repo.components.values()):
-        print("  - %s: %s\n    python-version=%s" % (component.name, component.relative_path, component.compatibility))
-        print("    packages: %s" % (", ".join(component.desired_packages)))
-
-    print()
-
-    if len(repo.errors) > 0:
-        print("ERRORS:")
-        for error in repo.errors:
-            print("  - {}: {}\n    Fix: {}".format(*error))
-
-        print()
-
-    if len(repo.warnings) > 0:
-        print("WARNINGS:")
-        for warning in repo.warnings:
-            print("  - {}: {}\n    Fix: {}".format(*warning))
+    info = render_template(repo.template.INFO_TEMPLATE, variables)
+    sys.stdout.write(info)
 
     if not repo.clean:
         return 1

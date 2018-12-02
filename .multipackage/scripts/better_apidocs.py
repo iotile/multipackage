@@ -25,6 +25,7 @@ import re
 import inspect
 import importlib
 import optparse
+import warnings
 from os import path
 from functools import partial
 from six import binary_type
@@ -44,6 +45,9 @@ except ImportError:
     from sphinx.quickstart import EXTENSIONS
 from sphinx.ext.autosummary import get_documenter
 from sphinx.util.inspect import safe_getattr
+
+# Remove PendingDeprecationWarning for features removed in sphinx-2.0.0
+warnings.simplefilter("ignore")
 
 periods_re = re.compile(r'\.(?:\s+)')
 

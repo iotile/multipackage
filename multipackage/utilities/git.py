@@ -6,7 +6,7 @@ import re
 from ..exceptions import UsageError, MissingPackageError
 
 
-class GITRepository:
+class GITRepository(object):
     """Helper class for git repository functionality.
 
     Args:
