@@ -49,7 +49,7 @@ class PyPIPackageTemplate(RepositoryTemplate):
 
     def _find_packages(self, repo):
         self.toplevel_packages = self.find_toplevel_packages(repo.path, repo.components)
-        self.namespace_packages = self.find_namespace_packages(self.desired_packages)
+        self.namespace_packages = self.find_namespace_packages(self.toplevel_packages)
 
         if len(self.namespace_packages) == 0:
             self.desired_packages = self.toplevel_packages

@@ -95,8 +95,8 @@ install:
 {% endfor %}
 
 script:
-{% for _key, component in components|dictsort %}
-- cd {{ component.relative_path }} && pwd && pytest test
+{% for key, component in components|dictsort %}
+- python .multipackage/scripts/test_by_name {{ key }}
 {% endfor %}
 - python .multipackage/scripts/build_documentation.py
 

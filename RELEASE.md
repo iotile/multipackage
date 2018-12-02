@@ -14,7 +14,8 @@
   has a template that installs and configures subsystems.  These subsystems are
   then in charge of managing the repository.  There is one default template
   named `pypi_package` that sets up a repository for releasing pypi packages.
-
+- Add `test_by_name.py` script to handle entering each component subdirectory
+  and running the required test commands.
 ## v0.1.0 (11/29/2018)
 
 - Update location of multipackage files to all live under a `.multipackage`

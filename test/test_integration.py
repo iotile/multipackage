@@ -6,6 +6,7 @@ import subprocess
 import shutil
 import pytest
 from multipackage.scripts.multipackage import main as multipackage_main
+from multipackage import Repository
 
 
 def copy_repo(name, dest_folder, init_git=True, git_remote="git@github.com:com/my_package.git"):
@@ -49,8 +50,17 @@ def run_in_sandbox(args, pypi_url=None, slack=None):
 
     env = os.environ.copy()
 
-    env['PYTHONPATH'] = os.path.abspath(os.getcwd())
+    repo = Repository('.')
+
+    python_path = os.pathsep.join([os.path.abspath(x.relative_path) for x in repo.components.values()])
+
+    if not isinstance(python_path, str):
+        python_path = python_path.encode('utf-8')
+
+    env['PYTHONPATH'] = python_path
+
     print("Running in %s" % os.getcwd())
+    print("python path: %s" % python_path)
 
     env['SLACK_TOKEN'] = "test_slack_token"
 
@@ -104,6 +114,35 @@ def bare_repo(tmpdir, travis, monkeypatch):
         monkeypatch.setenv('SLACK_TOKEN', 'test_slack_token')
         monkeypatch.setenv('SLACK_WEB_HOOK', 'http://127.0.0.1:8000/nothing')
 
+        yield folder
+    finally:
+        os.chdir(curr_dir)
+
+
+@pytest.fixture(scope='function')
+def namespace_repo(tmpdir, travis, monkeypatch):
+    """A repository with namespace packages."""
+
+    folder = str(tmpdir.join('repo'))
+    copy_repo('namespace_project', folder)
+
+    curr_dir = os.getcwd()
+    try:
+        os.chdir(folder)
+
+        monkeypatch.syspath_prepend(os.path.abspath(folder))
+        monkeypatch.setenv('GITHUB_TOKEN', "github_token")
+        monkeypatch.setenv('PYPI_USER', 'test_user')
+        monkeypatch.setenv('PYPI_PASS', 'test_pass')
+        monkeypatch.setenv('SLACK_TOKEN', 'test_slack_token')
+        monkeypatch.setenv('SLACK_WEB_HOOK', 'http://127.0.0.1:8000/nothing')
+
+        multipackage_main(['init'])
+
+        with open(os.path.join(".multipackage", "components.txt"), 'a') as outfile:
+            outfile.write('\niotile_analytics_core: ./iotile_analytics_core\n')
+            outfile.write('iotile_analytics_interactive: ./iotile_analytics_interactive\n')
+            outfile.write('iotile_analytics_offline: ./iotile_analytics_offline\n')
         yield folder
     finally:
         os.chdir(curr_dir)
@@ -207,3 +246,32 @@ def test_twine_release(uni_repo, pypi_url, pypi, slack, slack_url):
     assert pypi.error_count == 0
     assert slack.request_count == 1
     assert slack.error_count == 0
+
+
+def test_namespace_finding(namespace_repo):
+    """Make sure we discover namespaces correctly."""
+
+    repo = Repository(".")
+    template = repo.template
+
+    assert template.namespace_packages == ['iotile_analytics']
+    assert template.toplevel_packages == {
+        'iotile_analytics_core': ['iotile_analytics'],
+        'iotile_analytics_interactive': ['iotile_analytics'],
+        'iotile_analytics_offline': ['iotile_analytics'],
+    }
+
+    assert template.desired_packages == {
+        'iotile_analytics_core': ['iotile_analytics.core'],
+        'iotile_analytics_interactive': ['iotile_analytics.interactive'],
+        'iotile_analytics_offline': ['iotile_analytics.offline'],
+    }
+
+
+def test_namespace_docs(namespace_repo):
+    """Make sure we can build documentation for namespace repos."""
+
+    multipackage_main(['update'])
+
+    retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'build_documentation.py')])
+    assert retval == 0

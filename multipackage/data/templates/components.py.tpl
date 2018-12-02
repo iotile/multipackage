@@ -4,6 +4,7 @@ COMPONENTS = {
 {%- for name, value in component.options | dictsort %}
 {{ name | quote }}: {{ value | quote }}{% if not loop.last %}, {% endif %}
 {% endfor -%}
-}}
+}}{% if not loop.last %},{% endif %}
+
 {% endfor %}
 }

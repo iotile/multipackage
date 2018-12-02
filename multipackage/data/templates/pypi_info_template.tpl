@@ -15,7 +15,7 @@ COMPONENTS:
 {% for key, component in repo.components | dictsort %}
   - {{ component.name }}: {{component.relative_path}} 
     python-version={{ component.options.compatibility | default('universal')}}
-    packages: {{ repo.template.desired_packages | join(", ")}}
+    packages: {{ repo.template.desired_packages[key] | join(", ")}}
 {% endfor %}
 
 SUBSYSTEMS:
