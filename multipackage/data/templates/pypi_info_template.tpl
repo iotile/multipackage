@@ -24,22 +24,32 @@ SUBSYSTEMS:
     {{ subsystem.SHORT_DESCRIPTION | default("no description available") }}
 {% endfor %}
 
-{%- if repo.errors %}
+{%- if repo.count_messages('error') != 0 %}
 
 ERRORS:
-{% for error in repo.errors %}
+{% for error in repo.iter_messages('error') %}
   - {{ error[0] }}: {{ error[1] }}
     FIX: {{ error[2] }}
 
 {% endfor %}
 {% endif %}
 
-{%- if repo.warnings %}
+{%- if repo.count_messages('warning') != 0 %}
 
 WARNINGS:
-{% for warning in repo.warnings %}
+{% for warning in repo.iter_messages('warning') %}
   - {{ warning[0] }}: {{ warning[1] }}
     FIX: {{ warning[2] }}
+
+{% endfor %}
+{% endif -%}
+
+{%- if repo.count_messages('info') != 0 %}
+
+INFORMATIONAL MESSAGES:
+{% for info in repo.iter_messages('info') %}
+  - {{ info[0] }}: {{ info[1] }}
+    FIX: {{ info[2] }}
 
 {% endfor %}
 {% endif -%}

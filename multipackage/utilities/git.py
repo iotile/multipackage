@@ -62,6 +62,15 @@ class GITRepository(object):
 
         return info
 
+    def github_slug(self):
+        """Get the github slug from this repository.
+
+        This is a string of the format user/repo_name.
+        """
+
+        org, repo = self.github_name()
+        return "{}/{}".format(org, repo)
+
     @classmethod
     def version(cls):
         """Return the version of git installed."""
@@ -75,9 +84,9 @@ class GITRepository(object):
         return version_string.rstrip()
 
 
-
 _SSH_REGEX = r"git@github\.com:(?P<user>[a-zA-Z0-9_\-]+)/(?P<repo>[a-zA-Z0-9_\-]+)\.git"
 _HTTPS_REGEX = r"https://github\.com/(?P<user>[a-zA-Z0-9_\-]+)/(?P<repo>[a-zA-Z0-9_\-]+)\.git"
+
 
 def extract_github_name(remote):
     """Extract a github name from a remote URL.

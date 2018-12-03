@@ -13,6 +13,17 @@ class UsageError(Exception):
         self.suggestion = suggestion
 
 
+class InvalidSettingError(Exception):
+    """Raised when a setting in settings.json is not present or invalid."""
+
+    def __init__(self, variable_name, reason, suggestion=None):
+        super(InvalidSettingError, self).__init__("Missing or invalid setting {}".format(variable_name))
+
+        self.variable_name = variable_name
+        self.reason = reason
+        self.suggestion = suggestion
+
+
 class InvalidEnvironmentError(Exception):
     """Raised when a required environment variable is not present."""
 

@@ -73,8 +73,12 @@ jobs:
           committer-from-gh: true
           keep-history: true
           local-dir: built_docs
+{% if repo.iter_context('deploy') | list | length > 0 %}
       env:
-        - {{ env.github_token }}
+{% for name, _value in repo.iter_context('deploy', include_empty=false) %}
+        - {{ name | encrypt(only_value=false) }}
+{% endfor %}
+{% endif %}
     - stage: "Deploy"
       if: tag IS present
       script: python .multipackage/scripts/release_by_name.py $TRAVIS_TAG
@@ -83,11 +87,12 @@ jobs:
       python: "3.6"
       language: python
       name: "Release to PyPI Index"
+{% if repo.iter_context('deploy') | list | length > 0 %}
       env:
-        - {{ env.slack_web_hook }}
-        - {{ env.pypi_user }}
-        - {{ env.pypi_pass }}
-
+{% for name, _value in repo.iter_context('deploy', include_empty=false) %}
+        - {{ name | encrypt(only_value=false) }}
+{% endfor %}
+{% endif %}
 install:
 - pip install -r requirements_build.txt -r requirements_doc.txt
 {% for _key, component in components|dictsort %}
@@ -104,7 +109,7 @@ notifications:
   email: false
   slack:
     rooms:
-    - {{ env.slack_token }}
+    - {{ "SLACK_TOKEN" | encrypt(only_value=true) }}
     template:
     - "Build <%{build_url}|#%{build_number}> (<%{compare_url}|%{commit}>) of %{repository_slug}@%{branch} in PR <%{pull_request_url}|#%{pull_request_number}> by %{author} %{result} in %{elapsed_time}"
     on_success: always

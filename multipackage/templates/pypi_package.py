@@ -12,6 +12,7 @@ class PyPIPackageTemplate(RepositoryTemplate):
     SHORT_NAME = "pypi_package"
     SHORT_DESCRIPTION = "Builds, tests and releases PyPI packages from Travis-CI"
     INFO_TEMPLATE = "pypi_info_template.tpl"
+    DOCTOR_TEMPLATE = "pypi_doctor_template.tpl"
 
     def __init__(self):
         super(PyPIPackageTemplate, self).__init__()
@@ -43,7 +44,7 @@ class PyPIPackageTemplate(RepositoryTemplate):
         for key, comp in repo.components.items():
             for name, value in comp.options.items():
                 if name == 'compatibility' and value not in ('universal', 'python2', 'python3'):
-                    repo.add_error(".multipackage/components.txt",
+                    repo.error(".multipackage/components.txt",
                                    "Invalid compatibility option for component %s: %s" % (key, value),
                                    "Choices are universal, python2 or python3")
 

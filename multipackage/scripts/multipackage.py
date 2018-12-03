@@ -6,7 +6,7 @@ import sys
 import os
 import logging
 from multipackage import Repository
-from multipackage.travis import TravisCI
+from multipackage.external import TravisCI
 from multipackage.exceptions import InvalidEnvironmentError, UsageError
 from multipackage.utilities import GITRepository, render_template
 
@@ -21,24 +21,22 @@ packages that are released separately to PyPI.
 
 The major things you can do are:
 
-$ multipackage init <path to repo or cwd>
+$ multipackage init [path to repo, default cwd]
 
     Provision an initial set of scripts into the repository at the given
-    path or the CWD if path is not specified.  The program will ask you
-    a series of questions to confirm actions its taking and make sure
-    everything is setup correctly.
+    path or the CWD if path is not specified.
 
-$ multipackage update <path to repo or cwd>
+$ multipackage update [path to repo, default cwd]
 
     Update the build and release scripts in the given repository to the
     latest version included with this multipackage program.
 
-$ multipackage doctor
+$ multipackage doctor [path to repo, default cwd]
 
     Verify that all of your environment variables are set correctly for
     running init or update on a repository.
 
-$ multipackage info <path to repo or cwd>
+$ multipackage info [path to repo, default cwd]
 
     Get information on the packages inside the given repository.  The
     reposository must already have a working set of multipackage release
@@ -47,49 +45,59 @@ $ multipackage info <path to repo or cwd>
     This will also verify that all of the multipackage build/release scripts
     in the given repository are correctly installed and check for common
     errors.
-
-$ multipackage release <path to repo or cwd> <package name> <version>
-
-    Tag the given package for release.  Note that this just tags the package
-    for release, it does not actually release it.  Releasing happens on Travis
-    CI once the tagged commit is built and verified.  This method will check
-    for and prevent common release mistakes like not being on master, not
-    having fetched the latest changes, etc.
 """
 
-
-def verify_env_var(name, message):
+def _variable_status(value, declarations):
     """Check that an environment variable exists."""
 
-    if os.environ.get(name) is None:
-        print("  - %s: ERROR, NOT PRESENT" % name)
-        print("    Needed for %s" % message)
-        return 0
+    required = False
+    for decl in declarations:
+        if decl.required:
+            required = True
+            break
 
-    print("  - %s: OKAY" % name)
-    return 1
+    if value is not None:
+        return "PRESENT"
+
+    if required and value is None:
+        return "MISSING"
+
+    return "NOT PRESENT"
 
 
-def verify_environment():
+def doctor_repo(repo_path):
     """Verify that all required environment settings are correct."""
 
-    _travis = TravisCI()
-    GITRepository.version()
+    repo = create_repo(repo_path)
 
-    print("\nChecking for required environment variables:")
+    if repo_path is None:
+        repo_path = ""
 
-    found = 0
-    found += verify_env_var("TRAVIS_TOKEN_ORG", "encrypting environment variables on travis-ci.org")
-    found += verify_env_var("TRAVIS_TOKEN_COM", "encrypting environment variables on travis-ci.com")
-    found += verify_env_var("GITHUB_TOKEN", "deploying documentation to github pages")
-    found += verify_env_var("SLACK_TOKEN", "sending slack notifications")
+    try:
+        GITRepository(repo_path)
+    except UsageError:
+        print("STATUS: Repository is not a valid git repo.\n")
+        print("Make sure your path is correct.\n")
+        return 2
 
-    print()
+    if repo.initialized is False:
+        print("\nSTATUS: Repository has not been set up with multipackage.\n")
+        print("Set it up with:\n\n\tmultipackage init {}\n".format(repo_path))
+        return 1
 
-    if found == 3:
-        return 0
+    variables = {
+        "repo": repo,
+        "repo_path": repo_path
+    }
 
-    return 1
+    filters = {
+        "variable_status": _variable_status
+    }
+
+    info = render_template(repo.template.DOCTOR_TEMPLATE, variables, filters=filters)
+    sys.stdout.write(info)
+
+    return 0
 
 
 def create_repo(repo_path):
@@ -107,6 +115,7 @@ def init_repo(repo_path, clean):
     repo = create_repo(repo_path)
     repo.initialize(clean=clean)
 
+    return 0
 
 def update_repo(repo_path):
     """Update the installed files in a repository."""
@@ -127,7 +136,7 @@ def update_repo(repo_path):
     return 0
 
 
-def verify_repo(repo_path):
+def info_repo(repo_path):
     """Get info on the given repository.
 
     Args:
@@ -181,8 +190,9 @@ def build_parser():
     init_parser.add_argument('-f', '--force', action="store_true", help="Forcibly clean and reinitialize the repo")
     init_parser.add_argument('repo', nargs='?', help="Optional path to repository, defaults to cwd")
 
-    _doctor_parser = subparser.add_parser('doctor', description="Verify your environment settings and connectivity.",
-                                          help='verify your enviornment for multipackage usage')
+    doctor_parser = subparser.add_parser('doctor', description="Verify your environment settings and connectivity.",
+                                         help='verify your enviornment for multipackage usage')
+    doctor_parser.add_argument('repo', nargs='?', help="Optional path to repository, defaults to cwd")
 
     info_parser = subparser.add_parser('info', description="Get info on the given repository and verify it is correctly installed",
                                        help="get info and any errors with a repository")
@@ -264,9 +274,9 @@ def main(argv=None):
 
     try:
         if args.action == 'doctor':
-            retval = verify_environment()
+            retval = doctor_repo(args.repo)
         elif args.action == 'info':
-            retval = verify_repo(args.repo)
+            retval = info_repo(args.repo)
         elif args.action == "init":
             retval = init_repo(args.repo, args.force)
         elif args.action == "update":

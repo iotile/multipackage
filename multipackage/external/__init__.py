@@ -1,4 +1,4 @@
-"""Travis CI API Wrapper."""
+"""API Wrappers for Third-Party Services."""
 
 from .travis import TravisCI
 

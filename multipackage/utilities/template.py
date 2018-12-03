@@ -7,7 +7,7 @@ def _quote(obj):
     return '"' + obj + '"'
 
 
-def render_template(template_name, info, out_path=None, adjust_newlines=True):
+def render_template(template_name, info, out_path=None, adjust_newlines=True, filters=None):
     """Render a template using the variables in info.
 
     You can optionally render to a file by passing out_path.  This assumes
@@ -26,6 +26,8 @@ def render_template(template_name, info, out_path=None, adjust_newlines=True):
             perform substitutions.
         adjust_newlines (bool): Automatically convert the output to have
             platform specific newlines.  Default: True.
+        filters (dict): Optional dict of callables that are provided as filters
+            to the underlying template.
 
     Returns:
         string: The rendered template data.
@@ -35,6 +37,9 @@ def render_template(template_name, info, out_path=None, adjust_newlines=True):
                       trim_blocks=True, lstrip_blocks=True)
 
     env.filters['quote'] = _quote
+
+    if filters is not None:
+        env.filters.update(filters)
 
     template = env.get_template(template_name)
     result = template.render(info)

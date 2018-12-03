@@ -27,9 +27,9 @@ class ManifestFile(object):
             will be initialized as empty.
         base_path (str): The base path that will be used to store relative
             paths for keys.
-        reporter (object): An error reporter class that has an add_warning
-            and add_error method.  This is compatible with the signatures
-            of the Repository class so it can be passed directly.
+        reporter (object): An error reporter class that has a ``warning``,
+            `error`` and ``info`` method.  This is compatible with the
+            signatures of the Repository class so it can be passed directly.
     """
 
     def __init__(self, path, base_path, reporter):
@@ -44,7 +44,7 @@ class ManifestFile(object):
 
     def _try_load(self):
         if not os.path.exists(self.path):
-            self._reporter.add_error(self._relative_path, "Manifest file does not exist",
+            self._reporter.error(self._relative_path, "Manifest file does not exist",
                                      "Run `multipackage init --force`")
             return
 
@@ -53,12 +53,12 @@ class ManifestFile(object):
                 data = json.load(infile)
         except ValueError:
             self._logger.exception("Error parsing manifest file %s", self.path)
-            self._reporter.add_error(self._relative_path, "Could not parse JSON in manifest file",
+            self._reporter.error(self._relative_path, "Could not parse JSON in manifest file",
                                      "Run `multipackage init --force`")
             return
         except IOError:
             self._logger.exception("Error loading manifest file %s", self.path)
-            self._reporter.add_error(self._relative_path, "Could not load manifest file",
+            self._reporter.error(self._relative_path, "Could not load manifest file",
                                      "Run `multipackage init --force`")
             return
 
@@ -73,7 +73,7 @@ class ManifestFile(object):
 
             if hash_value is None or hash_type is None:
                 self._logger.error("Invalid manifest file entry for key %s: %s", key, value)
-                self._reporter.add_error(self._relative_path, "Invalid manifest entry for key %s" % key,
+                self._reporter.error(self._relative_path, "Invalid manifest entry for key %s" % key,
                                          "Run `multipackage init --force`")
                 continue
 
@@ -97,7 +97,7 @@ class ManifestFile(object):
                 status = INVALID_HASH
 
                 if report:
-                    self._reporter.add_error(key, "File hash does not match",
+                    self._reporter.error(key, "File hash does not match",
                                              "Run `multipackage update`")
 
             self.files[key] = ManagedFile(key, info.absolute_path, status, info.expected_hash, info.hash_type)

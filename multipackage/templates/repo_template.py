@@ -18,6 +18,9 @@ class RepositoryTemplate(object):
     INFO_TEMPLATE = None
     """The name of a jinja2 template that will be used to render the multipackge info results."""
 
+    DOCTOR_TEMPLATE = None
+    """The name of a jinja2 template that will be use dto render the multipackage doctor results."""
+
     def __init__(self):
         pass
 

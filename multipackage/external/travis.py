@@ -17,7 +17,7 @@ from Crypto.PublicKey import RSA
 from ..exceptions import InvalidEnvironmentError, InternalError
 
 
-class TravisCI:
+class TravisCI(object):
     """Wrapper for Travis CI API v3.
 
     This wrapper is not complete but currently just implements the features

@@ -2,11 +2,34 @@
 
 from __future__ import print_function
 import os
+import sys
 import subprocess
 import shutil
+from builtins import open
 import pytest
 from multipackage.scripts.multipackage import main as multipackage_main
 from multipackage import Repository
+from multipackage.subsystems import TravisSubsystem
+from multipackage.utilities import line_hash
+
+
+def assert_file(folder, relpath, expected_hash):
+    """Assert that a file has a given line hash."""
+
+    path = os.path.join(folder, relpath)
+
+    print("---------- File contents at %s -----------")
+    with open(path, "r", encoding="utf-8") as infile:
+        data = infile.read()
+        sys.stdout.write(data.encode('utf-8'))
+
+    print("\n----------  End file contents  -----------")
+
+    actual_hash = line_hash(path)
+    print("Actual   hash: %s" % actual_hash)
+    print("Expected hash: %s" % expected_hash)
+
+    assert expected_hash == actual_hash
 
 
 def copy_repo(name, dest_folder, init_git=True, git_remote="git@github.com:com/my_package.git"):
@@ -189,6 +212,18 @@ def uni_repo(bare_repo):
     return bare_repo
 
 
+@pytest.fixture(scope='function')
+def bare_uni(bare_repo):
+    """Create an initialized (but not updated) python 2/3 repository."""
+
+    multipackage_main(['init'])
+
+    with open(os.path.join(".multipackage", "components.txt"), 'a') as outfile:
+        outfile.write('\nmy_package: ./, compatibility=universal\n')
+
+    return bare_repo
+
+
 def test_unitialized_info(bare_repo, capsys):
     """Test multipackage init."""
 
@@ -275,3 +310,13 @@ def test_namespace_docs(namespace_repo):
 
     retval, _stdout, _stderr = run_in_sandbox(['python', os.path.join('.multipackage', 'scripts', 'build_documentation.py')])
     assert retval == 0
+
+
+def test_travis_encryption(bare_uni):
+    """Make sure we properly generate .travis.yml files with secrets."""
+
+    repo = Repository(bare_uni)
+    travis_sub = [x for x in repo.subsystems if isinstance(x, TravisSubsystem)][0]
+
+    travis_sub.update(repo.options)
+

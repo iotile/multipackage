@@ -13,6 +13,17 @@ class BasicPythonSupport(object):
         self._repo = repo
         self._logger = logging.getLogger(__name__)
 
+        repo.required_secret('PYPI_USER', self.SHORT_NAME,
+                             'Username for uploading packages to the target PyPI Index',
+                             context="deploy")
+        repo.required_secret('PYPI_PASS', self.SHORT_NAME,
+                             'Password for uploading packages to the target PyPI Index',
+                             context="deploy")
+
+        repo.optional_secret('PYPI_URL', self.SHORT_NAME,
+                             'URL of a custom PyPI index that we should release to',
+                             context="deploy")
+
     def update(self, options):
         """Update the basic subsystem."""
 
