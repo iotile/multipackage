@@ -54,6 +54,15 @@ def copy_repo(name, dest_folder, init_git=True, git_remote="git@github.com:com/m
         os.chdir(curr_dir)
 
 
+def commit_repo():
+    """Git commit everything in the repository."""
+
+    subprocess.check_call(['git', 'config', 'user.email', 'test@test.com'])
+    subprocess.check_call(['git', 'config', 'user.name', 'Test User'])
+    subprocess.check_call(['git', 'add', '.'])
+    subprocess.check_output(['git', 'commit', '-m', 'initial_checkin'])
+
+
 def run_in_sandbox(args, pypi_url=None, slack=None):
     """Run a command with env variables to point to local servers and proper pythonpath.
 
@@ -290,8 +299,7 @@ def test_twine_release(uni_repo, pypi_url, pypi, slack, slack_url):
 def test_tag_release(uni_repo):
     """Make sure we can tag a test release and a real release."""
 
-    subprocess.check_call(['git', 'add', '.'])
-    subprocess.check_output(['git', 'commit', '-m', 'initial_checkin'])
+    commit_repo()
 
     retval, _stdout, _stderr = run_in_sandbox('python .multipackage/scripts/tag_release.py my_package -t -y -f -n')
     assert retval == 0
@@ -345,4 +353,3 @@ def test_travis_encryption(bare_uni):
     travis_sub = [x for x in repo.subsystems if isinstance(x, TravisSubsystem)][0]
 
     travis_sub.update(repo.options)
-
