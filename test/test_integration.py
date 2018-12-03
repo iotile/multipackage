@@ -5,7 +5,6 @@ import os
 import sys
 import subprocess
 import shutil
-from builtins import open
 import pytest
 from multipackage.scripts.multipackage import main as multipackage_main
 from multipackage import Repository
@@ -19,9 +18,10 @@ def assert_file(folder, relpath, expected_hash):
     path = os.path.join(folder, relpath)
 
     print("---------- File contents at %s -----------")
-    with open(path, "r", encoding="utf-8") as infile:
+
+    with open(path, "rb") as infile:
         data = infile.read()
-        sys.stdout.write(data.encode('utf-8'))
+        sys.stdout.write(data)
 
     print("\n----------  End file contents  -----------")
 
