@@ -1,4 +1,4 @@
-# Template-based Management of CI and CD scripts for Code Repositories
+# A Tool for Sharing Best-Practice CI/CD Templates
 
 <!-- MarkdownTOC autolink="true" bracket="round" -->
 
