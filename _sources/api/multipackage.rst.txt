@@ -30,10 +30,10 @@ Subpackages
     :toctree:
 
     ~multipackage.data
+    ~multipackage.external
     ~multipackage.scripts
     ~multipackage.subsystems
     ~multipackage.templates
-    ~multipackage.travis
     ~multipackage.utilities
 
 

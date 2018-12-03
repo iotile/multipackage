@@ -180,10 +180,13 @@
 <tr class="row-odd"><td><a class="reference internal" href="#multipackage.repo.Component" title="multipackage.repo.Component"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Component</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.repo.ErrorMessage" title="multipackage.repo.ErrorMessage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ErrorMessage</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.repo.EnvironmentVariable" title="multipackage.repo.EnvironmentVariable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnvironmentVariable</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.repo.Repository" title="multipackage.repo.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.repo.Message" title="multipackage.repo.Message"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Message</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.repo.Repository" title="multipackage.repo.Repository"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Repository</span></code></a></td>
 <td>High-level representation of an entire repository.</td>
 </tr>
 </tbody>
@@ -192,25 +195,31 @@
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="multipackage.repo.ErrorMessage">
-<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">ErrorMessage</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.ErrorMessage" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.repo.Message">
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Message</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.Message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 <dl class="attribute">
-<dt id="multipackage.repo.ErrorMessage.file">
-<code class="descname">file</code><a class="headerlink" href="#multipackage.repo.ErrorMessage.file" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.repo.Message.file">
+<code class="descname">file</code><a class="headerlink" href="#multipackage.repo.Message.file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 0</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="multipackage.repo.ErrorMessage.message">
-<code class="descname">message</code><a class="headerlink" href="#multipackage.repo.ErrorMessage.message" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.repo.Message.message">
+<code class="descname">message</code><a class="headerlink" href="#multipackage.repo.Message.message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 1</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="multipackage.repo.ErrorMessage.suggestion">
-<code class="descname">suggestion</code><a class="headerlink" href="#multipackage.repo.ErrorMessage.suggestion" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.repo.Message.suggestion">
+<code class="descname">suggestion</code><a class="headerlink" href="#multipackage.repo.Message.suggestion" title="Permalink to this definition">¶</a></dt>
 <dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Message.type">
+<code class="descname">type</code><a class="headerlink" href="#multipackage.repo.Message.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
 </dd></dl>
 
 </dd></dl>
@@ -240,29 +249,69 @@
 </dd></dl>
 
 <dl class="class">
+<dt id="multipackage.repo.EnvironmentVariable">
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">EnvironmentVariable</code><span class="sig-paren">(</span><em>name</em>, <em>subsystem</em>, <em>contexts</em>, <em>usage</em>, <em>required</em>, <em>verify</em><span class="sig-paren">)</span><a class="headerlink" href="#multipackage.repo.EnvironmentVariable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dl class="attribute">
+<dt id="multipackage.repo.EnvironmentVariable.contexts">
+<code class="descname">contexts</code><a class="headerlink" href="#multipackage.repo.EnvironmentVariable.contexts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.EnvironmentVariable.name">
+<code class="descname">name</code><a class="headerlink" href="#multipackage.repo.EnvironmentVariable.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.EnvironmentVariable.required">
+<code class="descname">required</code><a class="headerlink" href="#multipackage.repo.EnvironmentVariable.required" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.EnvironmentVariable.subsystem">
+<code class="descname">subsystem</code><a class="headerlink" href="#multipackage.repo.EnvironmentVariable.subsystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.EnvironmentVariable.usage">
+<code class="descname">usage</code><a class="headerlink" href="#multipackage.repo.EnvironmentVariable.usage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.EnvironmentVariable.verify">
+<code class="descname">verify</code><a class="headerlink" href="#multipackage.repo.EnvironmentVariable.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 5</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="multipackage.repo.Repository">
-<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Repository</code><span class="sig-paren">(</span><em>path</em>, <em>nogit=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">multipackage.repo.</code><code class="descname">Repository</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>High-level representation of an entire repository.</p>
 <p>This is the main class inside <code class="docutils literal notranslate"><span class="pre">multipackage</span></code> that processes a complete
 repository.  It reads two files from the repository:</p>
 <blockquote>
 <div><ul class="simple">
-<li>multipackage.json: The overall settings for this repository</li>
-<li>multipackage_manifest.json: A manifest file of all of the
-files multipackage is managing.</li>
+<li>.multipackage/settings.json: The overall settings for this repository</li>
+<li>.multipackage/manifest.json: A manifest file of all of the files
+multipackage is managing including hashes to check for changes.</li>
 </ul>
 </div></blockquote>
+<p>Using these files, the Repository class will load in the correct
+repository template that informs it what other files are managed and how
+to parse the settings stored inside <code class="docutils literal notranslate"><span class="pre">settings.json</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A path to the repository root directory.</li>
-<li><strong>nogit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Optional parameter to support creating a repository
-from a non-git repository.  This is useful for testing purposes.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A path to the repository root directory.</td>
 </tr>
 </tbody>
 </table>
@@ -274,6 +323,11 @@ from a non-git repository.  This is useful for testing purposes.</li>
 <dl class="attribute">
 <dt id="multipackage.repo.Repository.MULTIPACKAGE_DIR">
 <code class="descname">MULTIPACKAGE_DIR</code><em class="property"> = '.multipackage'</em><a class="headerlink" href="#multipackage.repo.Repository.MULTIPACKAGE_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.repo.Repository.SETTINGS_VERSION">
+<code class="descname">SETTINGS_VERSION</code><em class="property"> = '0.1'</em><a class="headerlink" href="#multipackage.repo.Repository.SETTINGS_VERSION" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -302,11 +356,6 @@ from a non-git repository.  This is useful for testing purposes.</li>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="multipackage.repo.Repository.SETTINGS_VERSION">
-<code class="descname">SETTINGS_VERSION</code><em class="property"> = '0.1'</em><a class="headerlink" href="#multipackage.repo.Repository.SETTINGS_VERSION" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
 <dt id="multipackage.repo.Repository.clean">
 <code class="descname">clean</code><a class="headerlink" href="#multipackage.repo.Repository.clean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether we have any errors.</p>
@@ -319,16 +368,62 @@ from a non-git repository.  This is useful for testing purposes.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="multipackage.repo.Repository.github_slug">
-<code class="descname">github_slug</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.github_slug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.github_slug" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the github slug from this repository.</p>
-<p>This is a string of the format user/repo_name.</p>
+<dt id="multipackage.repo.Repository.error">
+<code class="descname">error</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record an error.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="multipackage.repo.Repository.add_error">
-<code class="descname">add_error</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_error" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record an error.</p>
+<dt id="multipackage.repo.Repository.warning">
+<code class="descname">warning</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.warning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record a warning.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.info">
+<code class="descname">info</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Record an info message.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.iter_messages">
+<code class="descname">iter_messages</code><span class="sig-paren">(</span><em>message_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.iter_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.iter_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all messages of a given type.</p>
+<p>The message_type parameter must be one of info, warning or error and
+those messages will be returned in the order they were added to the
+Repository.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The type of message that you want to iterate
+over.  One of “info”, “warning”, or “error”.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An iterable of Message objects.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable of Message</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.count_messages">
+<code class="descname">count_messages</code><span class="sig-paren">(</span><em>message_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.count_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.count_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Count how many messages of a given type there are.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The type of message that you want to iterate
+over.  One of “info”, “warning”, or “error”.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The number of messages of the given type.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -338,9 +433,192 @@ from a non-git repository.  This is useful for testing purposes.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="multipackage.repo.Repository.add_warning">
-<code class="descname">add_warning</code><span class="sig-paren">(</span><em>file</em>, <em>message</em>, <em>suggestion</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_warning" title="Permalink to this definition">¶</a></dt>
-<dd><p>Record a warning.</p>
+<dt id="multipackage.repo.Repository.required_secret">
+<code class="descname">required_secret</code><span class="sig-paren">(</span><em>name</em>, <em>subsystem</em>, <em>usage</em>, <em>verify=None</em>, <em>context='all'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.required_secret"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.required_secret" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a required environment variable.</p>
+<p>See the documentation for Repository.add_secret().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.optional_secret">
+<code class="descname">optional_secret</code><span class="sig-paren">(</span><em>name</em>, <em>subsystem</em>, <em>usage</em>, <em>verify=None</em>, <em>context='all'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.optional_secret"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.optional_secret" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an optional environment variable.</p>
+<p>See the documentation for Repository.add_secret().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.add_secret">
+<code class="descname">add_secret</code><span class="sig-paren">(</span><em>name</em>, <em>subsystem</em>, <em>usage</em>, <em>required</em>, <em>verify=None</em>, <em>context='all'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.add_secret"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.add_secret" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an optional or required environment variable.</p>
+<p>Environment variables are needed when Repository.update() is called
+and are used to convey secret information that must be encrypted and
+stored in the repository itself.  The way this information is used
+and what specific environment variables are required is 100% decided
+by the RepositoryTemplate that is managing the repository.</p>
+<p>This method exists for the RepositoryTemplate to convey to the
+Repository class what environment variables it needs and whether they
+are required or optional.  If the relevant subsystem has a method
+of verifying the contents of the environment variable, it can also
+pass a callable function in the verify parameter that will be used
+to verify the value of the environment variable.</p>
+<p>This method can be called multiple times with the same <code class="docutils literal notranslate"><span class="pre">name</span></code>
+parameter by different subsystems if they both use the same
+enviornment variable.</p>
+<p>The context parameter must be a comma separated list with each entry
+being one of “update”, “all”, “build”, “deploy”.  The context
+parameter controls when an environment variable is needed.  It is used
+to get lists of all environment variables that might be needed during,
+e.g. building or deploying a project.  Only variables marked for a
+given context are provided when that context runs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the environment variable</li>
+<li><strong>subsystem</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the subsystem that needs the variable</li>
+<li><strong>usage</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A short, one line description of how the variable is
+used by the subsystem.</li>
+<li><strong>required</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether the variable is optional or required.</li>
+<li><strong>verify</strong> (<em>callable</em>) – Optional callable with signature:
+callable(name, value) that is called with the name and value
+of the environment variable as strings and should return None
+if the variable is valid.  If the variable is invalid, it
+should return a <code class="docutils literal notranslate"><span class="pre">str</span></code> instance with a short message
+describing why the variable’s contents are not valid.</li>
+<li><strong>context</strong> (<em>list of str</em>) – A comma separated list of contexts during
+which this environment variable is needed.  Supported contexts
+are update, all, build an deploy.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.iter_secrets">
+<code class="descname">iter_secrets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.iter_secrets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.iter_secrets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all declared secrets.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.get_secret">
+<code class="descname">get_secret</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.get_secret"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.get_secret" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a secret from the user’s environment.</p>
+<p>If the secret is marked as required and it is not present, an
+exception is raised, otherwise None is returned when the value
+is not present.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the secret that was previously registered
+with add_secret(), required_secret(), or optional_secret().</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The secret’s value or None if it is optional and not present.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidEnvironmentError</span></code> – If the secret is required and not present.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">IntenalError</span></code> – If <code class="docutils literal notranslate"><span class="pre">name</span></code> was never declared as a secret.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.iter_context">
+<code class="descname">iter_context</code><span class="sig-paren">(</span><em>context</em>, <em>include_empty=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.iter_context"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.iter_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over environment variables applicable to a given context.</p>
+<p>The <cite>context</cite> parameter must be one of ‘update’, ‘build’, or ‘deploy’
+and will be used to select environment variables needed in that
+context.</p>
+<p>The variables will be yielded in sorted order by name for consistency.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>context</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The context we wish to get variables for.  Must
+be one of update, build or deploy.  Variables marked with
+all will be returned for all contexts.</li>
+<li><strong>include_empty</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Also yield None for optional environement
+variables that are not defined in the user’s ENVIRONMENT.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><p>An iterable of variable name and value.</p>
+<p>Each variable that is marked with the passed context will be
+returned as part of the iterable in stable sorted order.  If the
+variable is marked as optional and it is not defined in the
+process’s environment, then a None value will be yielded if
+include_empty is True (the default behvaior), otherwise the
+variable will be skipped as if it were not declared at all.</p>
+</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">iterable of str, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.get_setting">
+<code class="descname">get_setting</code><span class="sig-paren">(</span><em>name</em>, <em>default=&lt;object object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.get_setting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.get_setting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of a setting from the options dictionary.</p>
+<p>The name of the setting can be a series of dot separated identifiers
+that will be resolved recursively into subkeys.</p>
+<p>For example, “doc.deploy” would be the key “deploy” in a dictionary
+assigned to the key “doc”.  “doc” would return the entire doc
+dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the setting that we want to fetch.</li>
+<li><strong>default</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – If the setting is optional, you can specify
+a default value.  The default behavior is to raise an
+exception when a setting is missing.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The value of the setting.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="multipackage.repo.Repository.set_setting">
+<code class="descname">set_setting</code><span class="sig-paren">(</span><em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.set_setting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.set_setting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change or set an option in settings.json.</p>
+<p>The change is flushed out to the settings file immediately.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the setting you want to set or change.</li>
+<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – A json serializable value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -440,7 +718,7 @@ subsequently overwriting them.</li>
 
 <dl class="method">
 <dt id="multipackage.repo.Repository.ensure_template">
-<code class="descname">ensure_template</code><span class="sig-paren">(</span><em>relative_path</em>, <em>template</em>, <em>variables=None</em>, <em>present=True</em>, <em>overwrite=True</em>, <em>raw=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_template" title="Permalink to this definition">¶</a></dt>
+<code class="descname">ensure_template</code><span class="sig-paren">(</span><em>relative_path</em>, <em>template</em>, <em>variables=None</em>, <em>present=True</em>, <em>overwrite=True</em>, <em>raw=False</em>, <em>filters=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/repo.html#Repository.ensure_template"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.repo.Repository.ensure_template" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ensure that the contents of a given file match a template.</p>
 <p>This function will render the given template shipped with the
 multipackage package.</p>
@@ -463,6 +741,8 @@ subsequently overwriting them.</li>
 <li><strong>raw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Do not actually fill in the template, just copy it into place.
 This is useful if the file itself is a jinja2 template that should
 be rendered later.</li>
+<li><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Optional dictionary of callable filters that will be passed
+to jinja2 for use in the template formatting.</li>
 </ul>
 </td>
 </tr>

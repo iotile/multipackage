@@ -156,14 +156,17 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">builtins</span> <span class="k">import</span> <span class="nb">open</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
-<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">InternalError</span>
-<span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">atomic_json</span><span class="p">,</span> <span class="n">ManagedFileSection</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">GITRepository</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">,</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">InvalidSettingError</span>
+<span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">atomic_json</span><span class="p">,</span> <span class="n">ManagedFileSection</span><span class="p">,</span> <span class="n">render_template</span>
 <span class="kn">from</span> <span class="nn">.manifest</span> <span class="k">import</span> <span class="n">ManifestFile</span>
 <span class="kn">from</span> <span class="nn">.templates</span> <span class="k">import</span> <span class="n">PyPIPackageTemplate</span>
 
 
-<span class="n">ErrorMessage</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;ErrorMessage&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;suggestion&#39;</span><span class="p">])</span>
+<span class="n">Message</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Message&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;suggestion&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">])</span>
 <span class="n">Component</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Component&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;relative_path&#39;</span><span class="p">,</span> <span class="s1">&#39;options&#39;</span><span class="p">])</span>
+<span class="n">EnvironmentVariable</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;EnvironmentVariable&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;subsystem&#39;</span><span class="p">,</span> <span class="s1">&#39;contexts&#39;</span><span class="p">,</span> <span class="s1">&#39;usage&#39;</span><span class="p">,</span> <span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="s1">&#39;verify&#39;</span><span class="p">])</span>
+
+<span class="n">_MISSING</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="Repository"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository">[docs]</a><span class="k">class</span> <span class="nc">Repository</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -172,28 +175,30 @@
 <span class="sd">    This is the main class inside ``multipackage`` that processes a complete</span>
 <span class="sd">    repository.  It reads two files from the repository:</span>
 
-<span class="sd">      - multipackage.json: The overall settings for this repository</span>
-<span class="sd">      - multipackage_manifest.json: A manifest file of all of the</span>
-<span class="sd">        files multipackage is managing.</span>
+<span class="sd">      - .multipackage/settings.json: The overall settings for this repository</span>
+<span class="sd">      - .multipackage/manifest.json: A manifest file of all of the files</span>
+<span class="sd">        multipackage is managing including hashes to check for changes.</span>
+
+<span class="sd">    Using these files, the Repository class will load in the correct</span>
+<span class="sd">    repository template that informs it what other files are managed and how</span>
+<span class="sd">    to parse the settings stored inside ``settings.json``.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        path (str): A path to the repository root directory.</span>
-<span class="sd">        nogit (bool): Optional parameter to support creating a repository</span>
-<span class="sd">            from a non-git repository.  This is useful for testing purposes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">DEFAULT_TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;pypi_package&quot;</span>
     <span class="n">MULTIPACKAGE_DIR</span> <span class="o">=</span> <span class="s2">&quot;.multipackage&quot;</span>
-    <span class="n">SCRIPT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;scripts&quot;</span><span class="p">)</span>
+    <span class="n">SETTINGS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
 
+    <span class="n">SCRIPT_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;scripts&quot;</span><span class="p">)</span>
     <span class="n">SETTINGS_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;settings.json&quot;</span><span class="p">)</span>
     <span class="n">MANIFEST_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;manifest.json&quot;</span><span class="p">)</span>
     <span class="n">COMPONENT_FILE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">MULTIPACKAGE_DIR</span><span class="p">,</span> <span class="s2">&quot;components.txt&quot;</span><span class="p">)</span>
 
     <span class="n">COMPONENT_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(?P&lt;package&gt;[a-zA-Z_0-9]+):\s*(?P&lt;path&gt;[\.a-zA-Z_\-0-9</span><span class="se">\\</span><span class="s2">/]+)(?P&lt;options&gt;(\s*,\s*[a-zA-Z_0-9_]+\s*=\s*[a-zA-Z_0-9_]+)+)?$&quot;</span>
-    <span class="n">SETTINGS_VERSION</span> <span class="o">=</span> <span class="s2">&quot;0.1&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">nogit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -212,24 +217,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subsystems</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_settings</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">template_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_load</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span> <span class="o">=</span> <span class="n">ManifestFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MANIFEST_FILE</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">nogit</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="o">=</span> <span class="n">GITRepository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_try_load_components</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">template_name</span> <span class="o">!=</span> <span class="s2">&quot;pypi_package&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Templates other than &#39;pypi_package&#39; are not yet supported.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">template_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Templates other than &#39;</span><span class="si">{}</span><span class="s2">&#39; are not yet supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">PyPIPackageTemplate</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -238,7 +240,7 @@
     <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Whether we have any errors.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">count_messages</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">settings_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -246,18 +248,6 @@
 
         <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">verify_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;unchanged&quot;</span>
-
-<div class="viewcode-block" id="Repository.github_slug"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.github_slug">[docs]</a>    <span class="k">def</span> <span class="nf">github_slug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Get the github slug from this repository.</span>
-
-<span class="sd">        This is a string of the format user/repo_name.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">git</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;You cannot call github_slug() if you pass nogit to the constructor&quot;</span><span class="p">)</span>
-
-        <span class="n">org</span><span class="p">,</span> <span class="n">repo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">git</span><span class="o">.</span><span class="n">github_name</span><span class="p">()</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">org</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_try_load_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Try to load the list of components from this repository.</span>
@@ -271,7 +261,7 @@
 
         <span class="n">component_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">component_path</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Missing components list&quot;</span><span class="p">,</span> <span class="s2">&quot;Run `multipackage update` to reinitialize&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Missing components list&quot;</span><span class="p">,</span> <span class="s2">&quot;Run `multipackage update` to reinitialize&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">component_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
@@ -286,16 +276,16 @@
 
             <span class="n">result</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Could not parse line &#39;</span><span class="si">%s</span><span class="s2">&#39; in components file&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">,</span>
-                               <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Could not parse line &#39;</span><span class="si">%s</span><span class="s2">&#39; in components file&quot;</span> <span class="o">%</span> <span class="n">line</span><span class="p">,</span>
+                           <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="n">package</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">option_string</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;package&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;options&quot;</span><span class="p">)</span>
             <span class="n">options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_options_string</span><span class="p">(</span><span class="n">option_string</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">path</span><span class="p">)):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Component folder &#39;</span><span class="si">%s</span><span class="s2">&#39; specified in components file is not a directory&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span>
-                               <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">COMPONENT_FILE</span><span class="p">,</span> <span class="s2">&quot;Component folder &#39;</span><span class="si">%s</span><span class="s2">&#39; specified in components file is not a directory&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">,</span>
+                           <span class="s2">&quot;Manually fix the file, verify with `multipackage info` and then run `multipackage update`&quot;</span><span class="p">)</span>
                 <span class="k">continue</span>
 
             <span class="n">component</span> <span class="o">=</span> <span class="n">Component</span><span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
@@ -334,7 +324,7 @@
 
         <span class="n">settings_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">settings_path</span><span class="p">):</span>
-            <span class="k">return</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -345,45 +335,344 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error opening file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">settings_path</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Could not load file due to IO error&quot;</span><span class="p">,</span> <span class="s2">&quot;Check the file&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Could not load file due to IO error&quot;</span><span class="p">,</span> <span class="s2">&quot;Check the file&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Error loading json from file </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">settings_path</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;File does not contain valid json&quot;</span><span class="p">,</span> <span class="s2">&quot;Verify the file&#39;s contents&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;File does not contain valid json&quot;</span><span class="p">,</span> <span class="s2">&quot;Verify the file&#39;s contents&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Repository.add_error"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.add_error">[docs]</a>    <span class="k">def</span> <span class="nf">add_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
+<div class="viewcode-block" id="Repository.error"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.error">[docs]</a>    <span class="k">def</span> <span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Record an error.&quot;&quot;&quot;</span>
 
-        <span class="n">error</span> <span class="o">=</span> <span class="n">ErrorMessage</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">err</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.warning"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.warning">[docs]</a>    <span class="k">def</span> <span class="nf">warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Record a warning.&quot;&quot;&quot;</span>
+
+        <span class="n">warn</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">warn</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.info"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.info">[docs]</a>    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Record an info message.&quot;&quot;&quot;</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">Message</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.iter_messages"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.iter_messages">[docs]</a>    <span class="k">def</span> <span class="nf">iter_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over all messages of a given type.</span>
+
+<span class="sd">        The message_type parameter must be one of info, warning or error and</span>
+<span class="sd">        those messages will be returned in the order they were added to the</span>
+<span class="sd">        Repository.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message_type (str): The type of message that you want to iterate</span>
+<span class="sd">                over.  One of &quot;info&quot;, &quot;warning&quot;, or &quot;error&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            iterable of Message: An iterable of Message objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">message_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Invalid message type &#39;</span><span class="si">%s</span><span class="s2">&#39; given to iter_messages&quot;</span> <span class="o">%</span> <span class="n">message_type</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_messages</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">msg</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">message_type</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">msg</span></div>
+
+<div class="viewcode-block" id="Repository.count_messages"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.count_messages">[docs]</a>    <span class="k">def</span> <span class="nf">count_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Count how many messages of a given type there are.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message_type (str): The type of message that you want to iterate</span>
+<span class="sd">                over.  One of &quot;info&quot;, &quot;warning&quot;, or &quot;error&quot;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The number of messages of the given type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">messages</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iter_messages</span><span class="p">(</span><span class="n">message_type</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Repository.add_subsystem"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.add_subsystem">[docs]</a>    <span class="k">def</span> <span class="nf">add_subsystem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add a subsystem to this repository.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subsystems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subsystem</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repository.add_warning"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.add_warning">[docs]</a>    <span class="k">def</span> <span class="nf">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Record a warning.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Repository.required_secret"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.required_secret">[docs]</a>    <span class="k">def</span> <span class="nf">required_secret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a required environment variable.</span>
 
-        <span class="n">error</span> <span class="o">=</span> <span class="n">ErrorMessage</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">suggestion</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+<span class="sd">        See the documentation for Repository.add_secret().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_secret</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.optional_secret"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.optional_secret">[docs]</a>    <span class="k">def</span> <span class="nf">optional_secret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an optional environment variable.</span>
+
+<span class="sd">        See the documentation for Repository.add_secret().</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_secret</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.add_secret"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.add_secret">[docs]</a>    <span class="k">def</span> <span class="nf">add_secret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add an optional or required environment variable.</span>
+
+<span class="sd">        Environment variables are needed when Repository.update() is called</span>
+<span class="sd">        and are used to convey secret information that must be encrypted and</span>
+<span class="sd">        stored in the repository itself.  The way this information is used</span>
+<span class="sd">        and what specific environment variables are required is 100% decided</span>
+<span class="sd">        by the RepositoryTemplate that is managing the repository.</span>
+
+<span class="sd">        This method exists for the RepositoryTemplate to convey to the</span>
+<span class="sd">        Repository class what environment variables it needs and whether they</span>
+<span class="sd">        are required or optional.  If the relevant subsystem has a method</span>
+<span class="sd">        of verifying the contents of the environment variable, it can also</span>
+<span class="sd">        pass a callable function in the verify parameter that will be used</span>
+<span class="sd">        to verify the value of the environment variable.</span>
+
+<span class="sd">        This method can be called multiple times with the same ``name``</span>
+<span class="sd">        parameter by different subsystems if they both use the same</span>
+<span class="sd">        enviornment variable.</span>
+
+<span class="sd">        The context parameter must be a comma separated list with each entry</span>
+<span class="sd">        being one of &quot;update&quot;, &quot;all&quot;, &quot;build&quot;, &quot;deploy&quot;.  The context</span>
+<span class="sd">        parameter controls when an environment variable is needed.  It is used</span>
+<span class="sd">        to get lists of all environment variables that might be needed during,</span>
+<span class="sd">        e.g. building or deploying a project.  Only variables marked for a</span>
+<span class="sd">        given context are provided when that context runs.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the environment variable</span>
+<span class="sd">            subsystem (str): The name of the subsystem that needs the variable</span>
+<span class="sd">            usage (str): A short, one line description of how the variable is</span>
+<span class="sd">                used by the subsystem.</span>
+<span class="sd">            required (bool): Whether the variable is optional or required.</span>
+<span class="sd">            verify (callable): Optional callable with signature:</span>
+<span class="sd">                callable(name, value) that is called with the name and value</span>
+<span class="sd">                of the environment variable as strings and should return None</span>
+<span class="sd">                if the variable is valid.  If the variable is invalid, it</span>
+<span class="sd">                should return a ``str`` instance with a short message</span>
+<span class="sd">                describing why the variable&#39;s contents are not valid.</span>
+<span class="sd">            context (list of str): A comma separated list of contexts during</span>
+<span class="sd">                which this environment variable is needed.  Supported contexts</span>
+<span class="sd">                are update, all, build an deploy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">context_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">context_entry</span> <span class="ow">in</span> <span class="n">context_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">context_entry</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;deploy&#39;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Invalid context specified in add_env_variable: &#39;</span><span class="si">%s</span><span class="s2">&#39; as part of &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">context_entry</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+
+        <span class="n">contexts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">context_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;all&quot;</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
+            <span class="n">contexts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+            <span class="n">contexts</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;deploy&#39;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">])</span>
+
+        <span class="n">env</span> <span class="o">=</span> <span class="n">EnvironmentVariable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">subsystem</span><span class="p">,</span> <span class="n">contexts</span><span class="p">,</span> <span class="n">usage</span><span class="p">,</span> <span class="n">required</span><span class="p">,</span> <span class="n">verify</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">env</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.iter_secrets"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.iter_secrets">[docs]</a>    <span class="k">def</span> <span class="nf">iter_secrets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over all declared secrets.&quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">var_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Repository.get_secret"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.get_secret">[docs]</a>    <span class="k">def</span> <span class="nf">get_secret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the value of a secret from the user&#39;s environment.</span>
+
+<span class="sd">        If the secret is marked as required and it is not present, an</span>
+<span class="sd">        exception is raised, otherwise None is returned when the value</span>
+<span class="sd">        is not present.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the secret that was previously registered</span>
+<span class="sd">                with add_secret(), required_secret(), or optional_secret().</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The secret&#39;s value or None if it is optional and not present.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidEnvironmentError: If the secret is required and not present.</span>
+<span class="sd">            IntenalError: If ``name`` was never declared as a secret.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">var_entries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">var_entries</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Cannot find secret declaration &#39;</span><span class="si">%s</span><span class="s2">&#39; in get_secret()&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">found_entry</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">var_entry</span> <span class="ow">in</span> <span class="n">var_entries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">var_entry</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
+                <span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">found_entry</span> <span class="o">=</span> <span class="n">var_entry</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">required</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">found_entry</span><span class="o">.</span><span class="n">usage</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Repository.iter_context"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.iter_context">[docs]</a>    <span class="k">def</span> <span class="nf">iter_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">include_empty</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over environment variables applicable to a given context.</span>
+
+<span class="sd">        The `context` parameter must be one of &#39;update&#39;, &#39;build&#39;, or &#39;deploy&#39;</span>
+<span class="sd">        and will be used to select environment variables needed in that</span>
+<span class="sd">        context.</span>
+
+<span class="sd">        The variables will be yielded in sorted order by name for consistency.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            context (str): The context we wish to get variables for.  Must</span>
+<span class="sd">                be one of update, build or deploy.  Variables marked with</span>
+<span class="sd">                all will be returned for all contexts.</span>
+<span class="sd">            include_empty (bool): Also yield None for optional environement</span>
+<span class="sd">                variables that are not defined in the user&#39;s ENVIRONMENT.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            iterable of str, str: An iterable of variable name and value.</span>
+
+<span class="sd">            Each variable that is marked with the passed context will be</span>
+<span class="sd">            returned as part of the iterable in stable sorted order.  If the</span>
+<span class="sd">            variable is marked as optional and it is not defined in the</span>
+<span class="sd">            process&#39;s environment, then a None value will be yielded if</span>
+<span class="sd">            include_empty is True (the default behvaior), otherwise the</span>
+<span class="sd">            variable will be skipped as if it were not declared at all.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">known_contexts</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">,</span> <span class="s1">&#39;deploy&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">known_contexts</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Unkown context </span><span class="si">%s</span><span class="s2"> in Repository.iter_environment&quot;</span> <span class="o">%</span> <span class="n">context</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">var_name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">):</span>
+            <span class="n">found_entry</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">var_entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variables</span><span class="p">[</span><span class="n">var_name</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">var_entry</span><span class="o">.</span><span class="n">contexts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">found_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">found_entry</span> <span class="o">=</span> <span class="n">var_entry</span>
+
+                    <span class="k">if</span> <span class="n">var_entry</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
+                        <span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">found_entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">var_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">required</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidEnvironmentError</span><span class="p">(</span><span class="n">var_name</span><span class="p">,</span> <span class="n">found_entry</span><span class="o">.</span><span class="n">usage</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">include_empty</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">yield</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">value</span></div>
 
     <span class="k">def</span> <span class="nf">_load_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load and validate settings dictionary.&quot;&quot;&quot;</span>
 
         <span class="n">version</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Missing required version key&quot;</span><span class="p">,</span>
-                           <span class="s2">&quot;Run `multipackage init --force` or manually fix.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Missing required version key&quot;</span><span class="p">,</span>
+                       <span class="s2">&quot;Run `multipackage init --force` or manually fix.&quot;</span><span class="p">)</span>
 
         <span class="c1"># FIXME: The template class should handle checking for outdated versions</span>
         <span class="k">if</span> <span class="n">version</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_VERSION</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Old file version (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">),</span>
-                             <span class="s2">&quot;Run `multipackage update`&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">,</span> <span class="s2">&quot;Old file version (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version</span><span class="p">),</span>
+                         <span class="s2">&quot;Run `multipackage update`&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">author</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span> <span class="s2">&quot;Unknown Author&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s2">&quot;Unknown Project&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;options&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">return</span> <span class="n">settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;template&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Repository.get_setting"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.get_setting">[docs]</a>    <span class="k">def</span> <span class="nf">get_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">_MISSING</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the value of a setting from the options dictionary.</span>
+
+<span class="sd">        The name of the setting can be a series of dot separated identifiers</span>
+<span class="sd">        that will be resolved recursively into subkeys.</span>
+
+<span class="sd">        For example, &quot;doc.deploy&quot; would be the key &quot;deploy&quot; in a dictionary</span>
+<span class="sd">        assigned to the key &quot;doc&quot;.  &quot;doc&quot; would return the entire doc</span>
+<span class="sd">        dictionary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the setting that we want to fetch.</span>
+<span class="sd">            default (object): If the setting is optional, you can specify</span>
+<span class="sd">                a default value.  The default behavior is to raise an</span>
+<span class="sd">                exception when a setting is missing.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The value of the setting.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="n">curr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">default</span>
+
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">names</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">curr</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">component</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">curr</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="n">curr</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">component</span><span class="p">]</span>
+
+        <span class="n">component</span> <span class="o">=</span> <span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">curr</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">curr</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">component</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">_MISSING</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidSettingError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Missing required key in settings dictionary&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Repository.set_setting"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.set_setting">[docs]</a>    <span class="k">def</span> <span class="nf">set_setting</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Change or set an option in settings.json.</span>
+
+<span class="sd">        The change is flushed out to the settings file immediately.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the setting you want to set or change.</span>
+<span class="sd">            value (object): A json serializable value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="n">curr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">curr</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">subname</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">raise</span> <span class="n">InvalidSettingError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Cannot set key </span><span class="si">%s</span><span class="s2"> because subkey </span><span class="si">%s</span><span class="s2"> exists and is not a dictionary&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">subname</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">component</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">curr</span><span class="p">:</span>
+                <span class="n">curr</span><span class="p">[</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">curr</span> <span class="o">=</span> <span class="n">curr</span><span class="p">[</span><span class="n">component</span><span class="p">]</span>
+
+        <span class="n">component</span> <span class="o">=</span> <span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">curr</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">subname</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="n">InvalidSettingError</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Cannot set key </span><span class="si">%s</span><span class="s2"> because subkey </span><span class="si">%s</span><span class="s2"> exists and is not a dictionary&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">subname</span><span class="p">))</span>
+
+        <span class="n">curr</span><span class="p">[</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SETTINGS_FILE</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_original_settings</span><span class="p">[</span><span class="s1">&#39;options&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+        <span class="n">atomic_json</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">hash_type</span><span class="o">=</span><span class="s2">&quot;json&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Repository.initialize"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.initialize">[docs]</a>    <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clean</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">platforms</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;macos&#39;</span><span class="p">,</span> <span class="s1">&#39;windows&#39;</span><span class="p">,</span> <span class="s1">&#39;linux&#39;</span><span class="p">),</span> <span class="n">python_versions</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;2.7&#39;</span><span class="p">,</span> <span class="s1">&#39;3.6&#39;</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;Initialize or reinitialize this repository.&quot;&quot;&quot;</span>
@@ -530,7 +819,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Repository.ensure_template"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.ensure_template">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Repository.ensure_template"><a class="viewcode-back" href="../../api/multipackage.repo.html#multipackage.repo.Repository.ensure_template">[docs]</a>    <span class="k">def</span> <span class="nf">ensure_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">present</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Ensure that the contents of a given file match a template.</span>
 
 <span class="sd">        This function will render the given template shipped with the</span>
@@ -551,6 +840,8 @@
 <span class="sd">            raw (bool): Do not actually fill in the template, just copy it into place.</span>
 <span class="sd">                This is useful if the file itself is a jinja2 template that should</span>
 <span class="sd">                be rendered later.</span>
+<span class="sd">            filters (dict): Optional dictionary of callable filters that will be passed</span>
+<span class="sd">                to jinja2 for use in the template formatting.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
@@ -573,7 +864,7 @@
             <span class="k">if</span> <span class="n">variables</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
 
-            <span class="n">render_template</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">render_template</span><span class="p">(</span><span class="n">template</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">manifest</span><span class="o">.</span><span class="n">update_file</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 

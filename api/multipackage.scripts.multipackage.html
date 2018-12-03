@@ -88,10 +88,10 @@
 <li class="toctree-l3"><a class="reference internal" href="multipackage.html#submodules">Submodules</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="multipackage.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.external.html">multipackage.external package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.templates.html">multipackage.templates package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="multipackage.travis.html">multipackage.travis package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
 </ul>
 </li>
@@ -188,6 +188,12 @@
 <tr class="row-even"><td><a class="reference internal" href="#multipackage.scripts.multipackage.create_repo" title="multipackage.scripts.multipackage.create_repo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_repo</span></code></a></td>
 <td>Helper method to create a Repository object.</td>
 </tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.scripts.multipackage.doctor_repo" title="multipackage.scripts.multipackage.doctor_repo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doctor_repo</span></code></a></td>
+<td>Verify that all required environment settings are correct.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.scripts.multipackage.info_repo" title="multipackage.scripts.multipackage.info_repo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info_repo</span></code></a></td>
+<td>Get info on the given repository.</td>
+</tr>
 <tr class="row-odd"><td><a class="reference internal" href="#multipackage.scripts.multipackage.init_repo" title="multipackage.scripts.multipackage.init_repo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_repo</span></code></a></td>
 <td>Initialize or reinitialize a repository.</td>
 </tr>
@@ -205,15 +211,6 @@
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="#multipackage.scripts.multipackage.update_repo" title="multipackage.scripts.multipackage.update_repo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_repo</span></code></a></td>
 <td>Update the installed files in a repository.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.scripts.multipackage.verify_env_var" title="multipackage.scripts.multipackage.verify_env_var"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_env_var</span></code></a></td>
-<td>Check that an environment variable exists.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.scripts.multipackage.verify_environment" title="multipackage.scripts.multipackage.verify_environment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_environment</span></code></a></td>
-<td>Verify that all required environment settings are correct.</td>
-</tr>
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.scripts.multipackage.verify_repo" title="multipackage.scripts.multipackage.verify_repo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_repo</span></code></a></td>
-<td>Get info on the given repository.</td>
 </tr>
 </tbody>
 </table>
@@ -233,14 +230,8 @@
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="multipackage.scripts.multipackage.verify_env_var">
-<code class="descclassname">multipackage.scripts.multipackage.</code><code class="descname">verify_env_var</code><span class="sig-paren">(</span><em>name</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/scripts/multipackage.html#verify_env_var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.scripts.multipackage.verify_env_var" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check that an environment variable exists.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="multipackage.scripts.multipackage.verify_environment">
-<code class="descclassname">multipackage.scripts.multipackage.</code><code class="descname">verify_environment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/scripts/multipackage.html#verify_environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.scripts.multipackage.verify_environment" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.scripts.multipackage.doctor_repo">
+<code class="descclassname">multipackage.scripts.multipackage.</code><code class="descname">doctor_repo</code><span class="sig-paren">(</span><em>repo_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/scripts/multipackage.html#doctor_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.scripts.multipackage.doctor_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Verify that all required environment settings are correct.</p>
 </dd></dl>
 
@@ -263,8 +254,8 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="multipackage.scripts.multipackage.verify_repo">
-<code class="descclassname">multipackage.scripts.multipackage.</code><code class="descname">verify_repo</code><span class="sig-paren">(</span><em>repo_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/scripts/multipackage.html#verify_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.scripts.multipackage.verify_repo" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.scripts.multipackage.info_repo">
+<code class="descclassname">multipackage.scripts.multipackage.</code><code class="descname">info_repo</code><span class="sig-paren">(</span><em>repo_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/scripts/multipackage.html#info_repo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.scripts.multipackage.info_repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get info on the given repository.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

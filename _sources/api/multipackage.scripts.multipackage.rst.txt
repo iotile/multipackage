@@ -7,7 +7,7 @@ multipackage.scripts.multipackage module
 .. currentmodule:: multipackage.scripts.multipackage
 
 .. automodule:: multipackage.scripts.multipackage
-    :members: DESCRIPTION, build_parser, create_repo, init_repo, main, print_environment_error, print_usage_error, setup_logging, update_repo, verify_env_var, verify_environment, verify_repo
+    :members: DESCRIPTION, build_parser, create_repo, doctor_repo, info_repo, init_repo, main, print_environment_error, print_usage_error, setup_logging, update_repo
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -22,15 +22,14 @@ multipackage.scripts.multipackage module
 
         build_parser
         create_repo
+        doctor_repo
+        info_repo
         init_repo
         main
         print_environment_error
         print_usage_error
         setup_logging
         update_repo
-        verify_env_var
-        verify_environment
-        verify_repo
 
     Data:
 

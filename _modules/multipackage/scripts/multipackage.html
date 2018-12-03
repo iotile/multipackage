@@ -154,7 +154,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">multipackage</span> <span class="k">import</span> <span class="n">Repository</span>
-<span class="kn">from</span> <span class="nn">multipackage.travis</span> <span class="k">import</span> <span class="n">TravisCI</span>
+<span class="kn">from</span> <span class="nn">multipackage.external</span> <span class="k">import</span> <span class="n">TravisCI</span>
 <span class="kn">from</span> <span class="nn">multipackage.exceptions</span> <span class="k">import</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">UsageError</span>
 <span class="kn">from</span> <span class="nn">multipackage.utilities</span> <span class="k">import</span> <span class="n">GITRepository</span><span class="p">,</span> <span class="n">render_template</span>
 
@@ -169,24 +169,22 @@
 
 <span class="sd">The major things you can do are:</span>
 
-<span class="sd">$ multipackage init &lt;path to repo or cwd&gt;</span>
+<span class="sd">$ multipackage init [path to repo, default cwd]</span>
 
 <span class="sd">    Provision an initial set of scripts into the repository at the given</span>
-<span class="sd">    path or the CWD if path is not specified.  The program will ask you</span>
-<span class="sd">    a series of questions to confirm actions its taking and make sure</span>
-<span class="sd">    everything is setup correctly.</span>
+<span class="sd">    path or the CWD if path is not specified.</span>
 
-<span class="sd">$ multipackage update &lt;path to repo or cwd&gt;</span>
+<span class="sd">$ multipackage update [path to repo, default cwd]</span>
 
 <span class="sd">    Update the build and release scripts in the given repository to the</span>
 <span class="sd">    latest version included with this multipackage program.</span>
 
-<span class="sd">$ multipackage doctor</span>
+<span class="sd">$ multipackage doctor [path to repo, default cwd]</span>
 
 <span class="sd">    Verify that all of your environment variables are set correctly for</span>
 <span class="sd">    running init or update on a repository.</span>
 
-<span class="sd">$ multipackage info &lt;path to repo or cwd&gt;</span>
+<span class="sd">$ multipackage info [path to repo, default cwd]</span>
 
 <span class="sd">    Get information on the packages inside the given repository.  The</span>
 <span class="sd">    reposository must already have a working set of multipackage release</span>
@@ -195,49 +193,59 @@
 <span class="sd">    This will also verify that all of the multipackage build/release scripts</span>
 <span class="sd">    in the given repository are correctly installed and check for common</span>
 <span class="sd">    errors.</span>
-
-<span class="sd">$ multipackage release &lt;path to repo or cwd&gt; &lt;package name&gt; &lt;version&gt;</span>
-
-<span class="sd">    Tag the given package for release.  Note that this just tags the package</span>
-<span class="sd">    for release, it does not actually release it.  Releasing happens on Travis</span>
-<span class="sd">    CI once the tagged commit is built and verified.  This method will check</span>
-<span class="sd">    for and prevent common release mistakes like not being on master, not</span>
-<span class="sd">    having fetched the latest changes, etc.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-
-<div class="viewcode-block" id="verify_env_var"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_env_var">[docs]</a><span class="k">def</span> <span class="nf">verify_env_var</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_variable_status</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">declarations</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Check that an environment variable exists.&quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">%s</span><span class="s2">: ERROR, NOT PRESENT&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;    Needed for </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">message</span><span class="p">)</span>
-        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">decl</span> <span class="ow">in</span> <span class="n">declarations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">decl</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  - </span><span class="si">%s</span><span class="s2">: OKAY&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
-    <span class="k">return</span> <span class="mi">1</span></div>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;PRESENT&quot;</span>
+
+    <span class="k">if</span> <span class="n">required</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;MISSING&quot;</span>
+
+    <span class="k">return</span> <span class="s2">&quot;NOT PRESENT&quot;</span>
 
 
-<div class="viewcode-block" id="verify_environment"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_environment">[docs]</a><span class="k">def</span> <span class="nf">verify_environment</span><span class="p">():</span>
+<div class="viewcode-block" id="doctor_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.doctor_repo">[docs]</a><span class="k">def</span> <span class="nf">doctor_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Verify that all required environment settings are correct.&quot;&quot;&quot;</span>
 
-    <span class="n">_travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
-    <span class="n">GITRepository</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
+    <span class="n">repo</span> <span class="o">=</span> <span class="n">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Checking for required environment variables:&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">repo_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">repo_path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
-    <span class="n">found</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;encrypting environment variables on travis-ci.org&quot;</span><span class="p">)</span>
-    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;TRAVIS_TOKEN_COM&quot;</span><span class="p">,</span> <span class="s2">&quot;encrypting environment variables on travis-ci.com&quot;</span><span class="p">)</span>
-    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;GITHUB_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;deploying documentation to github pages&quot;</span><span class="p">)</span>
-    <span class="n">found</span> <span class="o">+=</span> <span class="n">verify_env_var</span><span class="p">(</span><span class="s2">&quot;SLACK_TOKEN&quot;</span><span class="p">,</span> <span class="s2">&quot;sending slack notifications&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">GITRepository</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">UsageError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STATUS: Repository is not a valid git repo.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Make sure your path is correct.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span>
 
-    <span class="nb">print</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">repo</span><span class="o">.</span><span class="n">initialized</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STATUS: Repository has not been set up with multipackage.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Set it up with:</span><span class="se">\n\n\t</span><span class="s2">multipackage init </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repo_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="mi">1</span>
 
-    <span class="k">if</span> <span class="n">found</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;repo&quot;</span><span class="p">:</span> <span class="n">repo</span><span class="p">,</span>
+        <span class="s2">&quot;repo_path&quot;</span><span class="p">:</span> <span class="n">repo_path</span>
+    <span class="p">}</span>
 
-    <span class="k">return</span> <span class="mi">1</span></div>
+    <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;variable_status&quot;</span><span class="p">:</span> <span class="n">_variable_status</span>
+    <span class="p">}</span>
+
+    <span class="n">info</span> <span class="o">=</span> <span class="n">render_template</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">DOCTOR_TEMPLATE</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
 
 
 <div class="viewcode-block" id="create_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.create_repo">[docs]</a><span class="k">def</span> <span class="nf">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
@@ -253,8 +261,9 @@
     <span class="sd">&quot;&quot;&quot;Initialize or reinitialize a repository.&quot;&quot;&quot;</span>
 
     <span class="n">repo</span> <span class="o">=</span> <span class="n">create_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">)</span>
-    <span class="n">repo</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">clean</span><span class="o">=</span><span class="n">clean</span><span class="p">)</span></div>
+    <span class="n">repo</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">clean</span><span class="o">=</span><span class="n">clean</span><span class="p">)</span>
 
+    <span class="k">return</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="update_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.update_repo">[docs]</a><span class="k">def</span> <span class="nf">update_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Update the installed files in a repository.&quot;&quot;&quot;</span>
@@ -275,7 +284,7 @@
     <span class="k">return</span> <span class="mi">0</span></div>
 
 
-<div class="viewcode-block" id="verify_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.verify_repo">[docs]</a><span class="k">def</span> <span class="nf">verify_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
+<div class="viewcode-block" id="info_repo"><a class="viewcode-back" href="../../../api/multipackage.scripts.multipackage.html#multipackage.scripts.multipackage.info_repo">[docs]</a><span class="k">def</span> <span class="nf">info_repo</span><span class="p">(</span><span class="n">repo_path</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get info on the given repository.</span>
 
 <span class="sd">    Args:</span>
@@ -329,8 +338,9 @@
     <span class="n">init_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--force&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Forcibly clean and reinitialize the repo&quot;</span><span class="p">)</span>
     <span class="n">init_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional path to repository, defaults to cwd&quot;</span><span class="p">)</span>
 
-    <span class="n">_doctor_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;doctor&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Verify your environment settings and connectivity.&quot;</span><span class="p">,</span>
-                                          <span class="n">help</span><span class="o">=</span><span class="s1">&#39;verify your enviornment for multipackage usage&#39;</span><span class="p">)</span>
+    <span class="n">doctor_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;doctor&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Verify your environment settings and connectivity.&quot;</span><span class="p">,</span>
+                                         <span class="n">help</span><span class="o">=</span><span class="s1">&#39;verify your enviornment for multipackage usage&#39;</span><span class="p">)</span>
+    <span class="n">doctor_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;repo&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Optional path to repository, defaults to cwd&quot;</span><span class="p">)</span>
 
     <span class="n">info_parser</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Get info on the given repository and verify it is correctly installed&quot;</span><span class="p">,</span>
                                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;get info and any errors with a repository&quot;</span><span class="p">)</span>
@@ -412,9 +422,9 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;doctor&#39;</span><span class="p">:</span>
-            <span class="n">retval</span> <span class="o">=</span> <span class="n">verify_environment</span><span class="p">()</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">doctor_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;info&#39;</span><span class="p">:</span>
-            <span class="n">retval</span> <span class="o">=</span> <span class="n">verify_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">)</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="n">info_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;init&quot;</span><span class="p">:</span>
             <span class="n">retval</span> <span class="o">=</span> <span class="n">init_repo</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">force</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;update&quot;</span><span class="p">:</span>

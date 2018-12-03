@@ -149,36 +149,57 @@
 <span></span><span class="sd">&quot;&quot;&quot;Add support for automatic testing and deployment from Travis CI.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">..travis</span> <span class="k">import</span> <span class="n">TravisCI</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">..external</span> <span class="k">import</span> <span class="n">TravisCI</span>
+<span class="kn">from</span> <span class="nn">..utilities</span> <span class="k">import</span> <span class="n">GITRepository</span>
+
 
 <div class="viewcode-block" id="TravisSubsystem"><a class="viewcode-back" href="../../../api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem">[docs]</a><span class="k">class</span> <span class="nc">TravisSubsystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="n">SHORT_NAME</span> <span class="o">=</span> <span class="s2">&quot;CI/CD using Travis CI&quot;</span>
+    <span class="n">SHORT_NAME</span> <span class="o">=</span> <span class="s2">&quot;Travis CI (Python Profile)&quot;</span>
     <span class="n">SHORT_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;manages .travis.yml file for building and deploying on Travis CI&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span> <span class="o">=</span> <span class="n">repo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
+
+        <span class="n">repo</span><span class="o">.</span><span class="n">required_secret</span><span class="p">(</span><span class="s1">&#39;TRAVIS_TOKEN_COM&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Travis CI API token used for projects hosted on travis-ci.com&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;update&quot;</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">required_secret</span><span class="p">(</span><span class="s1">&#39;TRAVIS_TOKEN_ORG&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Travis CI API token used for projects hosted on travis-ci.org&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;update&quot;</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">required_secret</span><span class="p">(</span><span class="s1">&#39;GITHUB_TOKEN&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Github Token used for deploying documentation to Github Pages&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;deploy&quot;</span><span class="p">)</span>
+
+        <span class="n">repo</span><span class="o">.</span><span class="n">optional_secret</span><span class="p">(</span><span class="s1">&#39;SLACK_TOKEN&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Slack Travis-App token if notifications on build pass/fail are desired&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">optional_secret</span><span class="p">(</span><span class="s1">&#39;SLACK_WEB_HOOK&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Slack web hook URL if notifications on project release are desired&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;deploy&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="TravisSubsystem.update"><a class="viewcode-back" href="../../../api/multipackage.subsystems.travis.html#multipackage.subsystems.travis.TravisSubsystem.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the linting subsystem.&quot;&quot;&quot;</span>
 
-        <span class="n">slug</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">github_slug</span><span class="p">()</span>
-        <span class="n">env</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;github_token&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travis</span><span class="o">.</span><span class="n">encrypt_env</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="s2">&quot;GITHUB_TOKEN&quot;</span><span class="p">),</span>
-            <span class="s1">&#39;pypi_user&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travis</span><span class="o">.</span><span class="n">encrypt_env</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="s2">&quot;PYPI_USER&quot;</span><span class="p">),</span>
-            <span class="s1">&#39;pypi_pass&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travis</span><span class="o">.</span><span class="n">encrypt_env</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="s2">&quot;PYPI_PASS&quot;</span><span class="p">),</span>
-            <span class="s1">&#39;slack_token&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travis</span><span class="o">.</span><span class="n">encrypt_env</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="s2">&quot;SLACK_TOKEN&quot;</span><span class="p">,</span> <span class="n">only_value</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="s1">&#39;slack_web_hook&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_travis</span><span class="o">.</span><span class="n">encrypt_env</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="s2">&quot;SLACK_WEB_HOOK&quot;</span><span class="p">)</span>
+        <span class="n">git</span> <span class="o">=</span> <span class="n">GITRepository</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">travis</span> <span class="o">=</span> <span class="n">TravisCI</span><span class="p">()</span>
+
+        <span class="n">slug</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">github_slug</span><span class="p">()</span>
+
+        <span class="n">encryptor</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">name</span><span class="p">,</span> <span class="n">only_value</span><span class="o">=</span><span class="kc">False</span><span class="p">:</span> <span class="n">travis</span><span class="o">.</span><span class="n">encrypt_env</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">only_value</span><span class="o">=</span><span class="n">only_value</span><span class="p">)</span>
+
+        <span class="n">filters</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;encrypt&#39;</span><span class="p">:</span> <span class="n">encryptor</span>
         <span class="p">}</span>
 
         <span class="n">variables</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="n">options</span><span class="p">,</span>
             <span class="s1">&#39;components&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">components</span><span class="p">,</span>
-            <span class="s1">&#39;env&#39;</span><span class="p">:</span> <span class="n">env</span>
+            <span class="s1">&#39;repo&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span>
         <span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;.travis.yml&quot;</span><span class="p">,</span> <span class="s2">&quot;travis.yml.tpl&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span><span class="o">.</span><span class="n">ensure_template</span><span class="p">(</span><span class="s2">&quot;.travis.yml&quot;</span><span class="p">,</span> <span class="s2">&quot;travis.yml.tpl&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

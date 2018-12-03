@@ -7,7 +7,7 @@ multipackage.repo module
 .. currentmodule:: multipackage.repo
 
 .. automodule:: multipackage.repo
-    :members: Component, ErrorMessage, Repository
+    :members: Component, EnvironmentVariable, Message, Repository
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -21,7 +21,8 @@ multipackage.repo module
         :nosignatures:
 
         Component
-        ErrorMessage
+        EnvironmentVariable
+        Message
         Repository
 
 

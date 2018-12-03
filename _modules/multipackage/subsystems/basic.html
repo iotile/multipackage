@@ -161,6 +161,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_repo</span> <span class="o">=</span> <span class="n">repo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
+        <span class="n">repo</span><span class="o">.</span><span class="n">required_secret</span><span class="p">(</span><span class="s1">&#39;PYPI_USER&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Username for uploading packages to the target PyPI Index&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;deploy&quot;</span><span class="p">)</span>
+        <span class="n">repo</span><span class="o">.</span><span class="n">required_secret</span><span class="p">(</span><span class="s1">&#39;PYPI_PASS&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;Password for uploading packages to the target PyPI Index&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;deploy&quot;</span><span class="p">)</span>
+
+        <span class="n">repo</span><span class="o">.</span><span class="n">optional_secret</span><span class="p">(</span><span class="s1">&#39;PYPI_URL&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHORT_NAME</span><span class="p">,</span>
+                             <span class="s1">&#39;URL of a custom PyPI index that we should release to&#39;</span><span class="p">,</span>
+                             <span class="n">context</span><span class="o">=</span><span class="s2">&quot;deploy&quot;</span><span class="p">)</span>
+
 <div class="viewcode-block" id="BasicPythonSupport.update"><a class="viewcode-back" href="../../../api/multipackage.subsystems.basic.html#multipackage.subsystems.basic.BasicPythonSupport.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update the basic subsystem.&quot;&quot;&quot;</span>
 

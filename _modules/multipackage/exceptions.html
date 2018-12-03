@@ -161,6 +161,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">suggestion</span> <span class="o">=</span> <span class="n">suggestion</span></div>
 
 
+<div class="viewcode-block" id="InvalidSettingError"><a class="viewcode-back" href="../../api/multipackage.exceptions.html#multipackage.exceptions.InvalidSettingError">[docs]</a><span class="k">class</span> <span class="nc">InvalidSettingError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Raised when a setting in settings.json is not present or invalid.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable_name</span><span class="p">,</span> <span class="n">reason</span><span class="p">,</span> <span class="n">suggestion</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidSettingError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;Missing or invalid setting </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable_name</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">variable_name</span> <span class="o">=</span> <span class="n">variable_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suggestion</span> <span class="o">=</span> <span class="n">suggestion</span></div>
+
+
 <div class="viewcode-block" id="InvalidEnvironmentError"><a class="viewcode-back" href="../../api/multipackage.exceptions.html#multipackage.exceptions.InvalidEnvironmentError">[docs]</a><span class="k">class</span> <span class="nc">InvalidEnvironmentError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Raised when a required environment variable is not present.&quot;&quot;&quot;</span>
 

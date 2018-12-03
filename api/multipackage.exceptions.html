@@ -186,13 +186,16 @@
 <tr class="row-odd"><td><a class="reference internal" href="#multipackage.exceptions.InvalidPackageError" title="multipackage.exceptions.InvalidPackageError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidPackageError</span></code></a></td>
 <td>Raised when a required support package has an invalid version.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.exceptions.ManualInterventionError" title="multipackage.exceptions.ManualInterventionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManualInterventionError</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.exceptions.InvalidSettingError" title="multipackage.exceptions.InvalidSettingError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">InvalidSettingError</span></code></a></td>
+<td>Raised when a setting in settings.json is not present or invalid.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.exceptions.ManualInterventionError" title="multipackage.exceptions.ManualInterventionError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManualInterventionError</span></code></a></td>
 <td>Raised when there is a situation that requires manual intervention.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.exceptions.MissingPackageError" title="multipackage.exceptions.MissingPackageError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MissingPackageError</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="#multipackage.exceptions.MissingPackageError" title="multipackage.exceptions.MissingPackageError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MissingPackageError</span></code></a></td>
 <td>Raised when a required support package is not present.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#multipackage.exceptions.UsageError" title="multipackage.exceptions.UsageError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UsageError</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.exceptions.UsageError" title="multipackage.exceptions.UsageError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UsageError</span></code></a></td>
 <td>Raised when a multipackage API method is called incorrectly.</td>
 </tr>
 </tbody>
@@ -205,6 +208,13 @@
 <em class="property">exception </em><code class="descclassname">multipackage.exceptions.</code><code class="descname">UsageError</code><span class="sig-paren">(</span><em>message</em>, <em>suggestion=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/exceptions.html#UsageError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.exceptions.UsageError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
 <p>Raised when a multipackage API method is called incorrectly.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="multipackage.exceptions.InvalidSettingError">
+<em class="property">exception </em><code class="descclassname">multipackage.exceptions.</code><code class="descname">InvalidSettingError</code><span class="sig-paren">(</span><em>variable_name</em>, <em>reason</em>, <em>suggestion=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/exceptions.html#InvalidSettingError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.exceptions.InvalidSettingError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised when a setting in settings.json is not present or invalid.</p>
 </dd></dl>
 
 <dl class="exception">

@@ -1,5 +1,14 @@
 # `multipackage` Release Notes
 
+## v0.2.1 (12/2/2018)
+
+- Refactor code to unify all error and warning messages into a generic message
+  structure with iter_messages(type) to select warnings or errors.
+- Allow templates to declare what environment variables they need based on their
+  configured settings.
+- Implement `multipackage doctor` to show what environment variables are
+  optional or required for a given repository.
+
 ## v0.2.0 (12/1/2018)
 
 - Update `ManagedFileSection.ensure_lines` to support matching multiple lines

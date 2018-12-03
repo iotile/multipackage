@@ -7,7 +7,7 @@ multipackage.exceptions module
 .. currentmodule:: multipackage.exceptions
 
 .. automodule:: multipackage.exceptions
-    :members: InternalError, InvalidEnvironmentError, InvalidPackageError, ManualInterventionError, MissingPackageError, UsageError
+    :members: InternalError, InvalidEnvironmentError, InvalidPackageError, InvalidSettingError, ManualInterventionError, MissingPackageError, UsageError
     :undoc-members:
     :show-inheritance:
     :member-order: bysource
@@ -23,6 +23,7 @@ multipackage.exceptions module
         InternalError
         InvalidEnvironmentError
         InvalidPackageError
+        InvalidSettingError
         ManualInterventionError
         MissingPackageError
         UsageError

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.travis.travis &mdash; multipackage latest documentation</title>
+  <title>multipackage.external.travis &mdash; multipackage latest documentation</title>
   
 
   
@@ -130,7 +130,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>multipackage.travis.travis</li>
+      <li>multipackage.external.travis</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -145,7 +145,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for multipackage.travis.travis</h1><div class="highlight"><pre>
+  <h1>Source code for multipackage.external.travis</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Wrapper class for Travis CI API v3.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
@@ -165,7 +165,7 @@
 <span class="kn">from</span> <span class="nn">..exceptions</span> <span class="k">import</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">InternalError</span>
 
 
-<div class="viewcode-block" id="TravisCI"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI">[docs]</a><span class="k">class</span> <span class="nc">TravisCI</span><span class="p">:</span>
+<div class="viewcode-block" id="TravisCI"><a class="viewcode-back" href="../../../api/multipackage.external.travis.html#multipackage.external.travis.TravisCI">[docs]</a><span class="k">class</span> <span class="nc">TravisCI</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Wrapper for Travis CI API v3.</span>
 
 <span class="sd">    This wrapper is not complete but currently just implements the features</span>
@@ -262,7 +262,7 @@
 
         <span class="k">return</span> <span class="n">quote</span><span class="p">(</span><span class="n">repo_slug</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TravisCI.get_info"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+<div class="viewcode-block" id="TravisCI.get_info"><a class="viewcode-back" href="../../../api/multipackage.external.travis.html#multipackage.external.travis.TravisCI.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get info about this repository on Travis CI.</span>
 
 <span class="sd">        Args:</span>
@@ -278,7 +278,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Repository info on </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">info</span></div>
 
-<div class="viewcode-block" id="TravisCI.use_travis_org"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.use_travis_org">[docs]</a>    <span class="k">def</span> <span class="nf">use_travis_org</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+<div class="viewcode-block" id="TravisCI.use_travis_org"><a class="viewcode-back" href="../../../api/multipackage.external.travis.html#multipackage.external.travis.TravisCI.use_travis_org">[docs]</a>    <span class="k">def</span> <span class="nf">use_travis_org</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check and see if this repo is on travis.org or com.</span>
 
 <span class="sd">        Returns:</span>
@@ -301,7 +301,7 @@
 
         <span class="k">raise</span> <span class="n">InternalError</span><span class="p">(</span><span class="s2">&quot;Could not find repository </span><span class="si">%s</span><span class="s2"> on either travis-ci.org or travis-ci.com&quot;</span> <span class="o">%</span> <span class="n">encoded_slug</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TravisCI.get_key"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.get_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
+<div class="viewcode-block" id="TravisCI.get_key"><a class="viewcode-back" href="../../../api/multipackage.external.travis.html#multipackage.external.travis.TravisCI.get_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get the encryption key for a repository by its slug.</span>
 
 <span class="sd">        This method will automatically get the correct key for the repository</span>
@@ -334,7 +334,7 @@
 
         <span class="k">return</span> <span class="n">key</span></div>
 
-<div class="viewcode-block" id="TravisCI.encrypt_string"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.encrypt_string">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<div class="viewcode-block" id="TravisCI.encrypt_string"><a class="viewcode-back" href="../../../api/multipackage.external.travis.html#multipackage.external.travis.TravisCI.encrypt_string">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Encrypt a string using the repo&#39;s public key.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Encrypting &#39;</span><span class="si">%s</span><span class="s2">&#39; for repo &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">)</span>
@@ -350,7 +350,7 @@
 
         <span class="k">return</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">ciphertext</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TravisCI.encrypt_env"><a class="viewcode-back" href="../../../api/multipackage.travis.travis.html#multipackage.travis.travis.TravisCI.encrypt_env">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="o">*</span><span class="n">env_names</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="TravisCI.encrypt_env"><a class="viewcode-back" href="../../../api/multipackage.external.travis.html#multipackage.external.travis.TravisCI.encrypt_env">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repo_slug</span><span class="p">,</span> <span class="o">*</span><span class="n">env_names</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Encrypt one or more environment variables.</span>
 
 <span class="sd">        The resulting string is suitable for pasting directly into a</span>

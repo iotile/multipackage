@@ -210,6 +210,15 @@
 
         <span class="k">return</span> <span class="n">info</span></div>
 
+<div class="viewcode-block" id="GITRepository.github_slug"><a class="viewcode-back" href="../../../api/multipackage.utilities.git.html#multipackage.utilities.git.GITRepository.github_slug">[docs]</a>    <span class="k">def</span> <span class="nf">github_slug</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the github slug from this repository.</span>
+
+<span class="sd">        This is a string of the format user/repo_name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">org</span><span class="p">,</span> <span class="n">repo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">github_name</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">org</span><span class="p">,</span> <span class="n">repo</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="GITRepository.version"><a class="viewcode-back" href="../../../api/multipackage.utilities.git.html#multipackage.utilities.git.GITRepository.version">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return the version of git installed.&quot;&quot;&quot;</span>
@@ -223,9 +232,9 @@
         <span class="k">return</span> <span class="n">version_string</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span></div></div>
 
 
-
 <span class="n">_SSH_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;git@github\.com:(?P&lt;user&gt;[a-zA-Z0-9_\-]+)/(?P&lt;repo&gt;[a-zA-Z0-9_\-]+)\.git&quot;</span>
 <span class="n">_HTTPS_REGEX</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;https://github\.com/(?P&lt;user&gt;[a-zA-Z0-9_\-]+)/(?P&lt;repo&gt;[a-zA-Z0-9_\-]+)\.git&quot;</span>
+
 
 <div class="viewcode-block" id="extract_github_name"><a class="viewcode-back" href="../../../api/multipackage.utilities.git.html#multipackage.utilities.git.extract_github_name">[docs]</a><span class="k">def</span> <span class="nf">extract_github_name</span><span class="p">(</span><span class="n">remote</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Extract a github name from a remote URL.</span>
