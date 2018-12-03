@@ -191,7 +191,7 @@ def main():
         else:
             print('\nSkipping pre-release checks becaus -f/--force was passed\n')
 
-        create_tag(path, comp['name'], version, release_notes)
+        create_tag(path, comp['name'], version, release_notes, test=args.test)
 
         if args.push:
             push_tag(path)

@@ -4,6 +4,7 @@ from __future__ import print_function
 import os
 import sys
 import subprocess
+import shlex
 import shutil
 import pytest
 from multipackage.scripts.multipackage import main as multipackage_main
@@ -70,6 +71,9 @@ def run_in_sandbox(args, pypi_url=None, slack=None):
     - patches the environment variables sent to that process to remote
       anything that could refer to a real third-party service.
     """
+
+    if isinstance(args, str):
+        args = shlex.split(args)
 
     env = os.environ.copy()
 
@@ -281,6 +285,28 @@ def test_twine_release(uni_repo, pypi_url, pypi, slack, slack_url):
     assert pypi.error_count == 0
     assert slack.request_count == 1
     assert slack.error_count == 0
+
+
+def test_tag_release(uni_repo):
+    """Make sure we can tag a test release and a real release."""
+
+    subprocess.check_call(['git', 'add', '.'])
+    subprocess.check_output(['git', 'commit', '-m', 'initial_checkin'])
+
+    retval, _stdout, _stderr = run_in_sandbox('python .multipackage/scripts/tag_release.py my_package -t -y -f -n')
+    assert retval == 0
+
+    retval, _stdout, _stderr = run_in_sandbox('python .multipackage/scripts/tag_release.py my_package -y -f -n')
+    assert retval == 0
+
+    tags = subprocess.check_output(['git', 'tag'])
+    tags = tags.decode('utf-8')
+
+    tags = [x.strip() for x in tags.splitlines() if len(x.strip()) > 0]
+    assert len(tags) == 2
+
+    assert tags[0] == "my_package-0.0.1"
+    assert tags[1] == "test@my_package-0.0.1"
 
 
 def test_namespace_finding(namespace_repo):
