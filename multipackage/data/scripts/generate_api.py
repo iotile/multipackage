@@ -28,7 +28,7 @@ def delete_with_retry(folder):
     https://mail.python.org/pipermail/python-dev/2013-September/128350.html
     """
 
-    for _i in range(0, 5):
+    for _ in range(0, 5):
         try:
             if os.path.exists(folder):
                 shutil.rmtree(folder)

@@ -150,12 +150,6 @@ def main():
 
     api_main(args)
 
-    # sphinx-build on windows powershell leaves the terminal in a weird state
-    # so disable color on windows
-    args = ["sphinx-build", "-W", "-E", "-b", "html", output_folder, dest_folder]
-    if platform.system() == 'Windows':
-        args.insert(1, "--no-color")
-
     print("\n---- Copying release notes ----\n")
     copy_release_notes(base_folder, output_folder)
 
@@ -163,8 +157,14 @@ def main():
     delete_with_retry(dest_folder)
 
     print("\n---- Running Sphinx to generate docs ----\n")
+    # sphinx-build on windows powershell leaves the terminal in a weird state
+    # so disable color on windows
+    args = ["sphinx-build", "-W", "-E", "-b", "html", output_folder, dest_folder]
+    if platform.system() == 'Windows':
+        args.insert(1, "--no-color")
+
     try:
-        subprocess.check_output(args)
+        subprocess.check_call(args)
     except subprocess.CalledProcessError as err:
         return err.returncode
 

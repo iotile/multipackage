@@ -2,8 +2,10 @@
 
 import os
 import platform
+import logging
 from setuptools import find_packages
 
+logger = logging.getLogger(__name__)
 
 def find_toplevel_packages(path, exclude=("test",), prefix=None):
     """Find all top level python packages in the given directory.
@@ -45,6 +47,8 @@ def find_toplevel_packages(path, exclude=("test",), prefix=None):
         path = path.replace("\\", "/")
 
     packages = find_packages(path, exclude=exclude)
+
+    logger.info("Found packages in %s: %s", path, packages)
 
     if prefix is None:
         toplevel = set(x.split('.')[0] for x in packages)

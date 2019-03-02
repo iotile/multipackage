@@ -37,7 +37,8 @@ class PyPIPackageTemplate(RepositoryTemplate):
         repo.add_subsystem(subsystems.PylintLinter(repo))
         repo.add_subsystem(subsystems.TravisSubsystem(repo))
         repo.add_subsystem(subsystems.SphinxDocumentation(repo, self.desired_packages,
-                           self.toplevel_packages, namespace_packages=self.namespace_packages))
+                                                          self.toplevel_packages,
+                                                          namespace_packages=self.namespace_packages))
 
     @classmethod
     def _verify_options(cls, repo):
@@ -45,8 +46,8 @@ class PyPIPackageTemplate(RepositoryTemplate):
             for name, value in comp.options.items():
                 if name == 'compatibility' and value not in ('universal', 'python2', 'python3'):
                     repo.error(".multipackage/components.txt",
-                                   "Invalid compatibility option for component %s: %s" % (key, value),
-                                   "Choices are universal, python2 or python3")
+                               "Invalid compatibility option for component %s: %s" % (key, value),
+                               "Choices are universal, python2 or python3")
 
     def _find_packages(self, repo):
         self.toplevel_packages = self.find_toplevel_packages(repo.path, repo.components)
@@ -70,7 +71,7 @@ class PyPIPackageTemplate(RepositoryTemplate):
 
             if prefixes is not None:
                 if len(toplevel_packages) != 1:
-                    raise InternalError("Cannot support multiple packages per component in '%s' if there is a namespace package" % key)
+                    raise InternalError("Cannot support multiple packages (%s) per component in '%s' if there is a namespace package" % (", ".join(toplevel_packages), key))
 
                 if toplevel_packages[0] in prefixes:
                     toplevel_packages = find_toplevel_packages(path, prefix=toplevel_packages[0])
