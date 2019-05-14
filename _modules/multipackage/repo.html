@@ -17,32 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -159,7 +161,7 @@
 <span class="kn">from</span> <span class="nn">.exceptions</span> <span class="k">import</span> <span class="n">UsageError</span><span class="p">,</span> <span class="n">InternalError</span><span class="p">,</span> <span class="n">InvalidEnvironmentError</span><span class="p">,</span> <span class="n">InvalidSettingError</span>
 <span class="kn">from</span> <span class="nn">.utilities</span> <span class="k">import</span> <span class="n">atomic_json</span><span class="p">,</span> <span class="n">ManagedFileSection</span><span class="p">,</span> <span class="n">render_template</span>
 <span class="kn">from</span> <span class="nn">.manifest</span> <span class="k">import</span> <span class="n">ManifestFile</span>
-<span class="kn">from</span> <span class="nn">.templates</span> <span class="k">import</span> <span class="n">PyPIPackageTemplate</span>
+<span class="kn">from</span> <span class="nn">.templates</span> <span class="k">import</span> <span class="n">PyPIPackageTemplate</span><span class="p">,</span> <span class="n">ManualTemplate</span>
 
 
 <span class="n">Message</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Message&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="s1">&#39;suggestion&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">])</span>
@@ -230,10 +232,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_try_load_components</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">template_name</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Templates other than &#39;</span><span class="si">{}</span><span class="s2">&#39; are not yet supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">template_name</span> <span class="o">==</span> <span class="s1">&#39;manual&#39;</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">ManualTemplate</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">template_name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">:</span>
+                <span class="n">template</span> <span class="o">=</span> <span class="n">PyPIPackageTemplate</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UsageError</span><span class="p">(</span><span class="s2">&quot;Templates other than &#39;</span><span class="si">{}</span><span class="s2">&#39; and &#39;manual&#39; are not yet supported.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_TEMPLATE</span><span class="p">))</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">PyPIPackageTemplate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">template</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">install</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -920,25 +926,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

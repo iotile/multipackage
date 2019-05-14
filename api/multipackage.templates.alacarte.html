@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>multipackage.subsystems.travis module &mdash; multipackage latest documentation</title>
+  <title>multipackage.templates.alacarte module &mdash; multipackage latest documentation</title>
   
 
   
@@ -35,8 +35,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="multipackage.templates package" href="multipackage.templates.html" />
-    <link rel="prev" title="multipackage.subsystems.sphinx module" href="multipackage.subsystems.sphinx.html" /> 
+    <link rel="next" title="multipackage.templates.pypi_package module" href="multipackage.templates.pypi_package.html" />
+    <link rel="prev" title="multipackage.templates package" href="multipackage.templates.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,8 +92,8 @@
 <li class="toctree-l4"><a class="reference internal" href="multipackage.data.html">multipackage.data package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.external.html">multipackage.external package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.scripts.html">multipackage.scripts package</a></li>
-<li class="toctree-l4 current"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="multipackage.templates.html">multipackage.templates package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="multipackage.subsystems.html">multipackage.subsystems package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="multipackage.templates.html">multipackage.templates package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="multipackage.utilities.html">multipackage.utilities package</a></li>
 </ul>
 </li>
@@ -151,15 +151,15 @@
         
           <li><a href="multipackage.html">multipackage package</a> &raquo;</li>
         
-          <li><a href="multipackage.subsystems.html">multipackage.subsystems package</a> &raquo;</li>
+          <li><a href="multipackage.templates.html">multipackage.templates package</a> &raquo;</li>
         
-      <li>multipackage.subsystems.travis module</li>
+      <li>multipackage.templates.alacarte module</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/api/multipackage.subsystems.travis.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/api/multipackage.templates.alacarte.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -172,9 +172,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-multipackage.subsystems.travis">
-<span id="multipackage-subsystems-travis-module"></span><h1>multipackage.subsystems.travis module<a class="headerlink" href="#module-multipackage.subsystems.travis" title="Permalink to this headline">¶</a></h1>
-<p>Add support for automatic testing and deployment from Travis CI.</p>
+  <div class="section" id="module-multipackage.templates.alacarte">
+<span id="multipackage-templates-alacarte-module"></span><h1>multipackage.templates.alacarte module<a class="headerlink" href="#module-multipackage.templates.alacarte" title="Permalink to this headline">¶</a></h1>
+<p>Basic Repo Template that reads subsystem definitions from a config file.</p>
+<p>This template allows the user to choose exactly what subsystems to install and
+manage them manually.</p>
 <div class="section" id="summary">
 <h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
 <p>Classes:</p>
@@ -184,7 +186,7 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#multipackage.subsystems.travis.TravisSubsystem" title="multipackage.subsystems.travis.TravisSubsystem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TravisSubsystem</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="#multipackage.templates.alacarte.ManualTemplate" title="multipackage.templates.alacarte.ManualTemplate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ManualTemplate</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
@@ -193,23 +195,42 @@
 <div class="section" id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="multipackage.subsystems.travis.TravisSubsystem">
-<em class="property">class </em><code class="descclassname">multipackage.subsystems.travis.</code><code class="descname">TravisSubsystem</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/travis.html#TravisSubsystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.travis.TravisSubsystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dt id="multipackage.templates.alacarte.ManualTemplate">
+<em class="property">class </em><code class="descclassname">multipackage.templates.alacarte.</code><code class="descname">ManualTemplate</code><a class="reference internal" href="../_modules/multipackage/templates/alacarte.html#ManualTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.alacarte.ManualTemplate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="multipackage.templates.repo_template.html#multipackage.templates.repo_template.RepositoryTemplate" title="multipackage.templates.repo_template.RepositoryTemplate"><code class="xref py py-class docutils literal notranslate"><span class="pre">multipackage.templates.repo_template.RepositoryTemplate</span></code></a></p>
 <dl class="attribute">
-<dt id="multipackage.subsystems.travis.TravisSubsystem.SHORT_NAME">
-<code class="descname">SHORT_NAME</code><em class="property"> = 'Travis CI (Python Profile)'</em><a class="headerlink" href="#multipackage.subsystems.travis.TravisSubsystem.SHORT_NAME" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.templates.alacarte.ManualTemplate.SHORT_NAME">
+<code class="descname">SHORT_NAME</code><em class="property"> = 'manual'</em><a class="headerlink" href="#multipackage.templates.alacarte.ManualTemplate.SHORT_NAME" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="multipackage.subsystems.travis.TravisSubsystem.SHORT_DESCRIPTION">
-<code class="descname">SHORT_DESCRIPTION</code><em class="property"> = 'manages .travis.yml file for building and deploying on Travis CI'</em><a class="headerlink" href="#multipackage.subsystems.travis.TravisSubsystem.SHORT_DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dt id="multipackage.templates.alacarte.ManualTemplate.SHORT_DESCRIPTION">
+<code class="descname">SHORT_DESCRIPTION</code><em class="property"> = 'Manually installs subsystems'</em><a class="headerlink" href="#multipackage.templates.alacarte.ManualTemplate.SHORT_DESCRIPTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.templates.alacarte.ManualTemplate.INFO_TEMPLATE">
+<code class="descname">INFO_TEMPLATE</code><em class="property"> = 'manual_info_template.tpl'</em><a class="headerlink" href="#multipackage.templates.alacarte.ManualTemplate.INFO_TEMPLATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="multipackage.templates.alacarte.ManualTemplate.DOCTOR_TEMPLATE">
+<code class="descname">DOCTOR_TEMPLATE</code><em class="property"> = 'manual_doctor_template.tpl'</em><a class="headerlink" href="#multipackage.templates.alacarte.ManualTemplate.DOCTOR_TEMPLATE" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="multipackage.subsystems.travis.TravisSubsystem.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>options</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/subsystems/travis.html#TravisSubsystem.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.subsystems.travis.TravisSubsystem.update" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the linting subsystem.</p>
+<dt id="multipackage.templates.alacarte.ManualTemplate.install">
+<code class="descname">install</code><span class="sig-paren">(</span><em>repo</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/multipackage/templates/alacarte.html#ManualTemplate.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#multipackage.templates.alacarte.ManualTemplate.install" title="Permalink to this definition">¶</a></dt>
+<dd><p>Install this template into a Repository object.</p>
+<p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">RepositoryTemplate.install()</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>repo</strong> (<a class="reference internal" href="multipackage.repo.html#multipackage.repo.Repository" title="multipackage.repo.Repository"><em>Repository</em></a>) – The repository where we should install this template.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -225,10 +246,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="multipackage.templates.html" class="btn btn-neutral float-right" title="multipackage.templates package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="multipackage.templates.pypi_package.html" class="btn btn-neutral float-right" title="multipackage.templates.pypi_package module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="multipackage.subsystems.sphinx.html" class="btn btn-neutral float-left" title="multipackage.subsystems.sphinx module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="multipackage.templates.html" class="btn btn-neutral float-left" title="multipackage.templates package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

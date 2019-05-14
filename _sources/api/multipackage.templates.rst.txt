@@ -17,6 +17,7 @@ Submodules
     :nosignatures:
     :toctree:
 
+    ~multipackage.templates.alacarte
     ~multipackage.templates.pypi_package
     ~multipackage.templates.repo_template
 
