@@ -9,7 +9,6 @@ setup(
     version=version,
     license="LGPLv3",
     install_requires=[
-        "cookiecutter",
         "pycryptodome",
         "requests",
         "pyyaml"
@@ -21,14 +20,15 @@ setup(
     description="A CLI tool for managing CI and CD scripts on multi-package repositories",
     author="Arch Systems",
     author_email="info@archsys.io",
-    url="https://github.com/iotile/python_multipackage",
+    python_requires=">=3.5, <4",
+    url="https://github.com/iotile/multipackage",
     keywords=[""],
     classifiers=[
         "Programming Language :: Python",
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)",
         "Operating System :: OS Independent",

@@ -13,61 +13,61 @@
     :show-inheritance:
     :member-order: bysource
 
-    Summary
-    -------
+Summary
+-------
 
-    {%- if exceptions %}
+{%- if exceptions %}
 
-    Exceptions:
+Exceptions:
 
-    .. autosummary::
-        :nosignatures:
+.. autosummary::
+    :nosignatures:
 {% for item in exceptions %}
-        {{ item }}
+    {{ item }}
 {%- endfor %}
-    {%- endif %}
-
-    {%- if classes %}
-
-    Classes:
-
-    .. autosummary::
-        :nosignatures:
-{% for item in classes %}
-        {{ item }}
-{%- endfor %}
-    {%- endif %}
-
-    {%- if functions %}
-
-    Functions:
-
-    .. autosummary::
-        :nosignatures:
-{% for item in functions %}
-        {{ item }}
-{%- endfor %}
-    {%- endif %}
 {%- endif %}
 
-    {%- if data %}
+{%- if classes %}
 
-    Data:
+Classes:
 
-    .. autosummary::
-        :nosignatures:
-{% for item in data %}
-        {{ item }}
+.. autosummary::
+    :nosignatures:
+{% for item in classes %}
+    {{ item }}
 {%- endfor %}
-    {%- endif %}
+{%- endif %}
+
+{%- if functions %}
+
+Functions:
+
+.. autosummary::
+    :nosignatures:
+{% for item in functions %}
+    {{ item }}
+{%- endfor %}
+{%- endif %}
+{%- endif %}
+
+{%- if data %}
+
+Data:
+
+.. autosummary::
+    :nosignatures:
+{% for item in data %}
+    {{ item }}
+{%- endfor %}
+{%- endif %}
 
 {% if all_refs %}
-    ``__all__``: {{ all_refs|join(", ") }}
+``__all__``: {{ all_refs|join(", ") }}
 {%- endif %}
 
 
 {% if members %}
-    Reference
-    ---------
+Reference
+---------
 
 {%- endif %}

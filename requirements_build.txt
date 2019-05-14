@@ -1,7 +1,7 @@
 #BEGIN MULTIPACKAGE MANAGED SECTION, HASH=MD5:44AB7708B9490E8283A414A1D552B305
 requests ~= 2.20
 pycryptodome ~= 3.7
-pylint ~= 1.9
+pylint ~= 2.3
 twine ~= 1.12
 pytest ~= 4.0
 wheel >= 0.32

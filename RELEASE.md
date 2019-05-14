@@ -1,5 +1,12 @@
 # `multipackage` Release Notes
 
+## HEAD
+
+- Add support for a `manual` template that allows subsystems to be specified
+  individually in the settings file for custom usage.
+- Fix Sphinx documentation generation templates and add `--ignore-warnings`
+  options to `build_documentation.py` to facilitate debugging. 
+
 ## v0.2.1 (12/2/2018)
 
 - Refactor code to unify all error and warning messages into a generic message
@@ -25,6 +32,7 @@
   named `pypi_package` that sets up a repository for releasing pypi packages.
 - Add `test_by_name.py` script to handle entering each component subdirectory
   and running the required test commands.
+
 ## v0.1.0 (11/29/2018)
 
 - Update location of multipackage files to all live under a `.multipackage`

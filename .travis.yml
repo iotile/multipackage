@@ -14,15 +14,6 @@ jobs:
         - virtualenv venv -p python3
         - source venv/bin/activate
         - python --version
-    - os: osx
-      language: sh
-      python: "2.7"
-      name: "Mac OS - Python 2.7"
-      before_install:
-        - python -m pip install virtualenv
-        - virtualenv venv -p python2
-        - source venv/bin/activate
-        - python --version
     - os: windows
       language: sh
       python: "3.6"
@@ -32,25 +23,11 @@ jobs:
         - export PATH="/c/Python36:/c/Python36/Scripts:$PATH"
         - python -m pip install --upgrade pip wheel virtualenv
         - python --version
-    - os: windows
-      language: sh
-      python: "2.7"
-      name: "Windows - Python 2.7"
-      before_install:
-        - choco install python2
-        - export PATH="/c/Python27:/c/Python27/Scripts:$PATH"
-        - python -m pip install --upgrade pip wheel
-        - python --version
     - os: linux
       dist: xenial
       python: "3.6"
       language: python
       name: "Linux - Python 3.6"
-    - os: linux
-      dist: xenial
-      python: "2.7"
-      name: "Linux - Python 2.7"
-      language: python
 
     - stage: "Deploy"
       if: branch = master AND type != pull_request

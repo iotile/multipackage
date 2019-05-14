@@ -37,7 +37,8 @@ class PyPIPackageTemplate(RepositoryTemplate):
         repo.add_subsystem(subsystems.PylintLinter(repo))
         repo.add_subsystem(subsystems.TravisSubsystem(repo))
         repo.add_subsystem(subsystems.SphinxDocumentation(repo, self.desired_packages,
-                           self.toplevel_packages, namespace_packages=self.namespace_packages))
+                                                          self.toplevel_packages,
+                                                          namespace_packages=self.namespace_packages))
 
     @classmethod
     def _verify_options(cls, repo):
@@ -45,8 +46,8 @@ class PyPIPackageTemplate(RepositoryTemplate):
             for name, value in comp.options.items():
                 if name == 'compatibility' and value not in ('universal', 'python2', 'python3'):
                     repo.error(".multipackage/components.txt",
-                                   "Invalid compatibility option for component %s: %s" % (key, value),
-                                   "Choices are universal, python2 or python3")
+                               "Invalid compatibility option for component %s: %s" % (key, value),
+                               "Choices are universal, python2 or python3")
 
     def _find_packages(self, repo):
         self.toplevel_packages = self.find_toplevel_packages(repo.path, repo.components)

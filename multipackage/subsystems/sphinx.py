@@ -18,7 +18,8 @@ class SphinxDocumentation(object):
 
     SHORT_NAME = "Sphinx documentation"
     SHORT_DESCRIPTION = "generates and deploys api reference and prose documentation using sphinx"
-    def __init__(self, repo, desired_packages, toplevel_packages=None, namespace_packages=None):
+
+    def __init__(self, repo, desired_packages, toplevel_packages=None, namespace_packages=None, desired_components=None):
         self._repo = repo
         self._logger = logging.getLogger(__name__)
 
@@ -31,6 +32,10 @@ class SphinxDocumentation(object):
         self._namespace_packages = namespace_packages
         self._desired_packages = desired_packages
         self._toplevel_packages = toplevel_packages
+
+        if desired_components is not None:
+            desired_components = set(desired_components)
+        self._components = desired_components
 
     def update(self, options):
         """Update the documentation subsystem."""
@@ -56,7 +61,7 @@ class SphinxDocumentation(object):
 
         variables = {
             'options': options,
-            'components': self._repo.components,
+            'components': {key: value for key, value in self._repo.components.items() if self._components is None or key in self._components},
             'doc': options.get('documentation', {}),
             'repo': self._repo,
             'namespace': namespace_package,

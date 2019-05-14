@@ -11,7 +11,7 @@ from collections import namedtuple
 from .exceptions import UsageError, InternalError, InvalidEnvironmentError, InvalidSettingError
 from .utilities import atomic_json, ManagedFileSection, render_template
 from .manifest import ManifestFile
-from .templates import PyPIPackageTemplate
+from .templates import PyPIPackageTemplate, ManualTemplate
 
 
 Message = namedtuple("Message", ['file', 'message', 'suggestion', 'type'])
@@ -82,10 +82,14 @@ class Repository(object):
         if self.initialized:
             self._try_load_components()
 
-            if template_name != self.DEFAULT_TEMPLATE:
-                raise UsageError("Templates other than '{}' are not yet supported.".format(self.DEFAULT_TEMPLATE))
+            if template_name == 'manual':
+                template = ManualTemplate()
+            elif template_name == self.DEFAULT_TEMPLATE:
+                template = PyPIPackageTemplate()
+            else:
+                raise UsageError("Templates other than '{}' and 'manual' are not yet supported.".format(self.DEFAULT_TEMPLATE))
 
-            self.template = PyPIPackageTemplate()
+            self.template = template
             self.template.install(self)
 
     @property

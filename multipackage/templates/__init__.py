@@ -26,5 +26,6 @@ variables are required and optional.
 
 from .repo_template import RepositoryTemplate
 from .pypi_package import PyPIPackageTemplate
+from .alacarte import ManualTemplate
 
-__all__ = ['RepositoryTemplate', 'PyPIPackageTemplate']
+__all__ = ['RepositoryTemplate', 'PyPIPackageTemplate', 'ManualTemplate']
